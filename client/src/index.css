@@ -1,12 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
-  --bg-color: #050505;       /* Глубокий черный */
-  --card-color: #111111;     /* Темно-серый для блоков */
-  --text-main: #ffffff;      /* Белый текст */
-  --text-muted: #888888;     /* Серый текст */
-  --accent: #ffffff;         /* Акцент (кнопки) */
-  --danger: #ff3333;         /* Красный (удаление) */
-  --success: #00ff88;        /* Неоновый зеленый */
-  --border: #222222;         /* Цвет рамок */
+  --bg-color: #050505;
+  --card-color: #111111;
+  --text-main: #ffffff;
+  --text-muted: #888888;
+  --accent: #ffffff;
+  --danger: #ff3333;
+  --success: #00ff88;
+  --border: #222222;
 }
 
 body {
