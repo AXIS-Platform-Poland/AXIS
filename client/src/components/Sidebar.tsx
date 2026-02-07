@@ -1,67 +1,53 @@
-import {
-  Home,
-  Users,
-  Clapperboard,
-  ShoppingBag,
-  Settings,
-} from "lucide-react";
-import type { NavKey } from "../App";
+import { NavLink } from "react-router-dom";
 
-export default function Sidebar({
-  active,
-  onChange,
-  variant = "desktop",
-}: {
-  active: NavKey;
-  onChange: (k: NavKey) => void;
-  variant?: "desktop" | "mobile";
-}) {
-  const items: { key: NavKey; label: string; icon: any }[] = [
-    { key: "home", label: "Posts", icon: Home },
-    { key: "friends", label: "Friends", icon: Users },
-    { key: "reels", label: "Reels", icon: Clapperboard },
-    { key: "marketplace", label: "Marketplace", icon: ShoppingBag },
-    { key: "settings", label: "Settings", icon: Settings },
-  ];
+const linkStyle = ({ isActive }: { isActive: boolean }) => ({
+  display: "flex",
+  gap: 10,
+  alignItems: "center",
+  padding: "10px 12px",
+  borderRadius: 10,
+  textDecoration: "none",
+  color: "white",
+  background: isActive ? "rgba(255,255,255,0.12)" : "transparent",
+  cursor: "pointer",
+});
 
-  const base =
-    "w-full rounded-2xl border border-neutral-900 bg-neutral-950/60";
-  const pad = variant === "mobile" ? "p-2" : "p-3";
-
+export default function Sidebar() {
   return (
-    <div className={`${base} ${pad}`}>
-      <div className="mb-2 flex items-center gap-2 px-2 py-2">
-        <div className="h-10 w-10 rounded-xl bg-neutral-800" />
-        <div className="min-w-0">
-          <div className="truncate text-sm font-semibold">Ingvarr Sp. z o.o.</div>
-          <div className="text-xs text-neutral-400">Professional services • Poland</div>
-        </div>
+    <div
+      style={{
+        width: 260,
+        background: "#111",
+        color: "white",
+        padding: 12,
+        borderRight: "1px solid rgba(255,255,255,0.08)",
+      }}
+    >
+      <div style={{ marginBottom: 14, opacity: 0.9, fontWeight: 600 }}>
+        Ingvvar Sp. z o.o.
       </div>
 
-      <div className={variant === "mobile" ? "grid grid-cols-2 gap-2" : "grid gap-2"}>
-        {items.map((it) => {
-          const Icon = it.icon;
-          const isActive = active === it.key;
+      <nav style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        <NavLink to="/" style={linkStyle}>
+          🏠 <span>Home</span>
+        </NavLink>
 
-          return (
-            <button
-              key={it.key}
-              onClick={() => onChange(it.key)}
-              className={[
-                "flex items-center gap-3 rounded-2xl border px-3 py-3 text-left text-sm transition",
-                isActive
-                  ? "border-neutral-700 bg-neutral-900"
-                  : "border-neutral-900 bg-neutral-950/40 hover:bg-neutral-900/60",
-              ].join(" ")}
-            >
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-neutral-900">
-                <Icon size={18} />
-              </span>
-              <span className="font-medium">{it.label}</span>
-            </button>
-          );
-        })}
-      </div>
+        <NavLink to="/friends" style={linkStyle}>
+          👥 <span>Friends</span>
+        </NavLink>
+
+        <NavLink to="/reels" style={linkStyle}>
+          🎬 <span>Reels</span>
+        </NavLink>
+
+        <NavLink to="/marketplace" style={linkStyle}>
+          🛒 <span>Marketplace</span>
+        </NavLink>
+
+        <NavLink to="/settings" style={linkStyle}>
+          ⚙️ <span>Settings</span>
+        </NavLink>
+      </nav>
     </div>
   );
 }
