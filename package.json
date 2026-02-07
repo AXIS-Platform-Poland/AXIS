@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm install tailwindcss postcss autoprefixer && vite build",
+    "build": "npm install && npm install tailwindcss postcss autoprefixer && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
