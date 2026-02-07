@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 
@@ -10,25 +10,27 @@ import SettingsPage from "./pages/SettingsPage";
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <div style={{ display: "flex", minHeight: "100vh" }}>
+    <div className="min-h-screen bg-[#0b0b0f] text-white">
+      <div className="flex">
+        {/* Sidebar всегда поверх */}
         <Sidebar />
-        <div style={{ flex: 1 }}>
+
+        {/* Правая часть */}
+        <div className="flex-1 min-w-0 relative z-0">
           <Topbar />
-          <div style={{ padding: 16 }}>
+
+          {/* ВАЖНО: чтобы никакие “панели” не перекрывали сайдбар */}
+          <main className="relative z-0 px-4 pb-10">
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/friends" element={<FriendsPage />} />
               <Route path="/reels" element={<ReelsPage />} />
               <Route path="/marketplace" element={<MarketplacePage />} />
               <Route path="/settings" element={<SettingsPage />} />
-
-              {/* запасной маршрут */}
-              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
-          </div>
+          </main>
         </div>
       </div>
-    </BrowserRouter>
+    </div>
   );
 }
