@@ -23,23 +23,34 @@ export default function Topbar() {
         color: "white",
       }}
     >
+      {/* LEFT ICONS */}
       <div style={{ display: "flex", gap: 8 }}>
-        <NavLink to="/" style={iconStyle}>
+        <NavLink to="/" style={iconStyle} title="Posts">
           🏠
         </NavLink>
-        <NavLink to="/reels" style={iconStyle}>
-          🎬
-        </NavLink>
-        <NavLink to="/friends" style={iconStyle}>
+
+        <NavLink to="/friends" style={iconStyle} title="Friends">
           👥
         </NavLink>
-        <NavLink to="/marketplace" style={iconStyle}>
+
+        <NavLink to="/reels" style={iconStyle} title="Reels">
+          🎬
+        </NavLink>
+
+        <NavLink to="/marketplace" style={iconStyle} title="Marketplace">
           🛒
         </NavLink>
       </div>
 
+      {/* RIGHT ICONS */}
       <div style={{ display: "flex", gap: 8 }}>
-        <NavLink to="/settings" style={iconStyle}>
+        {/* PERSON (login/register) */}
+        <NavLink to="/auth" style={iconStyle} title="Login / Register">
+          👤
+        </NavLink>
+
+        {/* SETTINGS */}
+        <NavLink to="/settings" style={iconStyle} title="Settings">
           ⚙️
         </NavLink>
       </div>
