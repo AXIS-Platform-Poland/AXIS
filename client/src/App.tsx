@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 
@@ -7,6 +8,7 @@ import FriendsPage from "./pages/FriendsPage";
 import ReelsPage from "./pages/ReelsPage";
 import MarketplacePage from "./pages/MarketplacePage";
 import SettingsPage from "./pages/SettingsPage";
+import AuthPage from "./pages/AuthPage"; // ✅ ДОБАВИЛИ
 
 export default function App() {
   return (
@@ -19,7 +21,7 @@ export default function App() {
         <div className="flex-1 min-w-0 relative z-0">
           <Topbar />
 
-          {/* ВАЖНО: чтобы никакие “панели” не перекрывали сайдбар */}
+          {/* ВАЖНО: чтобы кликабельные элементы не перекрывались сайдбаром */}
           <main className="relative z-0 px-4 pb-10">
             <Routes>
               <Route path="/" element={<HomePage />} />
@@ -27,6 +29,9 @@ export default function App() {
               <Route path="/reels" element={<ReelsPage />} />
               <Route path="/marketplace" element={<MarketplacePage />} />
               <Route path="/settings" element={<SettingsPage />} />
+
+              {/* ✅ ДОБАВИЛИ страницу логина/регистрации */}
+              <Route path="/auth" element={<AuthPage />} />
             </Routes>
           </main>
         </div>
