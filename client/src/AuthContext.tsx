@@ -1,123 +1,145 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { supabase } from "./supabaseClient";
+import React from "react";
+import { useAuth } from "../AuthContext";
 
-type Profile = {
-  id: string;
-  user_id: string;
-  email: string | null;
-  full_name: string | null;
-  avatar_url: string | null;
-  bio: string | null;
-  created_at: string | null;
-};
+export default function SettingsPage() {
+  const { loading, user, profile, refreshProfile, signOut } = useAuth();
 
-type AuthContextValue = {
-  loading: boolean;
-  session: any | null;
-  user: any | null;
-  profile: Profile | null;
-  refreshProfile: () => Promise<void>;
-  signOut: () => Promise<void>;
-};
+  return (
+    <div
+      style={{
+        padding: 16,
+        color: "white",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 720,
+          margin: "0 auto",
+          background: "#141414",
+          border: "1px solid rgba(255,255,255,0.12)",
+          borderRadius: 16,
+          padding: 16,
+        }}
+      >
+        <h2 style={{ marginTop: 0, marginBottom: 12 }}>Settings</h2>
 
-const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+        <div
+          style={{
+            padding: 12,
+            borderRadius: 12,
+            background: "rgba(255,255,255,0.06)",
+            border: "1px solid rgba(255,255,255,0.10)",
+            marginBottom: 12,
+          }}
+        >
+          <div style={{ opacity: 0.9, marginBottom: 6 }}>
+            <b>Status:</b>{" "}
+            {loading ? "Loading auth..." : user ? "Authenticated ✅" : "Not logged in ❌"}
+          </div>
 
-async function fetchProfile(userId: string): Promise<Profile | null> {
-  // ВАЖНО: ищем по user_id (так у тебя настроено)
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("id,user_id,email,full_name,avatar_url,bio,created_at")
-    .eq("user_id", userId)
-    .maybeSingle();
+          <div style={{ opacity: 0.9, marginBottom: 6 }}>
+            <b>User:</b>{" "}
+            {user
+              ? `${user.email ?? "(no email)"} | id: ${user.id}`
+              : "—"}
+          </div>
 
-  if (error) {
-    console.error("fetchProfile error:", error.message);
-    return null;
-  }
-  return data ?? null;
-}
+          <div style={{ opacity: 0.9 }}>
+            <b>Profile (public.profiles):</b>{" "}
+            {user ? (
+              profile ? (
+                <span>
+                  Loaded ✅{" "}
+                  <span style={{ opacity: 0.85 }}>
+                    (user_id: {profile.user_id}, email: {profile.email ?? "NULL"})
+                  </span>
+                </span>
+              ) : (
+                <span style={{ color: "#ffb74d" }}>
+                  Not found ⚠️ (нет строки в profiles для этого user_id)
+                </span>
+              )
+            ) : (
+              "—"
+            )}
+          </div>
+        </div>
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [loading, setLoading] = useState(true);
-  const [session, setSession] = useState<any | null>(null);
-  const [user, setUser] = useState<any | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
+        {user && (
+          <>
+            <div
+              style={{
+                display: "flex",
+                gap: 10,
+                flexWrap: "wrap",
+                marginBottom: 12,
+              }}
+            >
+              <button
+                onClick={refreshProfile}
+                style={{
+                  padding: "10px 12px",
+                  borderRadius: 10,
+                  border: "1px solid rgba(255,255,255,0.18)",
+                  background: "rgba(255,255,255,0.08)",
+                  color: "white",
+                  cursor: "pointer",
+                }}
+              >
+                Refresh profile
+              </button>
 
-  const refreshProfile = async () => {
-    if (!user?.id) {
-      setProfile(null);
-      return;
-    }
-    const p = await fetchProfile(user.id);
-    setProfile(p);
-  };
+              <button
+                onClick={signOut}
+                style={{
+                  padding: "10px 12px",
+                  borderRadius: 10,
+                  border: "1px solid rgba(255,255,255,0.18)",
+                  background: "rgba(255,80,80,0.15)",
+                  color: "white",
+                  cursor: "pointer",
+                }}
+              >
+                Sign out
+              </button>
+            </div>
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
-    // onAuthStateChange сам всё почистит, но на всякий:
-    setSession(null);
-    setUser(null);
-    setProfile(null);
-  };
+            <div
+              style={{
+                padding: 12,
+                borderRadius: 12,
+                background: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.10)",
+              }}
+            >
+              <div style={{ marginBottom: 8, opacity: 0.85 }}>
+                Ниже — значения из <code>profiles</code> (если есть):
+              </div>
 
-  useEffect(() => {
-    let isMounted = true;
+              <div style={{ display: "grid", gridTemplateColumns: "160px 1fr", gap: 6 }}>
+                <div style={{ opacity: 0.75 }}>full_name</div>
+                <div>{profile?.full_name ?? "NULL"}</div>
 
-    (async () => {
-      setLoading(true);
+                <div style={{ opacity: 0.75 }}>avatar_url</div>
+                <div style={{ wordBreak: "break-all" }}>{profile?.avatar_url ?? "NULL"}</div>
 
-      const { data } = await supabase.auth.getSession();
-      const currentSession = data?.session ?? null;
+                <div style={{ opacity: 0.75 }}>bio</div>
+                <div style={{ whiteSpace: "pre-wrap" }}>{profile?.bio ?? "NULL"}</div>
 
-      if (!isMounted) return;
+                <div style={{ opacity: 0.75 }}>created_at</div>
+                <div>{profile?.created_at ?? "NULL"}</div>
+              </div>
+            </div>
+          </>
+        )}
 
-      setSession(currentSession);
-      const currentUser = currentSession?.user ?? null;
-      setUser(currentUser);
-
-      if (currentUser?.id) {
-        const p = await fetchProfile(currentUser.id);
-        if (!isMounted) return;
-        setProfile(p);
-      } else {
-        setProfile(null);
-      }
-
-      setLoading(false);
-    })();
-
-    const { data: sub } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
-      if (!isMounted) return;
-
-      setSession(newSession);
-      const newUser = newSession?.user ?? null;
-      setUser(newUser);
-
-      if (newUser?.id) {
-        const p = await fetchProfile(newUser.id);
-        if (!isMounted) return;
-        setProfile(p);
-      } else {
-        setProfile(null);
-      }
-    });
-
-    return () => {
-      isMounted = false;
-      sub.subscription.unsubscribe();
-    };
-  }, []);
-
-  const value = useMemo<AuthContextValue>(
-    () => ({ loading, session, user, profile, refreshProfile, signOut }),
-    [loading, session, user, profile]
+        {!loading && !user && (
+          <div style={{ opacity: 0.85 }}>
+            Зайди через страницу <b>Login / Register</b>, потом вернись сюда —
+            тут сразу покажет, загрузился ли профиль.
+          </div>
+        )}
+      </div>
+    </div>
   );
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
-  return ctx;
 }
