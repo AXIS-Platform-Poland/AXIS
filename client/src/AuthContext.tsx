@@ -1,5 +1,11 @@
-import React, { createContext, useContext, useEffect, useState, useMemo } from "react";
-import supabase from "./supabaseClient";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { supabase } from "./supabaseClient";
 
 type Profile = {
   id: string;
@@ -11,13 +17,15 @@ type Profile = {
   created_at: string | null;
 };
 
+type PartialProfile = Partial<Pick<Profile, "full_name" | "avatar_url" | "bio">>;
+
 type AuthContextValue = {
   loading: boolean;
-  user: any;
-  session: any;
+  session: any | null;
+  user: any | null;
   profile: Profile | null;
   refreshProfile: () => Promise<void>;
-  updateProfile: (updates: Partial<Profile>) => Promise<void>;
+  updateProfile: (updates: PartialProfile) => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -26,39 +34,51 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 async function fetchProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, user_id, email, full_name, avatar_url, bio, created_at")
+    .select("id,user_id,email,full_name,avatar_url,bio,created_at")
     .eq("user_id", userId)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error("fetchProfile error:", error.message);
     return null;
   }
 
-  return data;
+  return data ?? null;
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
-  const [session, setSession] = useState<any>(null);
-  const [user, setUser] = useState<any>(null);
+  const [session, setSession] = useState<any | null>(null);
+  const [user, setUser] = useState<any | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
 
   const refreshProfile = async () => {
-    if (!user) return;
+    if (!user?.id) {
+      setProfile(null);
+      return;
+    }
     const p = await fetchProfile(user.id);
     setProfile(p);
   };
 
-  const updateProfile = async (updates: Partial<Profile>) => {
-    if (!user) return;
+  const updateProfile = async (updates: PartialProfile) => {
+    if (!user?.id) return;
+
+    const payload: PartialProfile = {
+      full_name: updates.full_name ?? null,
+      avatar_url: updates.avatar_url ?? null,
+      bio: updates.bio ?? null,
+    };
 
     const { error } = await supabase
       .from("profiles")
-      .update(updates)
+      .update(payload)
       .eq("user_id", user.id);
 
     if (error) throw error;
+
+    // чтобы Settings сразу показал актуальные данные
+    await refreshProfile();
   };
 
   const signOut = async () => {
@@ -69,45 +89,66 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    let isMounted = true;
+    let mounted = true;
 
-    supabase.auth.getSession().then(({ data }) => {
-      if (!isMounted) return;
-      const current = data.session;
-      setSession(current);
-      setUser(current ? current.user : null);
-    });
+    (async () => {
+      setLoading(true);
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      setSession(newSession);
-      setUser(newSession ? newSession.user : null);
-    });
+      const { data } = await supabase.auth.getSession();
+      const currentSession = data?.session ?? null;
+
+      if (!mounted) return;
+
+      setSession(currentSession);
+      const currentUser = currentSession?.user ?? null;
+      setUser(currentUser);
+
+      if (currentUser?.id) {
+        const p = await fetchProfile(currentUser.id);
+        if (!mounted) return;
+        setProfile(p);
+      } else {
+        setProfile(null);
+      }
+
+      setLoading(false);
+    })();
+
+    const { data: sub } = supabase.auth.onAuthStateChange(
+      async (_event, newSession) => {
+        if (!mounted) return;
+
+        setSession(newSession);
+        const newUser = newSession?.user ?? null;
+        setUser(newUser);
+
+        if (newUser?.id) {
+          const p = await fetchProfile(newUser.id);
+          if (!mounted) return;
+          setProfile(p);
+        } else {
+          setProfile(null);
+        }
+      }
+    );
 
     return () => {
-      isMounted = false;
-      sub?.subscription.unsubscribe();
+      mounted = false;
+      sub.subscription?.unsubscribe();
     };
   }, []);
 
-  useEffect(() => {
-    if (!user) {
-      setProfile(null);
-      return;
-    }
-    refreshProfile();
-  }, [user]);
-
-  const value = useMemo(
+  const value = useMemo<AuthContextValue>(
     () => ({
       loading,
-      user,
       session,
+      user,
       profile,
       refreshProfile,
       updateProfile,
-      signOut
+      signOut,
     }),
-    [loading, user, session, profile]
+    [loading, session, user, profile]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
