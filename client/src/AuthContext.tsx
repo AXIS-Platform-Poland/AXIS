@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { supabase } from "./supabaseClient";
 
 type Profile = {
@@ -17,15 +11,17 @@ type Profile = {
   created_at: string | null;
 };
 
-type PartialProfile = Partial<Pick<Profile, "full_name" | "avatar_url" | "bio">>;
-
 type AuthContextValue = {
   loading: boolean;
-  session: any | null;
-  user: any | null;
+  user: any;
+  session: any;
   profile: Profile | null;
+
   refreshProfile: () => Promise<void>;
-  updateProfile: (updates: PartialProfile) => Promise<void>;
+  updateProfile: (updates: Partial<Profile>) => Promise<void>;
+
+  signUpWithEmail: (email: string, password: string) => Promise<{ needsEmailConfirm: boolean }>;
+  signInWithEmail: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -34,7 +30,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 async function fetchProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
     .from("profiles")
-    .select("id,user_id,email,full_name,avatar_url,bio,created_at")
+    .select("id, user_id, email, full_name, avatar_url, bio, created_at")
     .eq("user_id", userId)
     .maybeSingle();
 
@@ -42,43 +38,72 @@ async function fetchProfile(userId: string): Promise<Profile | null> {
     console.error("fetchProfile error:", error.message);
     return null;
   }
-
   return data ?? null;
+}
+
+async function ensureProfile(user: any): Promise<void> {
+  // Создаём профайл, если его нет (чтобы Settings не показывал Not found)
+  const existing = await fetchProfile(user.id);
+  if (existing) return;
+
+  const { error } = await supabase.from("profiles").insert({
+    user_id: user.id,
+    email: user.email ?? null,
+    full_name: null,
+    avatar_url: null,
+    bio: null,
+  });
+
+  if (error) {
+    // Если политика не даёт insert — увидишь тут ошибку, это важно для диагностики
+    console.error("ensureProfile insert error:", error.message);
+  }
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
-  const [session, setSession] = useState<any | null>(null);
-  const [user, setUser] = useState<any | null>(null);
+  const [session, setSession] = useState<any>(null);
+  const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
 
   const refreshProfile = async () => {
-    if (!user?.id) {
-      setProfile(null);
-      return;
-    }
+    if (!user) return;
     const p = await fetchProfile(user.id);
     setProfile(p);
   };
 
-  const updateProfile = async (updates: PartialProfile) => {
-    if (!user?.id) return;
-
-    const payload: PartialProfile = {
-      full_name: updates.full_name ?? null,
-      avatar_url: updates.avatar_url ?? null,
-      bio: updates.bio ?? null,
-    };
-
+  const updateProfile = async (updates: Partial<Profile>) => {
+    if (!user) throw new Error("Not authenticated");
     const { error } = await supabase
       .from("profiles")
-      .update(payload)
+      .update(updates)
       .eq("user_id", user.id);
 
     if (error) throw error;
-
-    // чтобы Settings сразу показал актуальные данные
     await refreshProfile();
+  };
+
+  const signUpWithEmail = async (email: string, password: string) => {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        // Важно: куда возвращаем после подтверждения письма
+        emailRedirectTo: `${window.location.origin}/auth`,
+      },
+    });
+
+    if (error) throw error;
+
+    // Если включены email confirmations — user есть, но session может быть null до подтверждения
+    const needsEmailConfirm = !data.session;
+
+    return { needsEmailConfirm };
+  };
+
+  const signInWithEmail = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
   };
 
   const signOut = async () => {
@@ -92,63 +117,57 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let mounted = true;
 
     (async () => {
-      setLoading(true);
-
       const { data } = await supabase.auth.getSession();
-      const currentSession = data?.session ?? null;
-
       if (!mounted) return;
 
-      setSession(currentSession);
-      const currentUser = currentSession?.user ?? null;
-      setUser(currentUser);
+      setSession(data.session ?? null);
+      setUser(data.session?.user ?? null);
 
-      if (currentUser?.id) {
-        const p = await fetchProfile(currentUser.id);
-        if (!mounted) return;
-        setProfile(p);
-      } else {
-        setProfile(null);
+      if (data.session?.user) {
+        await ensureProfile(data.session.user);
+        const p = await fetchProfile(data.session.user.id);
+        if (mounted) setProfile(p);
       }
 
       setLoading(false);
     })();
 
-    const { data: sub } = supabase.auth.onAuthStateChange(
-      async (_event, newSession) => {
-        if (!mounted) return;
+    const { data: sub } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+      if (!mounted) return;
 
-        setSession(newSession);
-        const newUser = newSession?.user ?? null;
-        setUser(newUser);
+      setSession(newSession);
+      setUser(newSession?.user ?? null);
 
-        if (newUser?.id) {
-          const p = await fetchProfile(newUser.id);
-          if (!mounted) return;
-          setProfile(p);
-        } else {
-          setProfile(null);
-        }
+      if (newSession?.user) {
+        await ensureProfile(newSession.user);
+        const p = await fetchProfile(newSession.user.id);
+        if (mounted) setProfile(p);
+      } else {
+        setProfile(null);
       }
-    );
+
+      setLoading(false);
+    });
 
     return () => {
       mounted = false;
-      sub.subscription?.unsubscribe();
+      sub.subscription.unsubscribe();
     };
   }, []);
 
-  const value = useMemo<AuthContextValue>(
+  const value = useMemo(
     () => ({
       loading,
-      session,
       user,
+      session,
       profile,
       refreshProfile,
       updateProfile,
+      signUpWithEmail,
+      signInWithEmail,
       signOut,
     }),
-    [loading, session, user, profile]
+    [loading, user, session, profile]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
