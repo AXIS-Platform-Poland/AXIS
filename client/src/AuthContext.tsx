@@ -1,145 +1,120 @@
-import React from "react";
-import { useAuth } from "../AuthContext";
+import React, { createContext, useContext, useEffect, useState, useMemo } from "react";
+import supabase from "./supabaseClient";
 
-export default function SettingsPage() {
-  const { loading, user, profile, refreshProfile, signOut } = useAuth();
+type Profile = {
+  id: string;
+  user_id: string;
+  email: string | null;
+  full_name: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+  created_at: string | null;
+};
 
-  return (
-    <div
-      style={{
-        padding: 16,
-        color: "white",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: 720,
-          margin: "0 auto",
-          background: "#141414",
-          border: "1px solid rgba(255,255,255,0.12)",
-          borderRadius: 16,
-          padding: 16,
-        }}
-      >
-        <h2 style={{ marginTop: 0, marginBottom: 12 }}>Settings</h2>
+type AuthContextValue = {
+  loading: boolean;
+  user: any;
+  session: any;
+  profile: Profile | null;
+  refreshProfile: () => Promise<void>;
+  updateProfile: (updates: Partial<Profile>) => Promise<void>;
+  signOut: () => Promise<void>;
+};
 
-        <div
-          style={{
-            padding: 12,
-            borderRadius: 12,
-            background: "rgba(255,255,255,0.06)",
-            border: "1px solid rgba(255,255,255,0.10)",
-            marginBottom: 12,
-          }}
-        >
-          <div style={{ opacity: 0.9, marginBottom: 6 }}>
-            <b>Status:</b>{" "}
-            {loading ? "Loading auth..." : user ? "Authenticated ✅" : "Not logged in ❌"}
-          </div>
+const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-          <div style={{ opacity: 0.9, marginBottom: 6 }}>
-            <b>User:</b>{" "}
-            {user
-              ? `${user.email ?? "(no email)"} | id: ${user.id}`
-              : "—"}
-          </div>
+async function fetchProfile(userId: string): Promise<Profile | null> {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, user_id, email, full_name, avatar_url, bio, created_at")
+    .eq("user_id", userId)
+    .single();
 
-          <div style={{ opacity: 0.9 }}>
-            <b>Profile (public.profiles):</b>{" "}
-            {user ? (
-              profile ? (
-                <span>
-                  Loaded ✅{" "}
-                  <span style={{ opacity: 0.85 }}>
-                    (user_id: {profile.user_id}, email: {profile.email ?? "NULL"})
-                  </span>
-                </span>
-              ) : (
-                <span style={{ color: "#ffb74d" }}>
-                  Not found ⚠️ (нет строки в profiles для этого user_id)
-                </span>
-              )
-            ) : (
-              "—"
-            )}
-          </div>
-        </div>
+  if (error) {
+    console.error("fetchProfile error:", error.message);
+    return null;
+  }
 
-        {user && (
-          <>
-            <div
-              style={{
-                display: "flex",
-                gap: 10,
-                flexWrap: "wrap",
-                marginBottom: 12,
-              }}
-            >
-              <button
-                onClick={refreshProfile}
-                style={{
-                  padding: "10px 12px",
-                  borderRadius: 10,
-                  border: "1px solid rgba(255,255,255,0.18)",
-                  background: "rgba(255,255,255,0.08)",
-                  color: "white",
-                  cursor: "pointer",
-                }}
-              >
-                Refresh profile
-              </button>
+  return data;
+}
 
-              <button
-                onClick={signOut}
-                style={{
-                  padding: "10px 12px",
-                  borderRadius: 10,
-                  border: "1px solid rgba(255,255,255,0.18)",
-                  background: "rgba(255,80,80,0.15)",
-                  color: "white",
-                  cursor: "pointer",
-                }}
-              >
-                Sign out
-              </button>
-            </div>
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [loading, setLoading] = useState(true);
+  const [session, setSession] = useState<any>(null);
+  const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
 
-            <div
-              style={{
-                padding: 12,
-                borderRadius: 12,
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.10)",
-              }}
-            >
-              <div style={{ marginBottom: 8, opacity: 0.85 }}>
-                Ниже — значения из <code>profiles</code> (если есть):
-              </div>
+  const refreshProfile = async () => {
+    if (!user) return;
+    const p = await fetchProfile(user.id);
+    setProfile(p);
+  };
 
-              <div style={{ display: "grid", gridTemplateColumns: "160px 1fr", gap: 6 }}>
-                <div style={{ opacity: 0.75 }}>full_name</div>
-                <div>{profile?.full_name ?? "NULL"}</div>
+  const updateProfile = async (updates: Partial<Profile>) => {
+    if (!user) return;
 
-                <div style={{ opacity: 0.75 }}>avatar_url</div>
-                <div style={{ wordBreak: "break-all" }}>{profile?.avatar_url ?? "NULL"}</div>
+    const { error } = await supabase
+      .from("profiles")
+      .update(updates)
+      .eq("user_id", user.id);
 
-                <div style={{ opacity: 0.75 }}>bio</div>
-                <div style={{ whiteSpace: "pre-wrap" }}>{profile?.bio ?? "NULL"}</div>
+    if (error) throw error;
+  };
 
-                <div style={{ opacity: 0.75 }}>created_at</div>
-                <div>{profile?.created_at ?? "NULL"}</div>
-              </div>
-            </div>
-          </>
-        )}
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setSession(null);
+    setUser(null);
+    setProfile(null);
+  };
 
-        {!loading && !user && (
-          <div style={{ opacity: 0.85 }}>
-            Зайди через страницу <b>Login / Register</b>, потом вернись сюда —
-            тут сразу покажет, загрузился ли профиль.
-          </div>
-        )}
-      </div>
-    </div>
+  useEffect(() => {
+    let isMounted = true;
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (!isMounted) return;
+      const current = data.session;
+      setSession(current);
+      setUser(current ? current.user : null);
+    });
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession);
+      setUser(newSession ? newSession.user : null);
+    });
+
+    return () => {
+      isMounted = false;
+      sub?.subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!user) {
+      setProfile(null);
+      return;
+    }
+    refreshProfile();
+  }, [user]);
+
+  const value = useMemo(
+    () => ({
+      loading,
+      user,
+      session,
+      profile,
+      refreshProfile,
+      updateProfile,
+      signOut
+    }),
+    [loading, user, session, profile]
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function useAuth() {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
+  return ctx;
 }
