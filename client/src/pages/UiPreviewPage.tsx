@@ -1,150 +1,539 @@
-export default function UiPreviewPage() {
-  return (
-    <div className="min-h-[calc(100vh-56px)] w-full">
-      {/* фон как в макете */}
-      <div className="absolute inset-0 -z-10 bg-[#0b0b0f]" />
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,rgba(88,101,242,0.18),transparent_40%),radial-gradient(circle_at_70%_30%,rgba(0,255,200,0.10),transparent_35%),radial-gradient(circle_at_50%_80%,rgba(160,81,255,0.14),transparent_45%)]" />
+import React, { useMemo, useState } from "react";
+import { NavLink } from "react-router-dom";
 
-      <div className="mx-auto flex max-w-6xl items-center justify-center gap-6 px-4 py-10">
-        {/* Левый “телефон” */}
-        <div className="w-[280px] rounded-[28px] border border-white/10 bg-white/5 p-4 backdrop-blur-xl">
-          <div className="mb-4 flex items-center gap-3">
-            <div className="h-9 w-9 rounded-xl bg-white/10" />
-            <div className="text-white">
-              <div className="text-sm font-semibold">AXIRO</div>
-              <div className="text-xs text-white/60">Menu</div>
+type FeedTab = "forYou" | "friends";
+
+const navItems = [
+  { to: "/posts", label: "Home" },
+  { to: "/discover", label: "Discover" },
+  { to: "/friends", label: "Messenger" },
+  { to: "/communities", label: "Communities" },
+  { to: "/messages", label: "Messages" },
+  { to: "/notifications", label: "Notifications" },
+  { to: "/settings", label: "Profile" },
+];
+
+function Pill({
+  active,
+  children,
+  onClick,
+}: {
+  active?: boolean;
+  children: React.ReactNode;
+  onClick?: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        padding: "10px 14px",
+        borderRadius: 14,
+        border: "1px solid rgba(255,255,255,0.14)",
+        background: active ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.06)",
+        color: "rgba(255,255,255,0.92)",
+        cursor: "pointer",
+        fontWeight: 600,
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function GlassCard({
+  children,
+  style,
+}: {
+  children: React.ReactNode;
+  style?: React.CSSProperties;
+}) {
+  return (
+    <div
+      style={{
+        borderRadius: 28,
+        border: "1px solid rgba(255,255,255,0.12)",
+        background: "rgba(255,255,255,0.06)",
+        backdropFilter: "blur(18px)",
+        WebkitBackdropFilter: "blur(18px)",
+        boxShadow: "0 20px 60px rgba(0,0,0,0.35)",
+        ...style,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function GradientLine() {
+  return (
+    <div
+      style={{
+        height: 3,
+        borderRadius: 999,
+        background:
+          "linear-gradient(90deg, rgba(0,210,255,1) 0%, rgba(187,120,255,1) 50%, rgba(255,70,170,1) 100%)",
+        opacity: 0.9,
+      }}
+    />
+  );
+}
+
+export default function UIPreviewPage() {
+  const [tab, setTab] = useState<FeedTab>("forYou");
+  const [query, setQuery] = useState("");
+
+  const posts = useMemo(() => {
+    const base = [
+      { id: 1, user: "Sophia L.", time: "2ч назад", text: "Exploring new digital dimension ✨", likes: 1200, comments: 350 },
+      { id: 2, user: "Maxim P.", time: "5ч назад", text: "New UI concept: glass + neon", likes: 980, comments: 210 },
+      { id: 3, user: "Anna K.", time: "вчера", text: "Working on Axiro feed interactions", likes: 640, comments: 88 },
+      { id: 4, user: "TravelGuru", time: "вчера", text: "Top places to visit in 2026 🌍", likes: 1540, comments: 402 },
+      { id: 5, user: "Dev Talks", time: "2 дня назад", text: "Routing patterns for scalable apps", likes: 430, comments: 52 },
+      { id: 6, user: "Creative Minds", time: "3 дня назад", text: "Design system: spacing & typography", likes: 720, comments: 91 },
+    ];
+
+    const filtered = base.filter((p) =>
+      p.text.toLowerCase().includes(query.toLowerCase())
+    );
+
+    if (tab === "friends") {
+      return filtered.filter((p) => p.user === "Sophia L." || p.user === "Anna K." || p.user === "Maxim P.");
+    }
+    return filtered;
+  }, [tab, query]);
+
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        padding: 24,
+        background:
+          "radial-gradient(1200px 800px at 30% 20%, rgba(140,80,255,0.18), transparent 60%)," +
+          "radial-gradient(900px 700px at 70% 30%, rgba(0,210,255,0.14), transparent 55%)," +
+          "radial-gradient(900px 700px at 50% 90%, rgba(255,70,170,0.10), transparent 55%)," +
+          "#0b0e12",
+        color: "white",
+        fontFamily:
+          "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial",
+      }}
+    >
+      {/* контейнер "3 экрана" */}
+      <div
+        style={{
+          maxWidth: 1220,
+          margin: "0 auto",
+          display: "grid",
+          gridTemplateColumns: "320px 1fr 360px",
+          gap: 22,
+          alignItems: "start",
+        }}
+      >
+        {/* LEFT */}
+        <GlassCard style={{ padding: 22, position: "sticky", top: 18 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 12,
+                background:
+                  "linear-gradient(135deg, rgba(0,210,255,0.85), rgba(187,120,255,0.85))",
+              }}
+            />
+            <div>
+              <div style={{ fontWeight: 900, letterSpacing: 0.4 }}>AXIRO</div>
+              <div style={{ opacity: 0.6, fontSize: 12 }}>Menu</div>
             </div>
           </div>
 
-          <div className="mb-4 h-[2px] w-full bg-gradient-to-r from-cyan-400/70 via-purple-500/70 to-pink-500/70" />
-
-          <div className="space-y-2">
-            {["Home", "Discover", "Messenger", "Communities", "Messages", "Notifications", "Profile"].map(
-              (t) => (
-                <div
-                  key={t}
-                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-white/80 hover:bg-white/10"
-                >
-                  <div className="h-8 w-8 rounded-full bg-white/10" />
-                  <div className="text-sm">{t}</div>
-                </div>
-              )
-            )}
+          <div style={{ marginTop: 18 }}>
+            <GradientLine />
           </div>
 
-          <button className="mt-6 w-full rounded-2xl bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 px-4 py-3 text-sm font-semibold text-black">
-            Create
-          </button>
-        </div>
-
-        {/* Центр */}
-        <div className="w-[360px] rounded-[28px] border border-white/10 bg-white/5 p-4 backdrop-blur-xl">
-          <div className="mb-3 text-center text-sm text-white/70">
-            Сейчас активно: <span className="text-white">18 друзей</span> •{" "}
-            <span className="text-white">4 тренда</span>
-          </div>
-
-          <div className="mb-4 h-[2px] w-full bg-gradient-to-r from-cyan-400/70 via-purple-500/70 to-pink-500/70" />
-
-          <div className="mb-4 flex gap-2">
-            <button className="rounded-full bg-white/15 px-4 py-2 text-sm text-white">
-              Для вас
-            </button>
-            <button className="rounded-full bg-white/5 px-4 py-2 text-sm text-white/70">
-              Друзья
-            </button>
-          </div>
-
-          <div className="mb-3 text-sm font-semibold text-white">Smart Stories</div>
-          <div className="mb-4 flex flex-wrap gap-2">
-            {["Анна К.", "Максим Р.", "Тренды", "Создать moment", "TravelGuru"].map((t) => (
-              <div
-                key={t}
-                className="rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/80"
+          <div style={{ marginTop: 18, display: "grid", gap: 10 }}>
+            {navItems.map((it) => (
+              <NavLink
+                key={it.to}
+                to={it.to}
+                style={({ isActive }) => ({
+                  textDecoration: "none",
+                  color: "rgba(255,255,255,0.88)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  padding: "12px 12px",
+                  borderRadius: 16,
+                  background: isActive ? "rgba(255,255,255,0.10)" : "transparent",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                })}
               >
-                {t}
-              </div>
+                <span
+                  style={{
+                    width: 18,
+                    height: 18,
+                    borderRadius: 999,
+                    background: "rgba(255,255,255,0.16)",
+                    display: "inline-block",
+                  }}
+                />
+                <span style={{ fontWeight: 600 }}>{it.label}</span>
+              </NavLink>
             ))}
           </div>
 
-          <div className="mb-4 flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 p-3">
-            <div className="h-10 w-10 rounded-full bg-gradient-to-r from-cyan-400/70 via-purple-500/70 to-pink-500/70" />
-            <input
-              className="w-full bg-transparent text-sm text-white/80 outline-none placeholder:text-white/40"
-              placeholder="Начните текст..."
-            />
-            <button className="rounded-xl bg-white/10 px-3 py-2 text-xs text-white/80">
-              Видео
-            </button>
+          <div style={{ marginTop: 18 }}>
+            <NavLink
+              to="/ui"
+              style={{
+                display: "block",
+                textDecoration: "none",
+                padding: "12px 14px",
+                borderRadius: 18,
+                border: "1px solid rgba(255,255,255,0.14)",
+                background:
+                  "linear-gradient(90deg, rgba(0,210,255,0.22), rgba(187,120,255,0.22))",
+                color: "rgba(255,255,255,0.95)",
+                fontWeight: 800,
+                textAlign: "center",
+              }}
+            >
+              UI Preview (ты сейчас здесь)
+            </NavLink>
           </div>
+        </GlassCard>
 
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-            <div className="mb-2 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="h-9 w-9 rounded-full bg-white/10" />
-                <div>
-                  <div className="text-sm font-semibold text-white">Sophia L.</div>
-                  <div className="text-xs text-white/50">community • 2ч назад</div>
-                </div>
-              </div>
-              <div className="text-white/60">⋯</div>
+        {/* CENTER */}
+        <div>
+          <GlassCard style={{ padding: 18 }}>
+            <div style={{ fontWeight: 700, opacity: 0.9, textAlign: "center" }}>
+              Сейчас активно: 18 друзей • 4 тренда
             </div>
 
-            <div className="h-44 rounded-2xl bg-gradient-to-br from-cyan-400/30 via-purple-500/25 to-pink-500/25" />
-            <div className="mt-3 flex items-center gap-4 text-xs text-white/70">
-              <span>❤️ 12k</span>
-              <span>💬 350</span>
-              <span>🔥 120</span>
-              <button className="ml-auto rounded-full bg-white/10 px-3 py-2 text-xs text-white">
-                Поддержать
+            <div style={{ marginTop: 12 }}>
+              <GradientLine />
+            </div>
+
+            <div style={{ marginTop: 14, display: "flex", gap: 10 }}>
+              <Pill active={tab === "forYou"} onClick={() => setTab("forYou")}>
+                Для вас
+              </Pill>
+              <Pill active={tab === "friends"} onClick={() => setTab("friends")}>
+                Друзья
+              </Pill>
+            </div>
+
+            <div style={{ marginTop: 16 }}>
+              <div style={{ fontWeight: 800, marginBottom: 10 }}>Smart Stories</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                {["Анна К.", "Максим Р.", "Тренды", "Создать moment", "TravelGuru"].map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => alert(`Stories: ${t}`)}
+                    style={{
+                      padding: "10px 12px",
+                      borderRadius: 14,
+                      border: "1px solid rgba(255,255,255,0.14)",
+                      background: "rgba(255,255,255,0.06)",
+                      color: "rgba(255,255,255,0.9)",
+                      cursor: "pointer",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* composer */}
+            <div style={{ marginTop: 18, display: "flex", gap: 10, alignItems: "center" }}>
+              <button
+                onClick={() => alert("Создать пост")}
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 16,
+                  border: "1px solid rgba(255,255,255,0.14)",
+                  background:
+                    "linear-gradient(135deg, rgba(0,210,255,0.22), rgba(187,120,255,0.22))",
+                  color: "white",
+                  fontSize: 22,
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                +
+              </button>
+              <div
+                style={{
+                  flex: 1,
+                  padding: "12px 14px",
+                  borderRadius: 18,
+                  border: "1px solid rgba(255,255,255,0.14)",
+                  background: "rgba(255,255,255,0.06)",
+                  color: "rgba(255,255,255,0.85)",
+                }}
+              >
+                Начните текст…
+              </div>
+              <button
+                onClick={() => alert("Загрузить видео")}
+                style={{
+                  padding: "10px 12px",
+                  borderRadius: 14,
+                  border: "1px solid rgba(255,255,255,0.14)",
+                  background: "rgba(255,255,255,0.08)",
+                  color: "rgba(255,255,255,0.92)",
+                  cursor: "pointer",
+                  fontWeight: 800,
+                }}
+              >
+                Видео
               </button>
             </div>
-          </div>
+
+            {/* feed */}
+            <div style={{ marginTop: 18, display: "grid", gap: 14 }}>
+              {posts.map((p) => (
+                <GlassCard key={p.id} style={{ padding: 14, borderRadius: 22 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <div
+                        style={{
+                          width: 34,
+                          height: 34,
+                          borderRadius: 14,
+                          background: "rgba(255,255,255,0.14)",
+                        }}
+                      />
+                      <div>
+                        <div style={{ fontWeight: 900 }}>{p.user}</div>
+                        <div style={{ opacity: 0.6, fontSize: 12 }}>{p.time}</div>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => alert("Меню поста")}
+                      style={{
+                        border: "1px solid rgba(255,255,255,0.12)",
+                        background: "rgba(255,255,255,0.06)",
+                        color: "rgba(255,255,255,0.9)",
+                        borderRadius: 12,
+                        padding: "8px 10px",
+                        cursor: "pointer",
+                        fontWeight: 800,
+                      }}
+                    >
+                      ⋯
+                    </button>
+                  </div>
+
+                  <div style={{ marginTop: 12, fontWeight: 700, opacity: 0.95 }}>
+                    {p.text}
+                  </div>
+
+                  <div
+                    style={{
+                      marginTop: 12,
+                      height: 180,
+                      borderRadius: 18,
+                      border: "1px solid rgba(255,255,255,0.10)",
+                      background:
+                        "linear-gradient(135deg, rgba(0,210,255,0.20), rgba(187,120,255,0.20), rgba(255,70,170,0.18))",
+                    }}
+                  />
+
+                  <div style={{ marginTop: 12, display: "flex", gap: 10, flexWrap: "wrap" }}>
+                    <button
+                      onClick={() => alert("Лайк")}
+                      style={{
+                        padding: "8px 12px",
+                        borderRadius: 14,
+                        border: "1px solid rgba(255,255,255,0.14)",
+                        background: "rgba(255,255,255,0.06)",
+                        color: "rgba(255,255,255,0.9)",
+                        cursor: "pointer",
+                        fontWeight: 800,
+                      }}
+                    >
+                      ❤️ {p.likes}
+                    </button>
+                    <button
+                      onClick={() => alert("Комментарии")}
+                      style={{
+                        padding: "8px 12px",
+                        borderRadius: 14,
+                        border: "1px solid rgba(255,255,255,0.14)",
+                        background: "rgba(255,255,255,0.06)",
+                        color: "rgba(255,255,255,0.9)",
+                        cursor: "pointer",
+                        fontWeight: 800,
+                      }}
+                    >
+                      💬 {p.comments}
+                    </button>
+                    <button
+                      onClick={() => alert("Поделиться")}
+                      style={{
+                        padding: "8px 12px",
+                        borderRadius: 14,
+                        border: "1px solid rgba(255,255,255,0.14)",
+                        background:
+                          "linear-gradient(90deg, rgba(0,210,255,0.18), rgba(187,120,255,0.18))",
+                        color: "rgba(255,255,255,0.95)",
+                        cursor: "pointer",
+                        fontWeight: 900,
+                      }}
+                    >
+                      Поделиться
+                    </button>
+                  </div>
+                </GlassCard>
+              ))}
+            </div>
+          </GlassCard>
         </div>
 
-        {/* Правый “телефон” */}
-        <div className="w-[280px] rounded-[28px] border border-white/10 bg-white/5 p-4 backdrop-blur-xl">
-          <div className="mb-4 flex items-center justify-between">
-            <div className="text-sm font-semibold text-white">Search</div>
-            <div className="text-white/60">≡</div>
+        {/* RIGHT */}
+        <GlassCard style={{ padding: 18, position: "sticky", top: 18 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ fontWeight: 900, fontSize: 18 }}>Search</div>
+            <button
+              onClick={() => alert("Меню поиска")}
+              style={{
+                border: "1px solid rgba(255,255,255,0.12)",
+                background: "rgba(255,255,255,0.06)",
+                color: "rgba(255,255,255,0.9)",
+                borderRadius: 12,
+                padding: "8px 10px",
+                cursor: "pointer",
+                fontWeight: 900,
+              }}
+            >
+              ≡
+            </button>
           </div>
 
-          <div className="mb-4 rounded-2xl border border-white/10 bg-white/5 p-3 text-sm text-white/50">
-            Search...
+          <div style={{ marginTop: 12 }}>
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search..."
+              style={{
+                width: "100%",
+                padding: "12px 14px",
+                borderRadius: 16,
+                border: "1px solid rgba(255,255,255,0.14)",
+                outline: "none",
+                background: "rgba(255,255,255,0.06)",
+                color: "rgba(255,255,255,0.92)",
+              }}
+            />
           </div>
 
-          <div className="mb-2 text-sm font-semibold text-white">Trending now</div>
-          <div className="mb-4 grid grid-cols-3 gap-2">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="rounded-2xl border border-white/10 bg-white/5 p-2">
-                <div className="h-14 rounded-xl bg-gradient-to-br from-cyan-400/20 via-purple-500/20 to-pink-500/20" />
-                <div className="mt-2 h-2 w-10 rounded bg-white/10" />
-                <div className="mt-1 h-2 w-16 rounded bg-white/10" />
-              </div>
-            ))}
+          <div style={{ marginTop: 16 }}>
+            <div style={{ fontWeight: 900, marginBottom: 10 }}>Trending now</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  onClick={() => alert(`Trending card ${i}`)}
+                  style={{
+                    cursor: "pointer",
+                    borderRadius: 16,
+                    border: "1px solid rgba(255,255,255,0.12)",
+                    background: "rgba(255,255,255,0.06)",
+                    padding: 10,
+                  }}
+                >
+                  <div
+                    style={{
+                      height: 54,
+                      borderRadius: 12,
+                      background:
+                        "linear-gradient(135deg, rgba(0,210,255,0.18), rgba(187,120,255,0.18))",
+                      border: "1px solid rgba(255,255,255,0.10)",
+                    }}
+                  />
+                  <div style={{ height: 8 }} />
+                  <div
+                    style={{
+                      height: 8,
+                      borderRadius: 999,
+                      background: "rgba(255,255,255,0.12)",
+                    }}
+                  />
+                  <div style={{ height: 6 }} />
+                  <div
+                    style={{
+                      height: 8,
+                      borderRadius: 999,
+                      background: "rgba(255,255,255,0.10)",
+                      width: "70%",
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="mb-2 text-sm font-semibold text-white">People you may like</div>
-          <div className="space-y-2">
-            {["Creative Minds", "Dev Talks", "Live Group"].map((t) => (
+          <div style={{ marginTop: 16 }}>
+            <div style={{ fontWeight: 900, marginBottom: 10 }}>People you may like</div>
+            {[
+              { name: "Creative Minds", sub: "1–2 поста в день" },
+              { name: "Dev Talks", sub: "1–2 поста в день" },
+              { name: "Live Group", sub: "онлайн" },
+            ].map((u) => (
               <div
-                key={t}
-                className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 p-3"
+                key={u.name}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "10px 10px",
+                  borderRadius: 16,
+                  border: "1px solid rgba(255,255,255,0.10)",
+                  background: "rgba(255,255,255,0.04)",
+                  marginBottom: 10,
+                }}
               >
-                <div className="flex items-center gap-2">
-                  <div className="h-10 w-10 rounded-full bg-white/10" />
+                <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                  <div
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: 14,
+                      background: "rgba(255,255,255,0.14)",
+                    }}
+                  />
                   <div>
-                    <div className="text-sm text-white">{t}</div>
-                    <div className="text-xs text-white/50">1–2 поста в день</div>
+                    <div style={{ fontWeight: 900 }}>{u.name}</div>
+                    <div style={{ opacity: 0.65, fontSize: 12 }}>{u.sub}</div>
                   </div>
                 </div>
-                <button className="rounded-full bg-white/10 px-3 py-2 text-xs text-white">
+                <button
+                  onClick={() => alert(`Follow: ${u.name}`)}
+                  style={{
+                    padding: "10px 12px",
+                    borderRadius: 14,
+                    border: "1px solid rgba(255,255,255,0.14)",
+                    background: "rgba(255,255,255,0.08)",
+                    color: "rgba(255,255,255,0.92)",
+                    cursor: "pointer",
+                    fontWeight: 900,
+                  }}
+                >
                   Follow
                 </button>
               </div>
             ))}
           </div>
-        </div>
+
+          <div style={{ marginTop: 14, opacity: 0.65, fontSize: 12 }}>
+            Это UI-прототип. Дальше перенесём дизайн в реальные страницы, чтобы всё было “по-настоящему”.
+          </div>
+        </GlassCard>
       </div>
     </div>
   );
