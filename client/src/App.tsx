@@ -12,7 +12,6 @@ import SettingsPage from "./pages/SettingsPage";
 import AuthPage from "./pages/AuthPage";
 
 import { useAuth } from "./AuthContext";
-import UIPreviewPage from "./pages/UIPreviewPage";
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -79,7 +78,6 @@ export default function App() {
                 <Route path="/reels" element={<ReelsPage />} />
                 <Route path="/marketplace" element={<MarketplacePage />} />
                 <Route path="/settings" element={<SettingsPage />} />
-                <Route path="/ui" element={<UIPreviewPage />} />
 
                 {/* на всякий случай */}
                 <Route path="*" element={<Navigate to="/settings" replace />} />
