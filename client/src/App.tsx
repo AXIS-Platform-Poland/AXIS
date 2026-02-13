@@ -1,4 +1,3 @@
-// client/src/App.tsx
 import React from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
@@ -15,6 +14,8 @@ import UIPreviewPage from "./pages/UIPreviewPage";
 
 import { useAuth } from "./AuthContext";
 
+/* ---------------- PROTECTED ROUTE ---------------- */
+
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const location = useLocation();
@@ -28,87 +29,76 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
   }
 
   if (!user) {
-    return <Navigate to="/auth" replace state={{ from: location.pathname }} />;
+    return <Navigate to="/auth" state={{ from: location.pathname }} replace />;
   }
 
   return <>{children}</>;
 }
 
+/* ---------------- MAIN APP ---------------- */
+
 export default function App() {
   const location = useLocation();
+  const { user } = useAuth();
+
   const isAuthRoute = location.pathname.startsWith("/auth");
 
-  // ✅ Страница /auth — без Sidebar/Topbar
+  /* ---------------- AUTH PAGE ---------------- */
+
   if (isAuthRoute) {
     return (
-      <div className="min-h-screen text-white relative overflow-hidden">
-        {/* Background gradient */}
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background:
-              "radial-gradient(circle at 20% 20%, rgba(128,119,180,0.15), transparent 40%), radial-gradient(circle at 80% 80%, rgba(255,0,128,0.12), transparent 40%), #0b0b0f",
-            zIndex: 0,
-          }}
-        />
-
-        <div className="relative z-10 min-h-screen">
-          <Routes>
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="*" element={<Navigate to="/auth" replace />} />
-          </Routes>
-        </div>
+      <div className="min-h-screen bg-black text-white">
+        <Routes>
+          <Route path="/auth" element={<AuthPage />} />
+          <Route path="*" element={<Navigate to="/auth" replace />} />
+        </Routes>
       </div>
     );
   }
 
-  // ✅ Все остальные страницы — только после логина
+  /* ---------------- MAIN UI ---------------- */
+
   return (
     <div className="min-h-screen text-white relative overflow-hidden">
-      {/* Background gradient */}
+
+      {/* ===== ГЛУБИННЫЙ ФОН ===== */}
       <div
         style={{
           position: "fixed",
           inset: 0,
           background:
-            "radial-gradient(circle at 20% 20%, rgba(128,119,180,0.15), transparent 40%), radial-gradient(circle at 80% 80%, rgba(255,0,128,0.12), transparent 40%), #0b0b0f",
-          zIndex: 0,
+            "radial-gradient(circle at 20% 20%, rgba(0,200,255,0.15), transparent 40%), radial-gradient(circle at 80% 80%, rgba(255,0,200,0.15), transparent 40%), #0b0b0f",
+          zIndex: 0
         }}
       />
 
-      {/* Content */}
+      {/* ===== КОНТЕНТ ===== */}
       <div className="relative z-10 min-h-screen flex">
-        {/* Sidebar слева */}
+
+        {/* SIDEBAR */}
         <Sidebar />
 
-        {/* Правая часть */}
+        {/* RIGHT SIDE */}
         <div
           className="flex-1 min-w-0 relative"
           style={{
             backdropFilter: "blur(20px)",
-            background: "rgba(255,255,255,0.03)",
-            borderLeft: "1px solid rgba(255,255,255,0.06)",
+            background: "rgba(255,255,255,0.04)",
+            borderLeft: "1px solid rgba(255,255,255,0.08)"
           }}
         >
           <Topbar />
 
-          <main className="relative z-0 px-4 pb-10">
+          <main className="p-6">
             <RequireAuth>
               <Routes>
-                {/* если зайти на / — перекинет на /settings */}
                 <Route path="/" element={<Navigate to="/settings" replace />} />
-
                 <Route path="/posts" element={<HomePage />} />
                 <Route path="/friends" element={<FriendsPage />} />
                 <Route path="/reels" element={<ReelsPage />} />
                 <Route path="/marketplace" element={<MarketplacePage />} />
                 <Route path="/settings" element={<SettingsPage />} />
-
-                {/* если ты используешь страницу предпросмотра UI */}
                 <Route path="/ui" element={<UIPreviewPage />} />
-
-                {/* на всякий случай */}
                 <Route path="*" element={<Navigate to="/settings" replace />} />
               </Routes>
             </RequireAuth>
