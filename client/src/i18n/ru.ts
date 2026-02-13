@@ -7,18 +7,28 @@ export const ru = {
     haveAccount: "Уже есть аккаунт? Войти",
     errorConfirmEmail: "Ошибка отправки письма подтверждения",
   },
+
   common: {
     language: "Язык",
     save: "Сохранить",
     signOut: "Выйти",
   },
+
+  nav: {
+    posts: "Посты",
+    friends: "Друзья",
+    reels: "Reels",
+    marketplace: "Маркетплейс",
+    settings: "Настройки",
+  },
+
   settings: {
     title: "Настройки",
     status: "Статус",
     authenticated: "Авторизован",
     notAuthenticated: "Не авторизован",
     userLabel: "Пользователь",
-    userIdLabel: "User ID",
+    userIdLabel: "ID пользователя",
     profileLabel: "Профиль (public.profiles)",
     profileLoaded: "Загружен",
     profileNotFound: "Не найден / пустой",
@@ -28,11 +38,12 @@ export const ru = {
     fullNamePlaceholder: "Например: Ihor Nepomiashchyi",
     avatarUrl: "Ссылка на аватар",
     bio: "О себе",
-    bioPlaceholder: "Коротко о себе…",
-    saving: "Сохранение…",
-    needAuth: "Нет авторизации. Войди в аккаунт.",
-    savedOk: "✅ Сохранено",
-    saveError: "❌ Ошибка сохранения",
-    currentValues: "Текущие значения из profiles:",
-  },
+    bioPlaceholder: "Коротко о себе...",
+    saving: "Сохранение...",
+    needAuth: "Нет авторизации. Войдите в аккаунт.",
+    saved: "Сохранено",
+    saveError: "Ошибка сохранения",
+    currentValues: "Текущие данные из profiles",
+  }
+
 } as const;
