@@ -17,7 +17,7 @@ export const ru = {
   nav: {
     posts: "Посты",
     friends: "Друзья",
-    reels: "Reels",
+    reels: "Рилсы",
     marketplace: "Маркетплейс",
     settings: "Настройки",
   },
