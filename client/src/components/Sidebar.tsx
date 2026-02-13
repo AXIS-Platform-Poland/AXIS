@@ -1,51 +1,63 @@
+import React from "react";
 import { NavLink } from "react-router-dom";
+import { useI18n } from "../i18n/I18nProvider";
 
-type NavItem = {
-  to: string;
-  label: string;
-  icon: string;
-};
-
-const nav: NavItem[] = [
-  { to: "/", label: "Posts", icon: "🏠" },
-  { to: "/friends", label: "Friends", icon: "👥" },
-  { to: "/reels", label: "Reels", icon: "🎬" },
-  { to: "/marketplace", label: "Marketplace", icon: "🛒" },
-  { to: "/settings", label: "Settings", icon: "⚙️" },
-];
+const itemStyle = ({ isActive }: { isActive: boolean }) => ({
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  padding: "10px 12px",
+  borderRadius: 10,
+  textDecoration: "none",
+  color: "white",
+  background: isActive ? "rgba(255,255,255,0.10)" : "transparent",
+});
 
 export default function Sidebar() {
-  return (
-    <aside
-      className="w-[280px] shrink-0 sticky top-0 h-screen z-[9999] pointer-events-auto"
-      style={{ position: "sticky" }}
-    >
-      <div className="m-4 rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl p-3">
-        <div className="mb-3 text-sm text-white/70">
-          <div className="font-semibold text-white">Ingvavr Sp. z o.o.</div>
-          <div>Professional services • Poland</div>
-        </div>
+  const { t } = useI18n();
 
-        <nav className="flex flex-col gap-2">
-          {nav.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) =>
-                [
-                  "flex items-center gap-3 rounded-xl px-3 py-2",
-                  "text-white/90 hover:bg-white/10 transition",
-                  isActive ? "bg-white/10" : "",
-                ].join(" ")
-              }
-              end={item.to === "/"}
-            >
-              <span className="text-lg">{item.icon}</span>
-              <span className="text-[15px] font-medium">{item.label}</span>
-            </NavLink>
-          ))}
-        </nav>
+  return (
+    <div
+      style={{
+        width: 240,
+        padding: 12,
+        borderRight: "1px solid rgba(255,255,255,0.08)",
+      }}
+    >
+      {/* Тут можешь оставить свой логотип/название */}
+      <div style={{ marginBottom: 14, fontWeight: 700 }}>
+        Ingvarr Sp. z o.o.
+        <div style={{ fontWeight: 400, opacity: 0.8, fontSize: 12 }}>
+          Professional services • Poland
+        </div>
       </div>
-    </aside>
+
+      <div style={{ display: "grid", gap: 8 }}>
+        <NavLink to="/" style={itemStyle}>
+          <span>🏠</span>
+          <span>{t.nav.posts}</span>
+        </NavLink>
+
+        <NavLink to="/friends" style={itemStyle}>
+          <span>👥</span>
+          <span>{t.nav.friends}</span>
+        </NavLink>
+
+        <NavLink to="/reels" style={itemStyle}>
+          <span>🎞️</span>
+          <span>{t.nav.reels}</span>
+        </NavLink>
+
+        <NavLink to="/marketplace" style={itemStyle}>
+          <span>🛒</span>
+          <span>{t.nav.marketplace}</span>
+        </NavLink>
+
+        <NavLink to="/settings" style={itemStyle}>
+          <span>⚙️</span>
+          <span>{t.nav.settings}</span>
+        </NavLink>
+      </div>
+    </div>
   );
 }
