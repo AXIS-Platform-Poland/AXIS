@@ -1,4 +1,4 @@
-export const ru = {
+const ru = {
   auth: {
     title: "Регистрация",
     email: "Email",
@@ -13,3 +13,5 @@ export const ru = {
     signOut: "Выйти",
   },
 } as const;
+
+export default ru;
