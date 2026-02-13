@@ -1,11 +1,15 @@
-const pl = {
-  posts: "Posty",
-  friends: "Znajomi",
-  reels: "Rolki",
-  marketplace: "Marketplace",
-  settings: "Ustawienia",
-  login: "Zaloguj się",
-  register: "Rejestracja",
-};
-
-export default pl;
+export const pl = {
+  auth: {
+    title: "Rejestracja",
+    email: "Email",
+    password: "Hasło",
+    create: "Utwórz konto",
+    haveAccount: "Masz już konto? Zaloguj się",
+    errorConfirmEmail: "Błąd wysyłki maila potwierdzającego",
+  },
+  common: {
+    language: "Język",
+    save: "Zapisz",
+    signOut: "Wyloguj",
+  },
+} as const;
