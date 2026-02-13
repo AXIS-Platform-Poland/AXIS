@@ -1,8 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { Globe } from "lucide-react";
-
-type Lang = "ru" | "en" | "pl";
+import { useI18n, type Lang } from "../i18n/I18nProvider";
 
 const LANGS: Array<{ code: Lang; label: string; sub: string }> = [
   { code: "ru", label: "RU", sub: "Русский" },
@@ -11,20 +9,13 @@ const LANGS: Array<{ code: Lang; label: string; sub: string }> = [
 ];
 
 export default function LanguageSwitcher() {
-  const { i18n } = useTranslation();
+  const { lang, setLang } = useI18n();
   const [open, setOpen] = useState(false);
-
   const rootRef = useRef<HTMLDivElement | null>(null);
 
-  const current = (i18n.language || "en").slice(0, 2) as Lang;
-
-  const setLang = async (lang: Lang) => {
-    try {
-      await i18n.changeLanguage(lang);
-      localStorage.setItem("axis_lang", lang);
-    } finally {
-      setOpen(false);
-    }
+  const onPick = (l: Lang) => {
+    setLang(l);          // ✅ меняем язык в твоем I18nProvider
+    setOpen(false);      // ✅ закрываем меню
   };
 
   // Закрытие по клику вне меню
@@ -32,15 +23,13 @@ export default function LanguageSwitcher() {
     const onDocMouseDown = (e: MouseEvent) => {
       if (!open) return;
       const target = e.target as Node;
-      if (rootRef.current && !rootRef.current.contains(target)) {
-        setOpen(false);
-      }
+      if (rootRef.current && !rootRef.current.contains(target)) setOpen(false);
     };
     document.addEventListener("mousedown", onDocMouseDown);
     return () => document.removeEventListener("mousedown", onDocMouseDown);
   }, [open]);
 
-  // Закрытие по Esc
+  // Закрытие на ESC
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (!open) return;
@@ -52,7 +41,6 @@ export default function LanguageSwitcher() {
 
   return (
     <div ref={rootRef} className="relative z-[9999]">
-      {/* Кнопка-глобус */}
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -62,25 +50,23 @@ export default function LanguageSwitcher() {
         title="Language"
       >
         <Globe size={18} />
-        <span className="text-xs font-semibold opacity-90">{current.toUpperCase()}</span>
+        <span className="text-xs font-semibold opacity-90">{lang.toUpperCase()}</span>
       </button>
 
-      {/* Меню */}
       {open && (
         <div
           role="menu"
           className="absolute right-0 mt-2 w-52 overflow-hidden rounded-2xl border border-white/12 bg-[#0b0f14]/95 backdrop-blur-xl shadow-2xl"
-          style={{ pointerEvents: "auto" }}
         >
           <div className="p-1">
             {LANGS.map((l) => {
-              const active = current === l.code;
+              const active = lang === l.code;
               return (
                 <button
                   key={l.code}
                   type="button"
                   role="menuitem"
-                  onClick={() => setLang(l.code)}
+                  onClick={() => onPick(l.code)}
                   className={[
                     "w-full text-left rounded-xl px-3 py-2 transition",
                     "hover:bg-white/10 active:bg-white/15",
@@ -89,12 +75,14 @@ export default function LanguageSwitcher() {
                   ].join(" ")}
                 >
                   <div className="flex flex-col leading-tight">
-                    <span className="text-sm font-semibold text-white/95">{l.label}</span>
+                    <span className="text-sm font-semibold text-white/95">
+                      {l.label}
+                    </span>
                     <span className="text-xs text-white/60">{l.sub}</span>
                   </div>
 
                   {active && (
-                    <span className="text-xs px-2 py-1 rounded-lg bg-white/10 text-white/80 border border-white/10">
+                    <span className="text-[10px] px-2 py-1 rounded-lg bg-white/10 text-white/80 border border-white/10">
                       ✓
                     </span>
                   )}
