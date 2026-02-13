@@ -1,4 +1,4 @@
-const en = {
+export const en = {
   auth: {
     title: "Sign up",
     email: "Email",
@@ -13,5 +13,3 @@ const en = {
     signOut: "Sign out",
   },
 } as const;
-
-export default en;
