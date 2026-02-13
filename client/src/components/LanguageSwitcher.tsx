@@ -1,52 +1,63 @@
-import React from "react";
-import { useI18n } from "../i18n/I18nProvider";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function LanguageSwitcher() {
-  const { lang, setLang } = useI18n();
+  const { i18n } = useTranslation();
+  const [open, setOpen] = useState(false);
+
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+    setOpen(false);
+  };
 
   return (
-    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+    <div style={{ position: "relative" }}>
+      {/* Кнопка глобуса */}
       <button
-        onClick={() => setLang("ru")}
+        onClick={() => setOpen(!open)}
         style={{
-          padding: "6px 10px",
-          borderRadius: 8,
-          border: "1px solid #444",
-          background: lang === "ru" ? "#2a2a2a" : "transparent",
-          color: "white",
+          background: "rgba(255,255,255,0.08)",
+          border: "1px solid rgba(255,255,255,0.15)",
+          borderRadius: "10px",
+          padding: "8px 10px",
           cursor: "pointer",
+          fontSize: "18px",
         }}
       >
-        RU
+        🌍
       </button>
 
-      <button
-        onClick={() => setLang("en")}
-        style={{
-          padding: "6px 10px",
-          borderRadius: 8,
-          border: "1px solid #444",
-          background: lang === "en" ? "#2a2a2a" : "transparent",
-          color: "white",
-          cursor: "pointer",
-        }}
-      >
-        EN
-      </button>
+      {/* Выпадающее меню */}
+      {open && (
+        <div
+          style={{
+            position: "absolute",
+            top: "45px",
+            right: 0,
+            background: "#111",
+            border: "1px solid rgba(255,255,255,0.15)",
+            borderRadius: "12px",
+            padding: "8px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "6px",
+            minWidth: "120px",
+            zIndex: 1000,
+          }}
+        >
+          <button onClick={() => changeLanguage("ru")} className="lang-item">
+            🇷🇺 Русский
+          </button>
 
-      <button
-        onClick={() => setLang("pl")}
-        style={{
-          padding: "6px 10px",
-          borderRadius: 8,
-          border: "1px solid #444",
-          background: lang === "pl" ? "#2a2a2a" : "transparent",
-          color: "white",
-          cursor: "pointer",
-        }}
-      >
-        PL
-      </button>
+          <button onClick={() => changeLanguage("en")} className="lang-item">
+            🇬🇧 English
+          </button>
+
+          <button onClick={() => changeLanguage("pl")} className="lang-item">
+            🇵🇱 Polski
+          </button>
+        </div>
+      )}
     </div>
   );
 }
