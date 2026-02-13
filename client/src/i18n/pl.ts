@@ -5,22 +5,32 @@ export const pl = {
     password: "Hasło",
     create: "Utwórz konto",
     haveAccount: "Masz już konto? Zaloguj się",
-    errorConfirmEmail: "Błąd wysyłania maila potwierdzającego",
+    errorConfirmEmail: "Błąd wysyłania e-maila potwierdzającego",
   },
+
   common: {
     language: "Język",
     save: "Zapisz",
     signOut: "Wyloguj",
   },
+
+  nav: {
+    posts: "Posty",
+    friends: "Znajomi",
+    reels: "Reels",
+    marketplace: "Marketplace",
+    settings: "Ustawienia",
+  },
+
   settings: {
     title: "Ustawienia",
     status: "Status",
     authenticated: "Zalogowany",
     notAuthenticated: "Niezalogowany",
     userLabel: "Użytkownik",
-    userIdLabel: "User ID",
+    userIdLabel: "ID użytkownika",
     profileLabel: "Profil (public.profiles)",
-    profileLoaded: "Wczytany",
+    profileLoaded: "Załadowany",
     profileNotFound: "Nie znaleziono / pusty",
     refreshProfile: "Odśwież profil",
     editProfile: "Edytuj profil",
@@ -28,11 +38,12 @@ export const pl = {
     fullNamePlaceholder: "Np.: Ihor Nepomiashchyi",
     avatarUrl: "Link do avatara",
     bio: "O mnie",
-    bioPlaceholder: "Krótko o sobie…",
-    saving: "Zapisywanie…",
+    bioPlaceholder: "Krótko o sobie...",
+    saving: "Zapisywanie...",
     needAuth: "Brak autoryzacji. Zaloguj się.",
-    savedOk: "✅ Zapisano",
-    saveError: "❌ Błąd zapisu",
-    currentValues: "Aktualne wartości z profiles:",
-  },
+    saved: "Zapisano",
+    saveError: "Błąd zapisu",
+    currentValues: "Aktualne dane z profiles",
+  }
+
 } as const;
