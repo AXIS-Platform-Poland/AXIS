@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../AuthContext";
+import { useI18n } from "../i18n/I18nProvider";
 
 export default function SettingsPage() {
+  const { t } = useI18n();
   const { loading, user, profile, refreshProfile, updateProfile, signOut } = useAuth();
 
   const [fullName, setFullName] = useState<string>("");
   const [avatarUrl, setAvatarUrl] = useState<string>("");
   const [bio, setBio] = useState<string>("");
 
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving] = useState<boolean>(false);
   const [msg, setMsg] = useState<string | null>(null);
 
   useEffect(() => {
@@ -21,7 +23,7 @@ export default function SettingsPage() {
     setMsg(null);
 
     if (!user) {
-      setMsg("Нет авторизации. Войди в аккаунт.");
+      setMsg(t.settings.needAuth);
       return;
     }
 
@@ -35,52 +37,84 @@ export default function SettingsPage() {
       });
 
       await refreshProfile();
-      setMsg("✅ Сохранено");
+      setMsg(t.settings.savedOk);
     } catch (e: any) {
-      setMsg("❌ Ошибка сохранения: " + (e?.message ?? String(e)));
+      setMsg(`${t.settings.saveError}: ${e?.message ?? String(e)}`);
     } finally {
       setSaving(false);
     }
   };
 
+  const isAuthed = !!user;
+
   return (
     <div style={{ maxWidth: 720, margin: "0 auto", padding: 16 }}>
-      <h2 style={{ marginBottom: 12 }}>Settings</h2>
+      <h2 style={{ marginBottom: 12 }}>{t.settings.title}</h2>
 
+      {/* STATUS CARD */}
       <div style={{ padding: 12, border: "1px solid #333", borderRadius: 10, marginBottom: 12 }}>
-        <div><b>Status:</b> {user ? "Authenticated ✅" : "Not authenticated ❌"}</div>
-        <div style={{ opacity: 0.9, marginTop: 6 }}>
-          <div><b>User:</b> {user?.email ?? "-"}</div>
-          <div><b>User Id:</b> {user?.id ?? "-"}</div>
-          <div><b>Profile (public.profiles):</b> {profile ? "Loaded ✅" : "Not found / empty ⚠️"}</div>
+        <div style={{ opacity: 0.9, marginBottom: 6 }}>
+          <b>{t.settings.status}:</b>{" "}
+          {isAuthed ? (
+            <>
+              {t.settings.authenticated} ✅
+            </>
+          ) : (
+            <>
+              {t.settings.notAuthenticated} ❌
+            </>
+          )}
+        </div>
+
+        <div style={{ opacity: 0.9 }}>
+          <div>
+            <b>{t.settings.userLabel}:</b> {user?.email ?? "—"}
+          </div>
+          <div>
+            <b>{t.settings.userIdLabel}:</b> {user?.id ?? "—"}
+          </div>
+          <div>
+            <b>{t.settings.profileLabel}:</b>{" "}
+            {profile ? (
+              <>
+                {t.settings.profileLoaded} ✅
+              </>
+            ) : (
+              <>
+                {t.settings.profileNotFound} ⚠️
+              </>
+            )}
+          </div>
         </div>
 
         <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
           <button onClick={refreshProfile} disabled={loading}>
-            Refresh profile
+            {t.settings.refreshProfile}
           </button>
+
           <button onClick={signOut} style={{ background: "#b23b3b", color: "white" }}>
-            Sign out
+            {t.common.signOut}
           </button>
         </div>
       </div>
 
+      {/* EDIT PROFILE */}
       <div style={{ padding: 12, border: "1px solid #333", borderRadius: 10 }}>
-        <h3 style={{ marginTop: 0 }}>Edit profile</h3>
+        <h3 style={{ marginTop: 0 }}>{t.settings.editProfile}</h3>
 
         <div style={{ display: "grid", gap: 10 }}>
           <label>
-            <div style={{ marginBottom: 4 }}>Full name</div>
+            <div style={{ marginBottom: 4 }}>{t.settings.fullName}</div>
             <input
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              placeholder="Например: Ihor Nepomiashchyi"
+              placeholder={t.settings.fullNamePlaceholder}
               style={{ width: "100%", padding: 8 }}
             />
           </label>
 
           <label>
-            <div style={{ marginBottom: 4 }}>Avatar URL</div>
+            <div style={{ marginBottom: 4 }}>{t.settings.avatarUrl}</div>
             <input
               value={avatarUrl}
               onChange={(e) => setAvatarUrl(e.target.value)}
@@ -90,11 +124,11 @@ export default function SettingsPage() {
           </label>
 
           <label>
-            <div style={{ marginBottom: 4 }}>Bio</div>
+            <div style={{ marginBottom: 4 }}>{t.settings.bio}</div>
             <textarea
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              placeholder="Коротко о себе..."
+              placeholder={t.settings.bioPlaceholder}
               rows={4}
               style={{ width: "100%", padding: 8 }}
             />
@@ -102,18 +136,22 @@ export default function SettingsPage() {
 
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <button onClick={onSave} disabled={saving || loading || !user}>
-              {saving ? "Saving..." : "Save"}
+              {saving ? t.settings.saving : t.common.save}
             </button>
+
             {msg && <div style={{ opacity: 0.95 }}>{msg}</div>}
           </div>
+        </div>
 
-          <div style={{ marginTop: 10, opacity: 0.9 }}>
-            <div><b>Current values from profiles:</b></div>
-            <div>full_name: {profile?.full_name ?? "NULL"}</div>
-            <div>avatar_url: {profile?.avatar_url ?? "NULL"}</div>
-            <div>bio: {profile?.bio ?? "NULL"}</div>
-            <div>created_at: {profile?.created_at ?? "NULL"}</div>
+        {/* DEBUG CURRENT VALUES (optional) */}
+        <div style={{ marginTop: 12, opacity: 0.9 }}>
+          <div style={{ marginBottom: 6 }}>
+            <b>{t.settings.currentValues}</b>
           </div>
+          <div>full_name: {profile?.full_name ?? "NULL"}</div>
+          <div>avatar_url: {profile?.avatar_url ?? "NULL"}</div>
+          <div>bio: {profile?.bio ?? "NULL"}</div>
+          <div>created_at: {profile?.created_at ?? "NULL"}</div>
         </div>
       </div>
     </div>
