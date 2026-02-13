@@ -1,7 +1,8 @@
 import { NavLink } from "react-router-dom";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 const iconStyle = ({ isActive }: { isActive: boolean }) => ({
-  padding: "8px 10px",
+  padding: "8px 12px",
   borderRadius: 10,
   textDecoration: "none",
   color: "white",
@@ -25,32 +26,35 @@ export default function Topbar() {
     >
       {/* LEFT ICONS */}
       <div style={{ display: "flex", gap: 8 }}>
-        <NavLink to="/" style={iconStyle} title="Posts">
+        <NavLink to="/" style={iconStyle} title="Посты">
           🏠
         </NavLink>
 
-        <NavLink to="/friends" style={iconStyle} title="Friends">
+        <NavLink to="/friends" style={iconStyle} title="Друзья">
           👥
         </NavLink>
 
-        <NavLink to="/reels" style={iconStyle} title="Reels">
+        <NavLink to="/reels" style={iconStyle} title="Рилсы">
           🎬
         </NavLink>
 
-        <NavLink to="/marketplace" style={iconStyle} title="Marketplace">
+        <NavLink to="/marketplace" style={iconStyle} title="Маркетплейс">
           🛒
         </NavLink>
       </div>
 
       {/* RIGHT ICONS */}
-      <div style={{ display: "flex", gap: 8 }}>
+      <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+        {/* LANGUAGE SWITCHER */}
+        <LanguageSwitcher />
+
         {/* PERSON (login/register) */}
-        <NavLink to="/auth" style={iconStyle} title="Login / Register">
+        <NavLink to="/auth" style={iconStyle} title="Вход / Регистрация">
           👤
         </NavLink>
 
         {/* SETTINGS */}
-        <NavLink to="/settings" style={iconStyle} title="Settings">
+        <NavLink to="/settings" style={iconStyle} title="Настройки">
           ⚙️
         </NavLink>
       </div>
