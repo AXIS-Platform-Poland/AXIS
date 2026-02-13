@@ -7,11 +7,21 @@ export const en = {
     haveAccount: "Already have an account? Sign in",
     errorConfirmEmail: "Error sending confirmation email",
   },
+
   common: {
     language: "Language",
     save: "Save",
     signOut: "Sign out",
   },
+
+  nav: {
+    posts: "Posts",
+    friends: "Friends",
+    reels: "Reels",
+    marketplace: "Marketplace",
+    settings: "Settings",
+  },
+
   settings: {
     title: "Settings",
     status: "Status",
@@ -28,11 +38,12 @@ export const en = {
     fullNamePlaceholder: "Example: Ihor Nepomiashchyi",
     avatarUrl: "Avatar URL",
     bio: "Bio",
-    bioPlaceholder: "Short bio…",
-    saving: "Saving…",
+    bioPlaceholder: "Short bio...",
+    saving: "Saving...",
     needAuth: "Not authenticated. Please sign in.",
-    savedOk: "✅ Saved",
-    saveError: "❌ Save error",
-    currentValues: "Current values from profiles:",
-  },
+    saved: "Saved",
+    saveError: "Save error",
+    currentValues: "Current values from profiles",
+  }
+
 } as const;
