@@ -17,7 +17,7 @@ export const pl = {
   nav: {
     posts: "Posty",
     friends: "Znajomi",
-    reels: "Reels",
+    reels: "Rolki",
     marketplace: "Marketplace",
     settings: "Ustawienia",
   },
