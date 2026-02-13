@@ -22,10 +22,6 @@ export default function Sidebar() {
   const wrapStyle: React.CSSProperties = {
     width: 280,
     padding: 14,
-    height: "calc(100vh - 56px)", // если сверху Topbar 56px; если нет — просто будет чуть меньше
-    position: "sticky",
-    top: 56,
-    overflow: "auto",
     borderRight: "1px solid rgba(255,255,255,0.08)",
     background:
       "linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)",
@@ -99,13 +95,11 @@ export default function Sidebar() {
 
   return (
     <aside style={wrapStyle}>
-      {/* BRAND */}
       <div style={cardStyle}>
         <div style={brandTitle}>Ingvarr Sp. z o.o.</div>
         <div style={brandSub}>Professional services • Poland</div>
       </div>
 
-      {/* NAV */}
       <div style={navStyle}>
         {items.map((it) => (
           <NavLink
@@ -114,8 +108,8 @@ export default function Sidebar() {
             end={it.to === "/"}
             style={({ isActive }) => ({
               ...linkBase,
-              background: isActive ? "rgba(255,255,255,0.09)" : linkBase.background,
-              borderColor: isActive ? "rgba(255,255,255,0.22)" : (linkBase.border as string),
+              background: isActive ? "rgba(255,255,255,0.09)" : (linkBase.background as string),
+              borderColor: isActive ? "rgba(255,255,255,0.22)" : "rgba(255,255,255,0.08)",
               transform: isActive ? "translateX(2px)" : "translateX(0px)",
               boxShadow: isActive ? "0 10px 24px rgba(0,0,0,0.25)" : "none",
             })}
@@ -126,7 +120,6 @@ export default function Sidebar() {
         ))}
       </div>
 
-      {/* FOOTER */}
       <div style={footerStyle}>
         <div>AXIS Platform</div>
         <div style={{ marginTop: 4 }}>UI: Dark • v1</div>
