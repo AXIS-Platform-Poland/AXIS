@@ -2,28 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===== Theme vars ===== */
 :root {
   --bg-color: #050505;
   --card-color: #111111;
+
   --text-main: #ffffff;
   --text-muted: #888888;
+
   --accent: #ffffff;
   --danger: #ff3333;
   --success: #00ff88;
+
   --border: #222222;
 }
 
+/* ===== Base ===== */
 body {
   margin: 0;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
   background-color: var(--bg-color);
   color: var(--text-main);
   -webkit-font-smoothing: antialiased;
 }
 
-/* === КОНТЕЙНЕРЫ === */
+/* ===== Containers ===== */
 .container {
-  max-width: 800px;
+  max-width: 880px;
   margin: 0 auto;
   padding: 40px 20px;
   min-height: 100vh;
@@ -32,17 +37,20 @@ body {
   justify-content: center;
 }
 
+/* ===== Cards ===== */
 .card {
   background-color: var(--card-color);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 40px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
   animation: fadeIn 0.5s ease;
 }
 
-/* === ФОРМЫ И ИНПУТЫ === */
-input {
+/* ===== Form / Inputs ===== */
+input,
+textarea,
+select {
   background: #000;
   border: 1px solid var(--border);
   color: white;
@@ -55,13 +63,15 @@ input {
   transition: 0.3s;
 }
 
-input:focus {
+input:focus,
+textarea:focus,
+select:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 10px rgba(255,255,255,0.1);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.12);
 }
 
-/* === КНОПКИ === */
+/* ===== Buttons ===== */
 button {
   cursor: pointer;
   font-weight: bold;
@@ -82,7 +92,7 @@ button {
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(255,255,255,0.2);
+  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.25);
 }
 
 .btn-outline {
@@ -118,7 +128,7 @@ button {
   color: white;
 }
 
-/* === СПИСОК ЗАКАЗОВ === */
+/* ===== Simple list item ===== */
 .order-item {
   display: flex;
   justify-content: space-between;
@@ -133,10 +143,10 @@ button {
 
 .order-item:hover {
   border-color: #444;
-  transform: translateX(5px);
+  transform: translateY(5px);
 }
 
-/* === СТАТУСЫ === */
+/* ===== Badge ===== */
 .status-badge {
   padding: 6px 12px;
   border-radius: 20px;
@@ -148,8 +158,117 @@ button {
   user-select: none;
 }
 
-/* Анимация появления */
+/* ===== Animation ===== */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===================================================================== */
+/* =============================== Sidebar ============================== */
+/* ===================================================================== */
+
+.sb {
+  width: 260px;
+  min-width: 260px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+
+  padding: 16px;
+  background: rgba(20, 20, 20, 0.65);
+  backdrop-filter: blur(10px);
+
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sb-brand {
+  padding: 12px 12px 14px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sb-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.sb-subtitle {
+  margin-top: 4px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.sb-nav {
+  margin-top: 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.sb-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px 12px;
+  border-radius: 14px;
+
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.85);
+
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  transition: all 0.15s ease;
+}
+
+.sb-item:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.sb-item--active {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.20);
+}
+
+.sb-ico {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.sb-text {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sb-sep {
+  height: 1px;
+  margin: 6px 4px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.sb-footer {
+  margin-top: 14px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
 }
