@@ -4,16 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 
 type ProfileRow = {
-  id?: string | null;
   user_id: string;
   email?: string | null;
   full_name?: string | null;
   about?: string | null;
   avatar_url?: string | null;
-  updated_at?: string | null;
 };
 
-function safeText(v: any) {
+function s(v: any) {
   return typeof v === "string" ? v : "";
 }
 
@@ -23,24 +21,33 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const [userId, setUserId] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
+  const [userId, setUserId] = useState("");
+  const [email, setEmail] = useState("");
 
-  const [fullName, setFullName] = useState<string>("");
-  const [about, setAbout] = useState<string>("");
-  const [avatarUrl, setAvatarUrl] = useState<string>("");
+  // это “сохранённые” значения (то, что показываем вверху)
+  const [profile, setProfile] = useState<ProfileRow>({
+    user_id: "",
+    email: "",
+    full_name: "",
+    about: "",
+    avatar_url: "",
+  });
 
-  const [error, setError] = useState<string>("");
-  const [ok, setOk] = useState<string>("");
+  // режим редактирования + черновики
+  const [isEditing, setIsEditing] = useState(false);
+  const [draftFullName, setDraftFullName] = useState("");
+  const [draftAbout, setDraftAbout] = useState("");
+  const [draftAvatarUrl, setDraftAvatarUrl] = useState("");
 
-  const profileLabel = useMemo(() => {
-    return fullName?.trim() ? fullName.trim() : "Без имени";
-  }, [fullName]);
+  const [error, setError] = useState("");
+  const [ok, setOk] = useState("");
 
-  const publicAvatar = useMemo(() => {
-    // если avatarUrl уже public url — показываем его как есть
-    return avatarUrl?.trim() || "";
-  }, [avatarUrl]);
+  const titleName = useMemo(() => {
+    const name = s(profile.full_name).trim();
+    return name ? name : "Без имени";
+  }, [profile.full_name]);
+
+  const avatar = useMemo(() => s(profile.avatar_url).trim(), [profile.avatar_url]);
 
   async function load() {
     setLoading(true);
@@ -59,20 +66,30 @@ export default function Profile() {
       setUserId(u.id);
       setEmail(u.email ?? "");
 
-      // ВАЖНО: таблица называется profiles (public.profiles)
       const { data: rows, error: selErr } = await supabase
         .from("profiles")
-        .select("*")
+        .select("user_id,email,full_name,about,avatar_url")
         .eq("user_id", u.id)
         .limit(1);
 
       if (selErr) throw selErr;
 
-      const row = rows?.[0] as ProfileRow | undefined;
+      const row = (rows?.[0] as ProfileRow) || null;
 
-      setFullName(safeText(row?.full_name));
-      setAbout(safeText(row?.about));
-      setAvatarUrl(safeText(row?.avatar_url));
+      const next: ProfileRow = {
+        user_id: u.id,
+        email: row?.email ?? u.email ?? "",
+        full_name: row?.full_name ?? "",
+        about: row?.about ?? "",
+        avatar_url: row?.avatar_url ?? "",
+      };
+
+      setProfile(next);
+
+      // черновики заполняем текущими значениями
+      setDraftFullName(s(next.full_name));
+      setDraftAbout(s(next.about));
+      setDraftAvatarUrl(s(next.avatar_url));
     } catch (e: any) {
       setError(e?.message || "Ошибка загрузки профиля");
     } finally {
@@ -93,37 +110,24 @@ export default function Profile() {
     setOk("");
 
     try {
-      // 1) проверим, есть ли строка
-      const { data: existRows, error: selErr } = await supabase
-        .from("profiles")
-        .select("id,user_id")
-        .eq("user_id", userId)
-        .limit(1);
-
-      if (selErr) throw selErr;
-
-      const exists = !!existRows?.length;
-
-      const payload: Partial<ProfileRow> = {
-        full_name: fullName.trim() || null,
-        about: about.trim() || null,
-        avatar_url: avatarUrl.trim() || null,
-        email: email || null,
+      // upsert = вставит или обновит по user_id
+      const payload: ProfileRow = {
         user_id: userId,
+        email: email || null,
+        full_name: draftFullName.trim() || null,
+        about: draftAbout.trim() || null,
+        avatar_url: draftAvatarUrl.trim() || null,
       };
 
-      if (exists) {
-        const { error: updErr } = await supabase
-          .from("profiles")
-          .update(payload)
-          .eq("user_id", userId);
+      const { error: upErr } = await supabase
+        .from("profiles")
+        .upsert(payload, { onConflict: "user_id" });
 
-        if (updErr) throw updErr;
-      } else {
-        // если строки нет — создаём
-        const { error: insErr } = await supabase.from("profiles").insert(payload);
-        if (insErr) throw insErr;
-      }
+      if (upErr) throw upErr;
+
+      // применяем черновик как “сохранённое”
+      setProfile(payload);
+      setIsEditing(false);
 
       setOk("Сохранено ✅");
     } catch (e: any) {
@@ -131,6 +135,24 @@ export default function Profile() {
     } finally {
       setSaving(false);
     }
+  }
+
+  function startEdit() {
+    setDraftFullName(s(profile.full_name));
+    setDraftAbout(s(profile.about));
+    setDraftAvatarUrl(s(profile.avatar_url));
+    setIsEditing(true);
+    setOk("");
+    setError("");
+  }
+
+  function cancelEdit() {
+    setDraftFullName(s(profile.full_name));
+    setDraftAbout(s(profile.about));
+    setDraftAvatarUrl(s(profile.avatar_url));
+    setIsEditing(false);
+    setOk("");
+    setError("");
   }
 
   async function copyId() {
@@ -145,15 +167,16 @@ export default function Profile() {
 
   async function uploadAvatar(file: File) {
     if (!userId) return;
+
     setSaving(true);
     setError("");
     setOk("");
 
     try {
-      // bucket должен называться EXACT: avatars
       const ext = file.name.split(".").pop() || "jpg";
       const filePath = `${userId}/${Date.now()}.${ext}`;
 
+      // bucket должен быть avatars
       const { error: upErr } = await supabase.storage
         .from("avatars")
         .upload(filePath, file, {
@@ -167,12 +190,11 @@ export default function Profile() {
       const { data: pub } = supabase.storage.from("avatars").getPublicUrl(filePath);
       const url = pub?.publicUrl || "";
 
-      setAvatarUrl(url);
+      // кладём в черновик (чтобы сохранить кнопкой)
+      setDraftAvatarUrl(url);
 
-      // сразу сохраняем в profiles
-      await saveProfile();
-
-      setOk("Аватар обновлён ✅");
+      setOk("Аватар загружен ✅ (нажми «Сохранить»)");
+      setIsEditing(true);
     } catch (e: any) {
       setError(e?.message || "Ошибка загрузки аватара");
     } finally {
@@ -180,7 +202,7 @@ export default function Profile() {
     }
   }
 
-  const cardStyle: React.CSSProperties = {
+  const card: React.CSSProperties = {
     background: "rgba(255,255,255,0.06)",
     border: "1px solid rgba(255,255,255,0.12)",
     borderRadius: 14,
@@ -188,17 +210,17 @@ export default function Profile() {
     backdropFilter: "blur(10px)",
   };
 
-  const btnStyle: React.CSSProperties = {
+  const btn: React.CSSProperties = {
     borderRadius: 12,
     border: "1px solid rgba(255,255,255,0.12)",
     background: "rgba(255,255,255,0.08)",
     color: "white",
     padding: "10px 12px",
     cursor: "pointer",
-    fontWeight: 600,
+    fontWeight: 700,
   };
 
-  const inputStyle: React.CSSProperties = {
+  const input: React.CSSProperties = {
     width: "100%",
     borderRadius: 12,
     border: "1px solid rgba(255,255,255,0.12)",
@@ -211,15 +233,15 @@ export default function Profile() {
   if (loading) {
     return (
       <div style={{ color: "white", padding: 16 }}>
-        <div style={cardStyle}>Loading...</div>
+        <div style={card}>Loading...</div>
       </div>
     );
   }
 
   return (
     <div style={{ color: "white", padding: 16, maxWidth: 1100 }}>
-      {/* TOP CARD */}
-      <div style={{ ...cardStyle, display: "flex", gap: 14, alignItems: "center" }}>
+      {/* TOP */}
+      <div style={{ ...card, display: "flex", gap: 14, alignItems: "center" }}>
         <div
           style={{
             width: 54,
@@ -235,57 +257,65 @@ export default function Profile() {
           }}
           title="Аватар"
         >
-          {publicAvatar ? (
-            <img
-              src={publicAvatar}
-              alt="avatar"
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
+          {avatar ? (
+            <img src={avatar} alt="avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           ) : (
             <span style={{ opacity: 0.8 }}>👤</span>
           )}
         </div>
 
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 18, fontWeight: 800 }}>{profileLabel}</div>
+          <div style={{ fontSize: 18, fontWeight: 900 }}>{titleName}</div>
+
           <div style={{ opacity: 0.8, fontSize: 12, display: "flex", gap: 8, alignItems: "center" }}>
             <span>ID: {userId}</span>
-            <button onClick={copyId} style={{ ...btnStyle, padding: "6px 10px", fontWeight: 700 }}>
+            <button onClick={copyId} style={{ ...btn, padding: "6px 10px" }}>
               Copy
             </button>
           </div>
+
           <div style={{ marginTop: 8, opacity: 0.9 }}>
-            {about?.trim() ? about.trim() : "Пока нет описания."}
+            {s(profile.about).trim() ? s(profile.about).trim() : "Пока нет описания."}
           </div>
         </div>
 
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "flex-end" }}>
-          <button onClick={() => navigate(-1)} style={btnStyle}>
+          <button onClick={() => navigate(-1)} style={btn}>
             ← Назад
           </button>
 
           <button
             onClick={() => {
-              const url = window.location.href;
-              navigator.clipboard.writeText(url).then(
-                () => setOk("Ссылка скопирована ✅"),
-                () => setError("Не удалось скопировать ссылку")
-              );
+              navigator.clipboard
+                .writeText(window.location.href)
+                .then(() => setOk("Ссылка скопирована ✅"))
+                .catch(() => setError("Не удалось скопировать ссылку"));
             }}
-            style={btnStyle}
+            style={btn}
           >
             🔗 Поделиться
           </button>
 
-          <button onClick={saveProfile} style={{ ...btnStyle, opacity: saving ? 0.6 : 1 }} disabled={saving}>
-            ✏️ Сохранить
-          </button>
+          {!isEditing ? (
+            <button onClick={startEdit} style={btn}>
+              ✏️ Редактировать
+            </button>
+          ) : (
+            <>
+              <button onClick={cancelEdit} style={btn}>
+                ✖ Отмена
+              </button>
+              <button onClick={saveProfile} style={{ ...btn, opacity: saving ? 0.6 : 1 }} disabled={saving}>
+                ✅ Сохранить
+              </button>
+            </>
+          )}
         </div>
       </div>
 
       {/* STATUS */}
       {(error || ok) && (
-        <div style={{ marginTop: 12, ...cardStyle }}>
+        <div style={{ marginTop: 12, ...card }}>
           {error ? <div style={{ color: "#ffb4b4" }}>Ошибка: {error}</div> : null}
           {ok ? <div style={{ color: "#bfffd2" }}>{ok}</div> : null}
         </div>
@@ -300,35 +330,38 @@ export default function Profile() {
           gap: 12,
         }}
       >
-        {/* LEFT: EDIT */}
-        <div style={cardStyle}>
-          <div style={{ fontWeight: 800, marginBottom: 10 }}>Редактировать профиль</div>
+        {/* LEFT */}
+        <div style={card}>
+          <div style={{ fontWeight: 900, marginBottom: 10 }}>Редактировать профиль</div>
 
           <label style={{ display: "block", marginBottom: 8, opacity: 0.9 }}>Полное имя</label>
           <input
-            style={inputStyle}
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            style={input}
+            value={draftFullName}
+            onChange={(e) => setDraftFullName(e.target.value)}
             placeholder="Например: Ihor Nepomiashchyi"
+            disabled={!isEditing}
           />
 
           <div style={{ height: 12 }} />
 
           <label style={{ display: "block", marginBottom: 8, opacity: 0.9 }}>О себе</label>
           <textarea
-            style={{ ...inputStyle, minHeight: 90, resize: "vertical" }}
-            value={about}
-            onChange={(e) => setAbout(e.target.value)}
+            style={{ ...input, minHeight: 90, resize: "vertical" }}
+            value={draftAbout}
+            onChange={(e) => setDraftAbout(e.target.value)}
             placeholder="Коротко о себе..."
+            disabled={!isEditing}
           />
 
           <div style={{ height: 12 }} />
 
-          <label style={{ display: "block", marginBottom: 8, opacity: 0.9 }}>Аватар (из галереи / файла)</label>
+          <label style={{ display: "block", marginBottom: 8, opacity: 0.9 }}>Аватар (файл)</label>
           <input
             type="file"
             accept="image/*"
             style={{ width: "100%" }}
+            disabled={!isEditing}
             onChange={(e) => {
               const f = e.target.files?.[0];
               if (f) uploadAvatar(f);
@@ -338,46 +371,41 @@ export default function Profile() {
 
           <div style={{ height: 12 }} />
 
-          <label style={{ display: "block", marginBottom: 8, opacity: 0.9 }}>
-            Аватар URL (если нужно вручную)
-          </label>
+          <label style={{ display: "block", marginBottom: 8, opacity: 0.9 }}>Аватар URL (опционально)</label>
           <input
-            style={inputStyle}
-            value={avatarUrl}
-            onChange={(e) => setAvatarUrl(e.target.value)}
+            style={input}
+            value={draftAvatarUrl}
+            onChange={(e) => setDraftAvatarUrl(e.target.value)}
             placeholder="https://..."
+            disabled={!isEditing}
           />
 
-          <div style={{ height: 14 }} />
-
-          <button
-            onClick={saveProfile}
-            style={{ ...btnStyle, width: "100%", opacity: saving ? 0.6 : 1 }}
-            disabled={saving}
-          >
-            {saving ? "Сохраняю..." : "Сохранить изменения"}
-          </button>
-
-          <div style={{ marginTop: 10, fontSize: 12, opacity: 0.75 }}>
+          <div style={{ marginTop: 12, fontSize: 12, opacity: 0.75 }}>
             Email: <b>{email || "-"}</b>
           </div>
+
+          {!isEditing && (
+            <div style={{ marginTop: 10, fontSize: 12, opacity: 0.75 }}>
+              Нажми <b>«Редактировать»</b>, чтобы менять данные.
+            </div>
+          )}
         </div>
 
-        {/* RIGHT: STATS + POSTS PLACEHOLDER */}
+        {/* RIGHT */}
         <div style={{ display: "grid", gap: 12 }}>
-          <div style={cardStyle}>
+          <div style={card}>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-              <StatBox title="Посты" value="0" />
-              <StatBox title="Лайки" value="0" />
-              <StatBox title="Комментарии" value="0" />
+              <Stat title="Посты" value="0" />
+              <Stat title="Лайки" value="0" />
+              <Stat title="Комментарии" value="0" />
             </div>
             <div style={{ marginTop: 10, opacity: 0.85 }}>
               Тут дальше можно подключить счётчики и посты пользователя.
             </div>
           </div>
 
-          <div style={cardStyle}>
-            <div style={{ fontWeight: 800, marginBottom: 6 }}>Посты пользователя</div>
+          <div style={card}>
+            <div style={{ fontWeight: 900, marginBottom: 6 }}>Посты пользователя</div>
             <div style={{ opacity: 0.85 }}>
               Пока нет постов. Создай первый пост на странице <b>"Посты"</b>.
             </div>
@@ -388,7 +416,7 @@ export default function Profile() {
   );
 }
 
-function StatBox({ title, value }: { title: string; value: string }) {
+function Stat({ title, value }: { title: string; value: string }) {
   return (
     <div
       style={{
