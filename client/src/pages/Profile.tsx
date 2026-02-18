@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import { useAuth } from "../AuthContext";
@@ -20,10 +20,12 @@ type PostRow = {
   comments_count?: number | null;
 };
 
+// 1) Bucket для аватаров в Supabase Storage (создадим ниже в инструкции)
+const AVATAR_BUCKET = "avatars";
+
 export default function ProfilePage() {
   const nav = useNavigate();
   const { user } = useAuth();
-
   const userId = user?.id || "";
 
   const [loading, setLoading] = useState(true);
@@ -39,11 +41,18 @@ export default function ProfilePage() {
   const [editOpen, setEditOpen] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
 
-  // stats + posts
+  // posts/stats
   const [posts, setPosts] = useState<PostRow[]>([]);
   const [postsCount, setPostsCount] = useState(0);
   const [likesCount, setLikesCount] = useState(0);
   const [commentsCount, setCommentsCount] = useState(0);
+
+  // file upload
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  // auto-detect profile table
+  const profileTableRef = useRef<string | null>(null);
 
   const displayName = useMemo(() => {
     const n = (profile?.full_name || "").trim();
@@ -55,36 +64,68 @@ export default function ProfilePage() {
     return b.length ? b : "Пока нет описания.";
   }, [profile?.bio]);
 
-  useEffect(() => {
-    let cancelled = false;
+  function setToast(text: string, ms = 1400) {
+    setMsg(text);
+    window.setTimeout(() => setMsg(null), ms);
+  }
 
-    async function loadAll() {
-      if (!userId) return;
-      setLoading(true);
-      setMsg(null);
+  async function resolveProfileTable(): Promise<string> {
+    if (profileTableRef.current) return profileTableRef.current;
 
-      // 1) profile
+    // пробуем public_profiles
+    {
+      const r = await supabase.from("public_profiles").select("id", { head: true }).limit(1);
+      if (!r.error) {
+        profileTableRef.current = "public_profiles";
+        return "public_profiles";
+      }
+    }
+
+    // пробуем profiles
+    {
+      const r = await supabase.from("profiles").select("id", { head: true }).limit(1);
+      if (!r.error) {
+        profileTableRef.current = "profiles";
+        return "profiles";
+      }
+    }
+
+    // если обе не найдены — покажем нормальную ошибку
+    throw new Error(
+      "Не найдена таблица профилей. Создай в Supabase таблицу public_profiles или profiles (id, full_name, avatar_url, bio)."
+    );
+  }
+
+  async function loadProfileAndPosts() {
+    if (!userId) return;
+    setLoading(true);
+    setMsg(null);
+
+    try {
+      const table = await resolveProfileTable();
+
+      // PROFILE
       const p = await supabase
-        .from("public_profiles")
+        .from(table)
         .select("id, full_name, avatar_url, bio, updated_at")
         .eq("id", userId)
         .maybeSingle();
 
-      if (cancelled) return;
+      if (p.error) throw new Error(p.error.message);
 
-      if (p.error) {
-        setMsg(`Ошибка загрузки профиля: ${p.error.message}`);
-        setProfile({ id: userId, full_name: null, avatar_url: null, bio: null });
-      } else {
-        const row: ProfileRow =
-          p.data || { id: userId, full_name: null, avatar_url: null, bio: null };
-        setProfile(row);
-        setFullName(row.full_name || "");
-        setAvatarUrl(row.avatar_url || "");
-        setBio(row.bio || "");
-      }
+      const row: ProfileRow = p.data || {
+        id: userId,
+        full_name: null,
+        avatar_url: null,
+        bio: null,
+      };
 
-      // 2) posts list (latest 10)
+      setProfile(row);
+      setFullName(row.full_name || "");
+      setAvatarUrl(row.avatar_url || "");
+      setBio(row.bio || "");
+
+      // POSTS latest 10
       const postsRes = await supabase
         .from("freed_posts")
         .select("id, user_id, content, created_at, likes_count, comments_count")
@@ -92,92 +133,123 @@ export default function ProfilePage() {
         .order("created_at", { ascending: false })
         .limit(10);
 
-      if (!cancelled) {
-        if (!postsRes.error && Array.isArray(postsRes.data)) {
-          setPosts(postsRes.data as PostRow[]);
-          setPostsCount(postsRes.data.length); // быстрый счётчик из загруженных
-          // суммируем лайки/комменты если поля есть
-          const likes = (postsRes.data as any[]).reduce(
-            (acc, x) => acc + (Number(x.likes_count) || 0),
-            0
-          );
-          const comm = (postsRes.data as any[]).reduce(
-            (acc, x) => acc + (Number(x.comments_count) || 0),
-            0
-          );
-          setLikesCount(likes);
-          setCommentsCount(comm);
-        }
+      if (!postsRes.error && Array.isArray(postsRes.data)) {
+        setPosts(postsRes.data as PostRow[]);
+        const likes = (postsRes.data as any[]).reduce(
+          (acc, x) => acc + (Number(x.likes_count) || 0),
+          0
+        );
+        const comm = (postsRes.data as any[]).reduce(
+          (acc, x) => acc + (Number(x.comments_count) || 0),
+          0
+        );
+        setLikesCount(likes);
+        setCommentsCount(comm);
       }
 
-      // 3) total posts count (точный), если Supabase разрешает count
+      // total count exact
       const countRes = await supabase
         .from("freed_posts")
         .select("id", { count: "exact", head: true })
         .eq("user_id", userId);
 
-      if (!cancelled) {
-        if (!countRes.error && typeof countRes.count === "number") {
-          setPostsCount(countRes.count);
-        }
-        setLoading(false);
+      if (!countRes.error && typeof countRes.count === "number") {
+        setPostsCount(countRes.count);
+      } else {
+        setPostsCount(postsRes.data?.length || 0);
       }
+    } catch (e: any) {
+      setToast(`Ошибка загрузки: ${e?.message || String(e)}`, 3500);
+      setProfile({ id: userId, full_name: null, avatar_url: null, bio: null });
+    } finally {
+      setLoading(false);
     }
+  }
 
-    loadAll();
-    return () => {
-      cancelled = true;
-    };
+  useEffect(() => {
+    loadProfileAndPosts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
+
+  async function uploadAvatarIfNeeded(): Promise<string | null> {
+    if (!avatarFile) return null;
+
+    setUploading(true);
+    try {
+      const ext = avatarFile.name.split(".").pop()?.toLowerCase() || "jpg";
+      const filePath = `${userId}/${Date.now()}.${ext}`;
+
+      const up = await supabase.storage.from(AVATAR_BUCKET).upload(filePath, avatarFile, {
+        upsert: true,
+        contentType: avatarFile.type || "image/jpeg",
+      });
+
+      if (up.error) throw new Error(up.error.message);
+
+      const pub = supabase.storage.from(AVATAR_BUCKET).getPublicUrl(filePath);
+      const url = pub.data.publicUrl;
+
+      if (!url) throw new Error("Не удалось получить public URL аватара");
+
+      // сразу обновим поле
+      setAvatarUrl(url);
+      setAvatarFile(null);
+
+      return url;
+    } finally {
+      setUploading(false);
+    }
+  }
 
   async function saveProfile() {
     if (!userId) return;
     setSaving(true);
     setMsg(null);
 
-    const payload: ProfileRow = {
-      id: userId,
-      full_name: fullName.trim() || null,
-      avatar_url: avatarUrl.trim() || null,
-      bio: bio.trim() || null,
-    };
+    try {
+      const table = await resolveProfileTable();
 
-    const { error } = await supabase.from("public_profiles").upsert(payload, {
-      onConflict: "id",
-    });
+      // 1) если выбрано фото — сначала загрузим и возьмём url
+      let finalAvatar = avatarUrl.trim() || null;
+      const uploadedUrl = await uploadAvatarIfNeeded();
+      if (uploadedUrl) finalAvatar = uploadedUrl;
 
-    if (error) {
-      setMsg(`Ошибка сохранения: ${error.message}`);
+      const payload: ProfileRow = {
+        id: userId,
+        full_name: fullName.trim() || null,
+        avatar_url: finalAvatar,
+        bio: bio.trim() || null,
+      };
+
+      const { error } = await supabase.from(table).upsert(payload, { onConflict: "id" });
+      if (error) throw new Error(error.message);
+
+      setProfile((p) => ({
+        ...(p || { id: userId, full_name: null, avatar_url: null, bio: null }),
+        ...payload,
+        updated_at: new Date().toISOString(),
+      }));
+
+      setEditOpen(false);
+      setToast("Сохранено ✅");
+    } catch (e: any) {
+      setToast(`Ошибка сохранения: ${e?.message || String(e)}`, 4500);
+    } finally {
       setSaving(false);
-      return;
     }
-
-    setProfile((p) => ({
-      ...(p || { id: userId, full_name: null, avatar_url: null, bio: null }),
-      ...payload,
-      updated_at: new Date().toISOString(),
-    }));
-
-    setSaving(false);
-    setEditOpen(false);
-    setMsg("Сохранено ✅");
-    setTimeout(() => setMsg(null), 1400);
   }
 
   async function copy(text: string) {
     try {
       await navigator.clipboard.writeText(text);
-      setMsg("Скопировано ✅");
-      setTimeout(() => setMsg(null), 1100);
+      setToast("Скопировано ✅", 1100);
     } catch {
-      setMsg("Не удалось скопировать");
-      setTimeout(() => setMsg(null), 1200);
+      setToast("Не удалось скопировать", 1200);
     }
   }
 
   function shareProfile() {
-    const url = window.location.href;
-    copy(url);
+    copy(window.location.href);
   }
 
   function timeAgo(iso: string) {
@@ -210,7 +282,6 @@ export default function ProfilePage() {
 
   return (
     <div style={pageWrap}>
-      {/* HEADER */}
       <div style={cover}>
         <div style={coverTopRow}>
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
@@ -257,7 +328,6 @@ export default function ProfilePage() {
 
         <div style={bioBox}>{loading ? "..." : displayBio}</div>
 
-        {/* STATS */}
         <div style={statsRow}>
           <div style={statCard}>
             <div style={statNum}>{postsCount}</div>
@@ -272,15 +342,11 @@ export default function ProfilePage() {
             <div style={statLbl}>Комментарии</div>
           </div>
 
-          <div style={{ marginLeft: "auto", display: "flex", gap: 10 }}>
-            {msg && <div style={toastSmall}>{msg}</div>}
-          </div>
+          <div style={{ marginLeft: "auto" }}>{msg && <div style={toastSmall}>{msg}</div>}</div>
         </div>
       </div>
 
-      {/* BODY */}
       <div style={grid}>
-        {/* LEFT */}
         <div style={{ display: "grid", gap: 12 }}>
           <div style={card}>
             <div style={cardTitle}>О себе</div>
@@ -294,10 +360,7 @@ export default function ProfilePage() {
                 <>
                   <div style={mutedSmall}>Ссылка:</div>
                   <div style={monoWrap}>{profile.avatar_url}</div>
-                  <button
-                    style={{ ...miniBtn, marginTop: 10 }}
-                    onClick={() => copy(profile.avatar_url || "")}
-                  >
+                  <button style={{ ...miniBtn, marginTop: 10 }} onClick={() => copy(profile.avatar_url || "")}>
                     Copy link
                   </button>
                 </>
@@ -321,7 +384,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* RIGHT */}
         <div style={{ display: "grid", gap: 12 }}>
           <div style={card}>
             <div style={cardTitle}>Посты пользователя</div>
@@ -386,8 +448,23 @@ export default function ProfilePage() {
                 />
               </label>
 
+              {/* ✅ ВОТ ТУТ загрузка с галереи */}
               <label style={label}>
-                Ссылка на аватар
+                Фото профиля (с галереи)
+                <input
+                  style={input}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
+                />
+                <div style={mutedSmall}>
+                  {avatarFile ? `Выбрано: ${avatarFile.name}` : "Файл не выбран"}
+                </div>
+              </label>
+
+              {/* Оставим и поле ссылки — если захочешь вставить URL */}
+              <label style={label}>
+                Или ссылка на аватар (не обязательно)
                 <input
                   style={input}
                   value={avatarUrl}
@@ -410,9 +487,13 @@ export default function ProfilePage() {
                 <button style={btnGhost} onClick={() => setEditOpen(false)}>
                   Отмена
                 </button>
-                <button style={btnPrimary} onClick={saveProfile} disabled={saving}>
-                  {saving ? "Сохранение..." : "Сохранить"}
+                <button style={btnPrimary} onClick={saveProfile} disabled={saving || uploading}>
+                  {uploading ? "Загрузка фото..." : saving ? "Сохранение..." : "Сохранить"}
                 </button>
+              </div>
+
+              <div style={mutedSmall}>
+                * Если появится ошибка про bucket/политику — см. инструкцию ниже (2 минуты).
               </div>
             </div>
           </div>
@@ -424,17 +505,12 @@ export default function ProfilePage() {
 
 /* ===== styles ===== */
 
-const pageWrap: React.CSSProperties = {
-  padding: 16,
-  maxWidth: 1200,
-  margin: "0 auto",
-};
+const pageWrap: React.CSSProperties = { padding: 16, maxWidth: 1200, margin: "0 auto" };
 
 const cover: React.CSSProperties = {
   borderRadius: 18,
   border: "1px solid rgba(255,255,255,0.10)",
-  background:
-    "linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04))",
+  background: "linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04))",
   boxShadow: "0 16px 40px rgba(0,0,0,0.25)",
   padding: 14,
   marginBottom: 14,
@@ -460,12 +536,7 @@ const avatarWrap: React.CSSProperties = {
   justifyContent: "center",
 };
 
-const avatarImg: React.CSSProperties = {
-  width: "100%",
-  height: "100%",
-  objectFit: "cover",
-};
-
+const avatarImg: React.CSSProperties = { width: "100%", height: "100%", objectFit: "cover" };
 const avatarFallback: React.CSSProperties = { fontSize: 28, opacity: 0.9 };
 
 const nameText: React.CSSProperties = { fontSize: 20, fontWeight: 800, color: "white" };
@@ -508,11 +579,7 @@ const statCard: React.CSSProperties = {
 const statNum: React.CSSProperties = { fontSize: 18, fontWeight: 900, color: "white" };
 const statLbl: React.CSSProperties = { fontSize: 12, color: "rgba(255,255,255,0.70)" };
 
-const grid: React.CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "1fr 1.2fr",
-  gap: 14,
-};
+const grid: React.CSSProperties = { display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 14 };
 
 const card: React.CSSProperties = {
   borderRadius: 16,
@@ -598,13 +665,7 @@ const postCard: React.CSSProperties = {
   padding: 12,
 };
 
-const postHead: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap: 10,
-};
-
+const postHead: React.CSSProperties = { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 };
 const postId: React.CSSProperties = { ...mono, opacity: 0.95 };
 const postTime: React.CSSProperties = { fontSize: 12, color: "rgba(255,255,255,0.60)" };
 
@@ -615,13 +676,7 @@ const postBody: React.CSSProperties = {
   wordBreak: "break-word",
 };
 
-const postFoot: React.CSSProperties = {
-  display: "flex",
-  gap: 8,
-  alignItems: "center",
-  marginTop: 10,
-  flexWrap: "wrap",
-};
+const postFoot: React.CSSProperties = { display: "flex", gap: 8, alignItems: "center", marginTop: 10, flexWrap: "wrap" };
 
 const chip: React.CSSProperties = {
   padding: "6px 10px",
@@ -652,13 +707,7 @@ const modalCard: React.CSSProperties = {
   padding: 14,
 };
 
-const modalHeader: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap: 10,
-};
-
+const modalHeader: React.CSSProperties = { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 };
 const modalTitle: React.CSSProperties = { fontSize: 16, fontWeight: 800, color: "white" };
 
 const form: React.CSSProperties = { display: "grid", gap: 12, marginTop: 12 };
@@ -680,8 +729,4 @@ const input: React.CSSProperties = {
   outline: "none",
 };
 
-const textarea: React.CSSProperties = {
-  ...input,
-  minHeight: 110,
-  resize: "vertical",
-};
+const textarea: React.CSSProperties = { ...input, minHeight: 110, resize: "vertical" };
