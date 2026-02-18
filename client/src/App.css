@@ -1,42 +1,181 @@
+/* src/App.css */
+/* Полная замена Vite-демо стилей.
+   Основа под "глубину" + мобильный drawer (левое меню по кнопке).
+*/
+
+:root {
+  --radius-xl: 18px;
+  --radius-lg: 14px;
+
+  /* можно оставить, если у тебя в index.css уже есть vars */
+  --bg: var(--bg-color, #0b0f14);
+  --card: var(--card-color, #0f141b);
+  --text: var(--text-main, #e7edf5);
+  --muted: var(--text-muted, #98a3b3);
+  --border: var(--border, rgba(255, 255, 255, 0.12));
+}
+
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  width: 100%;
+  min-height: 100vh;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* Общий фон/глубина */
+.appRoot {
+  min-height: 100vh;
+  color: var(--text);
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+/* “световые пятна” на фоне */
+.appRoot::before,
+.appRoot::after {
+  content: "";
+  position: fixed;
+  inset: -40%;
+  z-index: 0;
+  pointer-events: none;
+  filter: blur(60px);
+  opacity: 0.55;
+}
+
+.appRoot::before {
+  background:
+    radial-gradient(circle at 25% 20%, rgba(120, 119, 198, 0.22), transparent 45%),
+    radial-gradient(circle at 80% 35%, rgba(255, 120, 230, 0.14), transparent 40%);
+}
+
+.appRoot::after {
+  background:
+    radial-gradient(circle at 20% 80%, rgba(90, 200, 255, 0.14), transparent 45%),
+    radial-gradient(circle at 85% 85%, rgba(160, 255, 190, 0.08), transparent 45%);
+}
+
+/* Каркас приложения */
+.appLayout {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Левое меню (десктоп) */
+.sidebarShell {
+  width: 290px;
+  flex: 0 0 290px;
+  padding: 14px;
+  border-right: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+  backdrop-filter: blur(10px);
+}
+
+/* Правая часть */
+.mainShell {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Верхняя панель */
+.topbarShell {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(10, 14, 20, 0.55);
+  backdrop-filter: blur(14px);
+}
+
+/* Контент */
+.contentShell {
+  flex: 1;
+  min-height: 0;
+  padding: 14px;
+}
+
+/* Кнопка “бургер” (видна на мобилке) */
+.burgerBtn {
+  height: 38px;
+  min-width: 38px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+
+  cursor: pointer;
+  user-select: none;
+  transition: transform 120ms ease, background 120ms ease;
+}
+.burgerBtn:active {
+  transform: scale(0.98);
+}
+.burgerBtn:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+/* Оверлей для мобилки */
+.mobileOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+/* Выезжающее меню (мобилка) */
+.mobileDrawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: min(86vw, 320px);
+  z-index: 60;
+
+  transform: translateX(-110%);
+  transition: transform 200ms ease;
+
+  border-right: 1px solid var(--border);
+  background: rgba(15, 20, 27, 0.80);
+  backdrop-filter: blur(14px);
+}
+
+/* Состояние: меню открыто
+   (просто добавляй класс "isMenuOpen" на .appRoot) */
+.appRoot.isMenuOpen .mobileOverlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+.appRoot.isMenuOpen .mobileDrawer {
+  transform: translateX(0);
+}
+
+/* Адаптив: на телефоне левое меню прячем, включаем drawer */
+@media (max-width: 900px) {
+  .sidebarShell {
+    display: none;
   }
-  to {
-    transform: rotate(360deg);
+
+  .contentShell {
+    padding: 12px;
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+/* На десктопе drawer/overlay не нужны */
+@media (min-width: 901px) {
+  .mobileOverlay,
+  .mobileDrawer {
+    display: none;
   }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }
