@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { useI18n } from "../i18n/i18nProvider";
+import { useI18n } from "../i18n/I18nProvider";
 
 type NavItem = {
   to: string;
