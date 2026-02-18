@@ -1,4 +1,3 @@
-// client/src/pages/Profile.tsx
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
@@ -7,11 +6,39 @@ type ProfileRow = {
   user_id: string;
   email?: string | null;
   full_name?: string | null;
-  about?: string | null;
+  bio?: string | null;         // ВАЖНО: у тебя именно bio
   avatar_url?: string | null;
 };
 
-function s(v: any) {
+const card: React.CSSProperties = {
+  background: "rgba(255,255,255,0.06)",
+  border: "1px solid rgba(255,255,255,0.12)",
+  borderRadius: 14,
+  padding: 16,
+  backdropFilter: "blur(10px)",
+};
+
+const btn: React.CSSProperties = {
+  borderRadius: 12,
+  border: "1px solid rgba(255,255,255,0.12)",
+  background: "rgba(255,255,255,0.08)",
+  color: "white",
+  padding: "10px 12px",
+  cursor: "pointer",
+  fontWeight: 700,
+};
+
+const input: React.CSSProperties = {
+  width: "100%",
+  borderRadius: 12,
+  border: "1px solid rgba(255,255,255,0.12)",
+  background: "rgba(0,0,0,0.25)",
+  color: "white",
+  padding: "10px 12px",
+  outline: "none",
+};
+
+function str(v: any) {
   return typeof v === "string" ? v : "";
 }
 
@@ -24,30 +51,36 @@ export default function Profile() {
   const [userId, setUserId] = useState("");
   const [email, setEmail] = useState("");
 
-  // это “сохранённые” значения (то, что показываем вверху)
+  // сохранённый профиль (то, что показываем вверху)
   const [profile, setProfile] = useState<ProfileRow>({
     user_id: "",
     email: "",
     full_name: "",
-    about: "",
+    bio: "",
     avatar_url: "",
   });
 
-  // режим редактирования + черновики
+  // черновик для редактирования
   const [isEditing, setIsEditing] = useState(false);
   const [draftFullName, setDraftFullName] = useState("");
-  const [draftAbout, setDraftAbout] = useState("");
+  const [draftBio, setDraftBio] = useState("");
   const [draftAvatarUrl, setDraftAvatarUrl] = useState("");
 
   const [error, setError] = useState("");
   const [ok, setOk] = useState("");
 
   const titleName = useMemo(() => {
-    const name = s(profile.full_name).trim();
-    return name ? name : "Без имени";
+    const n = str(profile.full_name).trim();
+    return n ? n : "Без имени";
   }, [profile.full_name]);
 
-  const avatar = useMemo(() => s(profile.avatar_url).trim(), [profile.avatar_url]);
+  const bioText = useMemo(() => str(profile.bio).trim(), [profile.bio]);
+  const avatar = useMemo(() => str(profile.avatar_url).trim(), [profile.avatar_url]);
+
+  useEffect(() => {
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function load() {
     setLoading(true);
@@ -55,20 +88,21 @@ export default function Profile() {
     setOk("");
 
     try {
-      const { data: userData, error: userErr } = await supabase.auth.getUser();
-      if (userErr) throw userErr;
-      if (!userData?.user) {
+      const { data, error: uErr } = await supabase.auth.getUser();
+      if (uErr) throw uErr;
+
+      const u = data?.user;
+      if (!u) {
         navigate("/auth");
         return;
       }
 
-      const u = userData.user;
       setUserId(u.id);
       setEmail(u.email ?? "");
 
       const { data: rows, error: selErr } = await supabase
         .from("profiles")
-        .select("user_id,email,full_name,about,avatar_url")
+        .select("user_id,email,full_name,bio,avatar_url")
         .eq("user_id", u.id)
         .limit(1);
 
@@ -80,16 +114,16 @@ export default function Profile() {
         user_id: u.id,
         email: row?.email ?? u.email ?? "",
         full_name: row?.full_name ?? "",
-        about: row?.about ?? "",
+        bio: row?.bio ?? "",
         avatar_url: row?.avatar_url ?? "",
       };
 
       setProfile(next);
 
-      // черновики заполняем текущими значениями
-      setDraftFullName(s(next.full_name));
-      setDraftAbout(s(next.about));
-      setDraftAvatarUrl(s(next.avatar_url));
+      // заполняем черновики
+      setDraftFullName(str(next.full_name));
+      setDraftBio(str(next.bio));
+      setDraftAvatarUrl(str(next.avatar_url));
     } catch (e: any) {
       setError(e?.message || "Ошибка загрузки профиля");
     } finally {
@@ -97,10 +131,23 @@ export default function Profile() {
     }
   }
 
-  useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  function startEdit() {
+    setDraftFullName(str(profile.full_name));
+    setDraftBio(str(profile.bio));
+    setDraftAvatarUrl(str(profile.avatar_url));
+    setIsEditing(true);
+    setError("");
+    setOk("");
+  }
+
+  function cancelEdit() {
+    setDraftFullName(str(profile.full_name));
+    setDraftBio(str(profile.bio));
+    setDraftAvatarUrl(str(profile.avatar_url));
+    setIsEditing(false);
+    setError("");
+    setOk("");
+  }
 
   async function saveProfile() {
     if (!userId) return;
@@ -110,12 +157,11 @@ export default function Profile() {
     setOk("");
 
     try {
-      // upsert = вставит или обновит по user_id
       const payload: ProfileRow = {
         user_id: userId,
         email: email || null,
         full_name: draftFullName.trim() || null,
-        about: draftAbout.trim() || null,
+        bio: draftBio.trim() || null,              // ВАЖНО: сохраняем в bio
         avatar_url: draftAvatarUrl.trim() || null,
       };
 
@@ -125,10 +171,8 @@ export default function Profile() {
 
       if (upErr) throw upErr;
 
-      // применяем черновик как “сохранённое”
       setProfile(payload);
       setIsEditing(false);
-
       setOk("Сохранено ✅");
     } catch (e: any) {
       setError(e?.message || "Ошибка сохранения");
@@ -137,29 +181,11 @@ export default function Profile() {
     }
   }
 
-  function startEdit() {
-    setDraftFullName(s(profile.full_name));
-    setDraftAbout(s(profile.about));
-    setDraftAvatarUrl(s(profile.avatar_url));
-    setIsEditing(true);
-    setOk("");
-    setError("");
-  }
-
-  function cancelEdit() {
-    setDraftFullName(s(profile.full_name));
-    setDraftAbout(s(profile.about));
-    setDraftAvatarUrl(s(profile.avatar_url));
-    setIsEditing(false);
-    setOk("");
-    setError("");
-  }
-
   async function copyId() {
     try {
       await navigator.clipboard.writeText(userId);
       setOk("ID скопирован ✅");
-      setTimeout(() => setOk(""), 1500);
+      setTimeout(() => setOk(""), 1200);
     } catch {
       setError("Не удалось скопировать ID");
     }
@@ -174,61 +200,30 @@ export default function Profile() {
 
     try {
       const ext = file.name.split(".").pop() || "jpg";
-      const filePath = `${userId}/${Date.now()}.${ext}`;
+      const path = `${userId}/${Date.now()}.${ext}`;
 
-      // bucket должен быть avatars
-      const { error: upErr } = await supabase.storage
-        .from("avatars")
-        .upload(filePath, file, {
-          cacheControl: "3600",
-          upsert: true,
-          contentType: file.type || "image/*",
-        });
+      // bucket должен называться "avatars"
+      const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, {
+        cacheControl: "3600",
+        upsert: true,
+        contentType: file.type || "image/*",
+      });
 
       if (upErr) throw upErr;
 
-      const { data: pub } = supabase.storage.from("avatars").getPublicUrl(filePath);
-      const url = pub?.publicUrl || "";
+      const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+      const publicUrl = data?.publicUrl || "";
 
-      // кладём в черновик (чтобы сохранить кнопкой)
-      setDraftAvatarUrl(url);
-
-      setOk("Аватар загружен ✅ (нажми «Сохранить»)");
+      // кладём в черновик, чтобы сохранить кнопкой
+      setDraftAvatarUrl(publicUrl);
       setIsEditing(true);
+      setOk("Аватар загружен ✅ (нажми «Сохранить»)");
     } catch (e: any) {
       setError(e?.message || "Ошибка загрузки аватара");
     } finally {
       setSaving(false);
     }
   }
-
-  const card: React.CSSProperties = {
-    background: "rgba(255,255,255,0.06)",
-    border: "1px solid rgba(255,255,255,0.12)",
-    borderRadius: 14,
-    padding: 16,
-    backdropFilter: "blur(10px)",
-  };
-
-  const btn: React.CSSProperties = {
-    borderRadius: 12,
-    border: "1px solid rgba(255,255,255,0.12)",
-    background: "rgba(255,255,255,0.08)",
-    color: "white",
-    padding: "10px 12px",
-    cursor: "pointer",
-    fontWeight: 700,
-  };
-
-  const input: React.CSSProperties = {
-    width: "100%",
-    borderRadius: 12,
-    border: "1px solid rgba(255,255,255,0.12)",
-    background: "rgba(0,0,0,0.25)",
-    color: "white",
-    padding: "10px 12px",
-    outline: "none",
-  };
 
   if (loading) {
     return (
@@ -240,7 +235,7 @@ export default function Profile() {
 
   return (
     <div style={{ color: "white", padding: 16, maxWidth: 1100 }}>
-      {/* TOP */}
+      {/* HEADER */}
       <div style={{ ...card, display: "flex", gap: 14, alignItems: "center" }}>
         <div
           style={{
@@ -275,7 +270,7 @@ export default function Profile() {
           </div>
 
           <div style={{ marginTop: 8, opacity: 0.9 }}>
-            {s(profile.about).trim() ? s(profile.about).trim() : "Пока нет описания."}
+            {bioText ? bioText : "Пока нет описания."}
           </div>
         </div>
 
@@ -313,7 +308,7 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* STATUS */}
+      {/* MESSAGES */}
       {(error || ok) && (
         <div style={{ marginTop: 12, ...card }}>
           {error ? <div style={{ color: "#ffb4b4" }}>Ошибка: {error}</div> : null}
@@ -348,8 +343,8 @@ export default function Profile() {
           <label style={{ display: "block", marginBottom: 8, opacity: 0.9 }}>О себе</label>
           <textarea
             style={{ ...input, minHeight: 90, resize: "vertical" }}
-            value={draftAbout}
-            onChange={(e) => setDraftAbout(e.target.value)}
+            value={draftBio}
+            onChange={(e) => setDraftBio(e.target.value)}
             placeholder="Коротко о себе..."
             disabled={!isEditing}
           />
