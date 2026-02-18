@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../supabaseClient"; // если у тебя экспорт называется иначе (например supabaseClient) — скажи
-import { useAuth } from "../AuthContext"; // если у тебя хук называется иначе — скажи, я поправлю
+import { supabase } from "../supabaseClient";
+import { useAuth } from "../AuthContext";
 
 type ProfileRow = {
   id: string;
@@ -11,16 +11,27 @@ type ProfileRow = {
   updated_at?: string | null;
 };
 
+type PostRow = {
+  id: string;
+  user_id: string;
+  content: string | null;
+  created_at: string;
+  likes_count?: number | null;
+  comments_count?: number | null;
+};
+
 export default function ProfilePage() {
   const nav = useNavigate();
   const { user } = useAuth();
+
+  const userId = user?.id || "";
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   const [profile, setProfile] = useState<ProfileRow | null>(null);
 
-  // form state
+  // form
   const [fullName, setFullName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [bio, setBio] = useState("");
@@ -28,7 +39,11 @@ export default function ProfilePage() {
   const [editOpen, setEditOpen] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
 
-  const userId = user?.id || "";
+  // stats + posts
+  const [posts, setPosts] = useState<PostRow[]>([]);
+  const [postsCount, setPostsCount] = useState(0);
+  const [likesCount, setLikesCount] = useState(0);
+  const [commentsCount, setCommentsCount] = useState(0);
 
   const displayName = useMemo(() => {
     const n = (profile?.full_name || "").trim();
@@ -43,12 +58,13 @@ export default function ProfilePage() {
   useEffect(() => {
     let cancelled = false;
 
-    async function load() {
+    async function loadAll() {
       if (!userId) return;
       setLoading(true);
       setMsg(null);
 
-      const { data, error } = await supabase
+      // 1) profile
+      const p = await supabase
         .from("public_profiles")
         .select("id, full_name, avatar_url, bio, updated_at")
         .eq("id", userId)
@@ -56,28 +72,59 @@ export default function ProfilePage() {
 
       if (cancelled) return;
 
-      if (error) {
-        setMsg(`Ошибка загрузки профиля: ${error.message}`);
-        setProfile({
-          id: userId,
-          full_name: null,
-          avatar_url: null,
-          bio: null,
-        });
+      if (p.error) {
+        setMsg(`Ошибка загрузки профиля: ${p.error.message}`);
+        setProfile({ id: userId, full_name: null, avatar_url: null, bio: null });
       } else {
         const row: ProfileRow =
-          data || { id: userId, full_name: null, avatar_url: null, bio: null };
-
+          p.data || { id: userId, full_name: null, avatar_url: null, bio: null };
         setProfile(row);
         setFullName(row.full_name || "");
         setAvatarUrl(row.avatar_url || "");
         setBio(row.bio || "");
       }
 
-      setLoading(false);
+      // 2) posts list (latest 10)
+      const postsRes = await supabase
+        .from("freed_posts")
+        .select("id, user_id, content, created_at, likes_count, comments_count")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(10);
+
+      if (!cancelled) {
+        if (!postsRes.error && Array.isArray(postsRes.data)) {
+          setPosts(postsRes.data as PostRow[]);
+          setPostsCount(postsRes.data.length); // быстрый счётчик из загруженных
+          // суммируем лайки/комменты если поля есть
+          const likes = (postsRes.data as any[]).reduce(
+            (acc, x) => acc + (Number(x.likes_count) || 0),
+            0
+          );
+          const comm = (postsRes.data as any[]).reduce(
+            (acc, x) => acc + (Number(x.comments_count) || 0),
+            0
+          );
+          setLikesCount(likes);
+          setCommentsCount(comm);
+        }
+      }
+
+      // 3) total posts count (точный), если Supabase разрешает count
+      const countRes = await supabase
+        .from("freed_posts")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId);
+
+      if (!cancelled) {
+        if (!countRes.error && typeof countRes.count === "number") {
+          setPostsCount(countRes.count);
+        }
+        setLoading(false);
+      }
     }
 
-    load();
+    loadAll();
     return () => {
       cancelled = true;
     };
@@ -105,7 +152,6 @@ export default function ProfilePage() {
       return;
     }
 
-    // reload local
     setProfile((p) => ({
       ...(p || { id: userId, full_name: null, avatar_url: null, bio: null }),
       ...payload,
@@ -115,18 +161,35 @@ export default function ProfilePage() {
     setSaving(false);
     setEditOpen(false);
     setMsg("Сохранено ✅");
-    setTimeout(() => setMsg(null), 1500);
+    setTimeout(() => setMsg(null), 1400);
   }
 
   async function copy(text: string) {
     try {
       await navigator.clipboard.writeText(text);
       setMsg("Скопировано ✅");
-      setTimeout(() => setMsg(null), 1200);
+      setTimeout(() => setMsg(null), 1100);
     } catch {
       setMsg("Не удалось скопировать");
       setTimeout(() => setMsg(null), 1200);
     }
+  }
+
+  function shareProfile() {
+    const url = window.location.href;
+    copy(url);
+  }
+
+  function timeAgo(iso: string) {
+    const d = new Date(iso).getTime();
+    const diff = Date.now() - d;
+    const m = Math.floor(diff / 60000);
+    if (m < 1) return "только что";
+    if (m < 60) return `${m} мин назад`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `${h} ч назад`;
+    const days = Math.floor(h / 24);
+    return `${days} дн назад`;
   }
 
   if (!userId) {
@@ -147,10 +210,10 @@ export default function ProfilePage() {
 
   return (
     <div style={pageWrap}>
-      {/* HEADER / COVER */}
+      {/* HEADER */}
       <div style={cover}>
         <div style={coverTopRow}>
-          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
             <div style={avatarWrap}>
               {profile?.avatar_url ? (
                 <img
@@ -167,12 +230,10 @@ export default function ProfilePage() {
             </div>
 
             <div>
-              <div style={nameRow}>
-                <div style={nameText}>{loading ? "Загрузка..." : displayName}</div>
-              </div>
+              <div style={nameText}>{loading ? "Загрузка..." : displayName}</div>
 
               <div style={idRow}>
-                <span style={mutedSmall}>ID: </span>
+                <span style={mutedSmall}>ID:</span>
                 <span style={mono}>{userId}</span>
                 <button style={miniBtn} onClick={() => copy(userId)}>
                   Copy
@@ -185,7 +246,9 @@ export default function ProfilePage() {
             <button style={btnGhost} onClick={() => nav(-1)}>
               ← Назад
             </button>
-
+            <button style={btnGhost} onClick={shareProfile}>
+              🔗 Поделиться
+            </button>
             <button style={btnPrimary} onClick={() => setEditOpen(true)}>
               ✏️ Редактировать
             </button>
@@ -193,11 +256,31 @@ export default function ProfilePage() {
         </div>
 
         <div style={bioBox}>{loading ? "..." : displayBio}</div>
+
+        {/* STATS */}
+        <div style={statsRow}>
+          <div style={statCard}>
+            <div style={statNum}>{postsCount}</div>
+            <div style={statLbl}>Посты</div>
+          </div>
+          <div style={statCard}>
+            <div style={statNum}>{likesCount}</div>
+            <div style={statLbl}>Лайки</div>
+          </div>
+          <div style={statCard}>
+            <div style={statNum}>{commentsCount}</div>
+            <div style={statLbl}>Комментарии</div>
+          </div>
+
+          <div style={{ marginLeft: "auto", display: "flex", gap: 10 }}>
+            {msg && <div style={toastSmall}>{msg}</div>}
+          </div>
+        </div>
       </div>
 
-      {/* CONTENT GRID */}
+      {/* BODY */}
       <div style={grid}>
-        {/* LEFT: Preview cards */}
+        {/* LEFT */}
         <div style={{ display: "grid", gap: 12 }}>
           <div style={card}>
             <div style={cardTitle}>О себе</div>
@@ -238,20 +321,45 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* RIGHT: message + edit hint */}
+        {/* RIGHT */}
         <div style={{ display: "grid", gap: 12 }}>
-          {msg && <div style={toast}>{msg}</div>}
-
           <div style={card}>
-            <div style={cardTitle}>Профиль (будет красиво)</div>
-            <div style={muted}>
-              Дальше добавим сюда:
-              <ul style={{ margin: "8px 0 0 18px" }}>
-                <li>посты пользователя</li>
-                <li>счетчики (посты / друзья / лайки)</li>
-                <li>кнопку “Поделиться профилем”</li>
-              </ul>
-            </div>
+            <div style={cardTitle}>Посты пользователя</div>
+
+            {loading ? (
+              <div style={muted}>Загрузка...</div>
+            ) : posts.length === 0 ? (
+              <div style={muted}>Пока нет постов. Создай первый пост на странице “Посты”.</div>
+            ) : (
+              <div style={{ display: "grid", gap: 10, marginTop: 10 }}>
+                {posts.map((p) => (
+                  <div key={p.id} style={postCard}>
+                    <div style={postHead}>
+                      <div style={postId}>{p.id.slice(0, 8)}…</div>
+                      <div style={postTime}>{timeAgo(p.created_at)}</div>
+                    </div>
+
+                    <div style={postBody}>
+                      {(p.content || "").trim().length ? p.content : <span style={muted}>—</span>}
+                    </div>
+
+                    <div style={postFoot}>
+                      <span style={chip}>❤️ {Number(p.likes_count) || 0}</span>
+                      <span style={chip}>💬 {Number(p.comments_count) || 0}</span>
+                      <button style={{ ...miniBtn, marginLeft: "auto" }} onClick={() => copy(p.id)}>
+                        Copy post id
+                      </button>
+                    </div>
+                  </div>
+                ))}
+
+                <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                  <button style={btnGhost} onClick={() => nav("/posts")}>
+                    Перейти в ленту →
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -318,7 +426,7 @@ export default function ProfilePage() {
 
 const pageWrap: React.CSSProperties = {
   padding: 16,
-  maxWidth: 1100,
+  maxWidth: 1200,
   margin: "0 auto",
 };
 
@@ -358,12 +466,8 @@ const avatarImg: React.CSSProperties = {
   objectFit: "cover",
 };
 
-const avatarFallback: React.CSSProperties = {
-  fontSize: 28,
-  opacity: 0.9,
-};
+const avatarFallback: React.CSSProperties = { fontSize: 28, opacity: 0.9 };
 
-const nameRow: React.CSSProperties = { display: "flex", alignItems: "center", gap: 10 };
 const nameText: React.CSSProperties = { fontSize: 20, fontWeight: 800, color: "white" };
 
 const idRow: React.CSSProperties = {
@@ -383,9 +487,30 @@ const bioBox: React.CSSProperties = {
   color: "rgba(255,255,255,0.88)",
 };
 
+const statsRow: React.CSSProperties = {
+  display: "flex",
+  gap: 10,
+  alignItems: "center",
+  marginTop: 12,
+  flexWrap: "wrap",
+};
+
+const statCard: React.CSSProperties = {
+  minWidth: 110,
+  padding: "10px 12px",
+  borderRadius: 14,
+  border: "1px solid rgba(255,255,255,0.10)",
+  background: "rgba(255,255,255,0.06)",
+  display: "grid",
+  gap: 2,
+};
+
+const statNum: React.CSSProperties = { fontSize: 18, fontWeight: 900, color: "white" };
+const statLbl: React.CSSProperties = { fontSize: 12, color: "rgba(255,255,255,0.70)" };
+
 const grid: React.CSSProperties = {
   display: "grid",
-  gridTemplateColumns: "1fr 1fr",
+  gridTemplateColumns: "1fr 1.2fr",
   gap: 14,
 };
 
@@ -457,9 +582,54 @@ const pillOk: React.CSSProperties = {
   background: "rgba(0,0,0,0.25)",
 };
 
-const toast: React.CSSProperties = {
-  ...card,
+const toastSmall: React.CSSProperties = {
+  padding: "8px 10px",
+  borderRadius: 12,
   border: "1px solid rgba(120,255,200,0.25)",
+  background: "rgba(0,0,0,0.22)",
+  color: "white",
+  fontSize: 12,
+};
+
+const postCard: React.CSSProperties = {
+  borderRadius: 14,
+  border: "1px solid rgba(255,255,255,0.10)",
+  background: "rgba(0,0,0,0.22)",
+  padding: 12,
+};
+
+const postHead: React.CSSProperties = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: 10,
+};
+
+const postId: React.CSSProperties = { ...mono, opacity: 0.95 };
+const postTime: React.CSSProperties = { fontSize: 12, color: "rgba(255,255,255,0.60)" };
+
+const postBody: React.CSSProperties = {
+  marginTop: 8,
+  color: "rgba(255,255,255,0.90)",
+  whiteSpace: "pre-wrap",
+  wordBreak: "break-word",
+};
+
+const postFoot: React.CSSProperties = {
+  display: "flex",
+  gap: 8,
+  alignItems: "center",
+  marginTop: 10,
+  flexWrap: "wrap",
+};
+
+const chip: React.CSSProperties = {
+  padding: "6px 10px",
+  borderRadius: 999,
+  border: "1px solid rgba(255,255,255,0.10)",
+  background: "rgba(255,255,255,0.06)",
+  color: "white",
+  fontSize: 12,
 };
 
 const modalOverlay: React.CSSProperties = {
