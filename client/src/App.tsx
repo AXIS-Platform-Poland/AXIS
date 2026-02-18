@@ -1,110 +1,142 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
-import Sidebar from "./components/Sidebar";
-import Topbar from "./components/Topbar";
+import "./App.css";
 
+import AuthPage from "./pages/AuthPage";
 import HomePage from "./pages/HomePage";
 import FriendsPage from "./pages/FriendsPage";
 import ReelsPage from "./pages/ReelsPage";
 import MarketplacePage from "./pages/MarketplacePage";
 import SettingsPage from "./pages/SettingsPage";
-import AuthPage from "./pages/AuthPage";
-import UIPreviewPage from "./pages/UIPreviewPage";
 
+import Sidebar from "./components/Sidebar";
+import Topbar from "./components/Topbar";
 import { useAuth } from "./AuthContext";
 
-/* ---------------- PROTECTED ROUTE ---------------- */
-
-function RequireAuth({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
-  const location = useLocation();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-white">
-        Loading...
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <Navigate to="/auth" state={{ from: location.pathname }} replace />;
-  }
-
-  return <>{children}</>;
-}
-
-/* ---------------- MAIN APP ---------------- */
-
 export default function App() {
-  const location = useLocation();
   const { user } = useAuth();
+  const location = useLocation();
 
-  const isAuthRoute = location.pathname.startsWith("/auth");
+  // Drawer (моб. меню)
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-  /* ---------------- AUTH PAGE ---------------- */
+  // закрывать drawer при смене страницы
+  useEffect(() => {
+    setDrawerOpen(false);
+  }, [location.pathname]);
 
-  if (isAuthRoute) {
-    return (
-      <div className="min-h-screen bg-black text-white">
-        <Routes>
-          <Route path="/auth" element={<AuthPage />} />
-          <Route path="*" element={<Navigate to="/auth" replace />} />
-        </Routes>
-      </div>
-    );
-  }
+  // закрывать по Esc
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setDrawerOpen(false);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, []);
 
-  /* ---------------- MAIN UI ---------------- */
+  const isAuthed = !!user;
+
+  // стили layout
+  const shellStyle: React.CSSProperties = {
+    minHeight: "100vh",
+    color: "white",
+    position: "relative",
+    overflow: "hidden",
+  };
+
+  const bgStyle: React.CSSProperties = {
+    position: "fixed",
+    inset: 0,
+    zIndex: 0,
+    background:
+      "radial-gradient(circle at 20% 20%, rgba(128,119,198,0.18), transparent 40%), radial-gradient(circle at 80% 30%, rgba(255,0,128,0.12), transparent 40%), #070A10",
+  };
+
+  const contentWrapStyle: React.CSSProperties = {
+    position: "relative",
+    zIndex: 1,
+    display: "flex",
+    minHeight: "100vh",
+  };
+
+  // Desktop sidebar
+  const desktopSidebarStyle: React.CSSProperties = {
+    display: "none",
+  };
+
+  // Desktop включаем через медиазапрос (inline нельзя), поэтому через маленький трюк:
+  // покажем desktop sidebar через className и css в App.css (ниже напишу)
+  // Но чтобы без правок css тоже работало — оставим и моб-лейаут.
+  // Мы сделаем так: sidebar для desktop будет visible начиная с 1024px через CSS.
+
+  const mainStyle: React.CSSProperties = {
+    flex: 1,
+    minWidth: 0,
+    display: "flex",
+    flexDirection: "column",
+  };
+
+  const pageStyle: React.CSSProperties = {
+    padding: 16,
+  };
+
+  // Роуты только после логина
+  const appRoutes = (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/friends" element={<FriendsPage />} />
+      <Route path="/reels" element={<ReelsPage />} />
+      <Route path="/marketplace" element={<MarketplacePage />} />
+      <Route path="/settings" element={<SettingsPage />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
 
   return (
-    <div className="min-h-screen text-white relative overflow-hidden">
+    <div style={shellStyle}>
+      <div style={bgStyle} />
 
-      {/* ===== ГЛУБИННЫЙ ФОН ===== */}
-      <div
-        style={{
-          position: "fixed",
-          inset: 0,
-          background:
-            "radial-gradient(circle at 20% 20%, rgba(0,200,255,0.15), transparent 40%), radial-gradient(circle at 80% 80%, rgba(255,0,200,0.15), transparent 40%), #0b0b0f",
-          zIndex: 0
-        }}
-      />
-
-      {/* ===== КОНТЕНТ ===== */}
-      <div className="relative z-10 min-h-screen flex">
-
-        {/* SIDEBAR */}
-        <Sidebar />
-
-        {/* RIGHT SIDE */}
-        <div
-          className="flex-1 min-w-0 relative"
-          style={{
-            backdropFilter: "blur(20px)",
-            background: "rgba(255,255,255,0.04)",
-            borderLeft: "1px solid rgba(255,255,255,0.08)"
-          }}
-        >
-          <Topbar />
-
-          <main className="p-6">
-            <RequireAuth>
-              <Routes>
-                <Route path="/" element={<Navigate to="/settings" replace />} />
-                <Route path="/posts" element={<HomePage />} />
-                <Route path="/friends" element={<FriendsPage />} />
-                <Route path="/reels" element={<ReelsPage />} />
-                <Route path="/marketplace" element={<MarketplacePage />} />
-                <Route path="/settings" element={<SettingsPage />} />
-                <Route path="/ui" element={<UIPreviewPage />} />
-                <Route path="*" element={<Navigate to="/settings" replace />} />
-              </Routes>
-            </RequireAuth>
-          </main>
+      {/* Если не залогинен — только Auth */}
+      {!isAuthed ? (
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <AuthPage />
         </div>
-      </div>
+      ) : (
+        <div style={contentWrapStyle}>
+          {/* DESKTOP SIDEBAR (виден только на больших экранах через CSS) */}
+          <div className="axis-desktop-sidebar" style={desktopSidebarStyle}>
+            <Sidebar />
+          </div>
+
+          {/* MOBILE DRAWER */}
+          {drawerOpen && (
+            <div
+              className="axis-drawer-overlay"
+              onClick={() => setDrawerOpen(false)}
+              role="button"
+              aria-label="Close menu"
+            />
+          )}
+
+          <div
+            className={`axis-drawer ${drawerOpen ? "open" : ""}`}
+            role="dialog"
+            aria-modal="true"
+          >
+            <Sidebar variant="mobile" onNavigate={() => setDrawerOpen(false)} />
+          </div>
+
+          {/* MAIN */}
+          <div style={mainStyle}>
+            <Topbar
+              onMenuClick={() => setDrawerOpen((v) => !v)}
+              showMenuButton
+            />
+            <div style={pageStyle}>{appRoutes}</div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
