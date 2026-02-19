@@ -14,7 +14,9 @@ import MarketplacePage from "./pages/MarketplacePage";
 import SettingsPage from "./pages/SettingsPage";
 
 import { useAuth } from "./AuthContext";
-import ProfilePage from "./pages/Profile";
+import ProfilePage from "./pages/Profile
+  import EditProfilePage from "./pages/EditProfile";
+
 
 export default function App() {
   const { user, loading } = useAuth();
@@ -114,6 +116,7 @@ export default function App() {
               <Route path="/marketplace" element={<MarketplacePage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/edit-profile" element={<EditProfilePage />} />
 <Route path="/profile/:id" element={<ProfilePage />} />
 
               <Route path="*" element={<Navigate to="/posts" replace />} />
