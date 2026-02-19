@@ -1,6 +1,12 @@
 // @ts-nocheck
 import React, { useEffect, useState } from "react";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
@@ -18,8 +24,9 @@ import EditProfile from "./pages/EditProfile";
 import { useAuth } from "./AuthContext";
 
 export default function App() {
-  const { user, loading } = useAuth();
+  const { user, loading, profile } = useAuth(); // profile — если есть в контексте
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -81,6 +88,16 @@ export default function App() {
       </div>
     );
   }
+
+  // ==== функции переходов для нижнего бара ====
+  const goHome = () => navigate("/posts");
+  const goReels = () => navigate("/reels");
+  const goCreate = () => navigate("/posts"); // позже можно сделать /posts?create=1
+  const goMessenger = () => navigate("/friends");
+  const goProfile = () => navigate("/profile");
+
+  // маленький аватар для нижнего бара
+  const avatarUrl = profile?.avatar_url;
 
   // основное приложение
   return (
@@ -146,7 +163,7 @@ export default function App() {
           </div>
         )}
 
-        {/* Топбар на десктопе (без бургера, просто сверху) */}
+        {/* Топбар на десктопе */}
         {!isMobile && (
           <div
             style={{
@@ -168,6 +185,7 @@ export default function App() {
             flex: 1,
             padding: "16px",
             paddingTop: isMobile ? 12 : 24,
+            paddingBottom: isMobile ? 72 : 24, // отступ под нижний бар
           }}
         >
           <Routes>
@@ -212,6 +230,115 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* Нижняя мобильная навигация */}
+      {isMobile && (
+        <nav
+          style={{
+            position: "fixed",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 56,
+            zIndex: 35,
+            background:
+              "linear-gradient(to top, rgba(15,23,42,0.98), rgba(15,23,42,0.95))",
+            borderTop: "1px solid rgba(31,41,55,0.9)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-around",
+            paddingInline: 12,
+          }}
+        >
+          {/* Домой */}
+          <button
+            onClick={goHome}
+            style={bottomBtnStyle(location.pathname.startsWith("/posts"))}
+          >
+            <span style={{ fontSize: 18 }}>🏠</span>
+          </button>
+
+          {/* Рилсы */}
+          <button
+            onClick={goReels}
+            style={bottomBtnStyle(location.pathname.startsWith("/reels"))}
+          >
+            <span style={{ fontSize: 18 }}>🎬</span>
+          </button>
+
+          {/* Плюс */}
+          <button
+            onClick={goCreate}
+            style={{
+              ...bottomBtnStyle(false),
+              width: 44,
+              height: 44,
+              borderRadius: 999,
+              background:
+                "linear-gradient(135deg, #38bdf8, #6366f1, #f97316)",
+              border: "none",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 8px 18px rgba(0,0,0,0.5)",
+              marginBottom: 6,
+            }}
+          >
+            <span style={{ fontSize: 26, color: "#020617", marginTop: -2 }}>
+              ＋
+            </span>
+          </button>
+
+          {/* Мессенджер */}
+          <button
+            onClick={goMessenger}
+            style={bottomBtnStyle(location.pathname.startsWith("/friends"))}
+          >
+            <span style={{ fontSize: 18 }}>💬</span>
+          </button>
+
+          {/* Профиль с аватаром */}
+          <button
+            onClick={goProfile}
+            style={bottomBtnStyle(location.pathname.startsWith("/profile"))}
+          >
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt="me"
+                style={{
+                  width: 26,
+                  height: 26,
+                  borderRadius: 999,
+                  objectFit: "cover",
+                  border: "2px solid #38bdf8",
+                }}
+              />
+            ) : (
+              <span style={{ fontSize: 18 }}>👤</span>
+            )}
+          </button>
+        </nav>
+      )}
     </div>
   );
+}
+
+// общий стиль для кнопок нижнего бара
+function bottomBtnStyle(active: boolean) {
+  return {
+    width: 40,
+    height: 40,
+    borderRadius: 999,
+    border: active
+      ? "1px solid rgba(148,163,184,0.9)"
+      : "1px solid rgba(31,41,55,0.9)",
+    background: active ? "rgba(15,23,42,0.95)" : "rgba(15,23,42,0.9)",
+    color: active ? "#e5e7eb" : "#9ca3af",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 0,
+    cursor: "pointer",
+  } as React.CSSProperties;
 }
