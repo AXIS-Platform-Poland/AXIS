@@ -10,7 +10,7 @@ import FriendsPage from "./pages/FriendsPage";
 import ReelsPage from "./pages/ReelsPage";
 import MarketplacePage from "./pages/MarketplacePage";
 import SettingsPage from "./pages/SettingsPage";
-import ProfilePage from "./pages/ProfilePage";
+import ProfilePage from "./pages/Profile";
 import EditProfilePage from "./pages/EditProfilePage";
 import UIPreviewPage from "./pages/UIPreviewPage";
 
