@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>AXIRO • Premium Profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome для иконок -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <style>
+    :root {
+      --bg-main: #050505;
+      --bg-soft: #0f0f0f;
+      --text-main: #ffffff;
+      --accent: #007aff;
+      --glass-bg: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --radius-xl: 1.5rem;
+      --radius-lg: 1rem;
+      --transition-fast: 0.3s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      color: var(--text-main);
+      background:
+        radial-gradient(circle at top, var(--bg-soft) 0, var(--bg-main) 55%, #020202 100%);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    /* Страница целиком */
+
+    .page {
+      min-height: 100vh;
+      padding: 1.5rem 1rem 5.5rem; /* снизу место под док-бар */
+      display: flex;
+      justify-content: center;
+    }
+
+    .page-inner {
+      width: 100%;
+      max-width: 960px;
+    }
+
+    /* Верхняя панель с языками / логотипом */
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      padding: 0.5rem 0.25rem;
+    }
+
+    .top-bar__brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .top-bar__brand-dot {
+      width: 0.45rem;
+      height: 0.45rem;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.8);
+    }
+
+    .top-bar__lang {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.2rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      font-size: 0.75rem;
+    }
+
+    .top-bar__lang-btn {
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      color: rgba(229, 231, 235, 0.75);
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+
+    .top-bar__lang-btn--active {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+    }
+
+    .top-bar__lang-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* Профиль */
+
+    .profile-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 1.75rem 1.5rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 26px 80px rgba(0, 0, 0, 0.8);
+      margin-bottom: 1.5rem;
+    }
+
+    .profile-avatar {
+      width: 6.4rem;
+      height: 6.4rem;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+      border: 3px solid rgba(255, 255, 255, 0.32);
+      box-shadow:
+        0 0 0 3px rgba(255, 255, 255, 0.25),
+        0 0 30px rgba(255, 255, 255, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 85%);
+    }
+
+    .profile-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .profile-name {
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.4rem;
+    }
+
+    .profile-subtitle {
+      font-size: 0.8rem;
+      color: #fbbf24;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      margin-bottom: 1.2rem;
+    }
+
+    .profile-stats {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .profile-stat {
+      border-radius: 1rem;
+      padding: 0.7rem 0.55rem;
+      background: radial-gradient(circle at top, rgba(255, 255, 255, 0.08), rgba(15, 23, 42, 0.95));
+      border: 1px solid rgba(148, 163, 184, 0.25);
+    }
+
+    .profile-stat__value {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .profile-stat__label {
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(209, 213, 219, 0.7);
+    }
+
+    .profile-actions {
+      display: flex;
+      gap: 0.6rem;
+      margin-top: 0.4rem;
+      width: 100%;
+      overflow-x: auto;
+      padding-bottom: 0.1rem;
+      scrollbar-width: none;
+    }
+
+    .profile-actions::-webkit-scrollbar {
+      display: none;
+    }
+
+    .btn-pill {
+      flex: 0 0 auto;
+      padding: 0.6rem 1.1rem;
+      border-radius: 999px;
+      border: 1px solid var(--glass-border);
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      font-size: 0.78rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: rgba(249, 250, 251, 0.9);
+      cursor: pointer;
+      transition: var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .btn-pill:hover {
+      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+
+    .btn-primary {
+      background: #ffffff;
+      color: #050505;
+      border-color: rgba(255, 255, 255, 0.9);
+      box-shadow:
+        0 12px 32px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+    }
+
+    .btn-primary:hover {
+      background: #f4f4f5;
+      transform: scale(1.05) translateY(-1px);
+    }
+
+    .btn-pill i {
+      font-size: 0.8rem;
+    }
+
+    /* Раздел Portfolio */
+
+    .section {
+      margin-top: 1.25rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(229, 231, 235, 0.9);
+    }
+
+    .section-subtitle {
+      font-size: 0.75rem;
+      color: rgba(156, 163, 175, 0.9);
+    }
+
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.9rem;
+    }
+
+    .portfolio-card {
+      position: relative;
+      border-radius: 1rem;
+      overflow: hidden;
+      background: radial-gradient(circle at top left, #1f2937 0, #020617 60%);
+      min-height: 7rem;
+      cursor: pointer;
+      box-shadow: 0 18px 35px rgba(0, 0, 0, 0.7);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .portfolio-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 24px 50px rgba(0, 0, 0, 0.85);
+    }
+
+    .portfolio-card__image {
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .portfolio-card__overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.1));
+      opacity: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0.75rem;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      transition: var(--transition-fast);
+      transform: translateY(10px);
+    }
+
+    .portfolio-card:hover .portfolio-card__overlay {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .portfolio-card__title {
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .portfolio-card__meta {
+      font-size: 0.7rem;
+      color: rgba(209, 213, 219, 0.85);
+    }
+
+    /* Floating Dock Nav */
+
+    .dock {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 0.9rem;
+      width: calc(100% - 2.5rem);
+      max-width: 480px;
+      z-index: 40;
+      padding: 0.45rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.9);
+    }
+
+    .dock-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.15rem 0.35rem;
+    }
+
+    .dock-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(229, 231, 235, 0.85);
+      font-size: 1.1rem;
+      padding: 0.35rem 0;
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+
+    .dock-btn--center {
+      margin: 0 0.15rem;
+    }
+
+    .dock-btn--center .dock-icon-circle {
+      width: 2.35rem;
+      height: 2.35rem;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #007aff, #9333ea, #f97316);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.9);
+      color: #fff;
+      font-size: 1.15rem;
+    }
+
+    .dock-btn--active {
+      color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .dock-btn:hover {
+      color: var(--accent);
+      transform: translateY(-2px) scale(1.03);
+    }
+
+    .dock-avatar {
+      width: 1.7rem;
+      height: 1.7rem;
+      border-radius: 999px;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      overflow: hidden;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.8);
+    }
+
+    .dock-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Адаптив */
+
+    @media (min-width: 640px) {
+      .page {
+        padding-top: 2.25rem;
+      }
+
+      .profile-card {
+        padding: 2rem 2.25rem 1.8rem;
+      }
+
+      .profile-avatar {
+        width: 7.5rem;
+        height: 7.5rem;
+      }
+
+      .profile-name {
+        font-size: 1.65rem;
+      }
+
+      .profile-subtitle {
+        font-size: 0.85rem;
+      }
+
+      .profile-actions {
+        justify-content: center;
+      }
+
+      .portfolio-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 900px) {
+      .profile-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+
+      .profile-stats {
+        max-width: 520px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="page-inner">
+      <header class="top-bar">
+        <div class="top-bar__brand">
+          <span class="top-bar__brand-dot"></span>
+          <span>AXIRO PROFILE</span>
+        </div>
+
+        <!-- Здесь в React-проекте вместо этих кнопок будет твой LanguageSwitcher -->
+        <div class="top-bar__lang">
+          <button class="top-bar__lang-btn top-bar__lang-btn--active">RU</button>
+          <button class="top-bar__lang-btn">PL</button>
+          <button class="top-bar__lang-btn">EN</button>
+        </div>
+      </header>
+
+      <main>
+        <section class="profile-card" aria-labelledby="profile-name">
+          <div class="profile-avatar">
+            <!-- поставь свою фотографию -->
+            <img src="https://images.pexels.com/photos/2837009/pexels-photo-2837009.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Avatar" />
+          </div>
+
+          <h1 id="profile-name" class="profile-name">Ihor Nepomiashchyi</h1>
+          <p class="profile-subtitle">Owner • INGVARR Sp. z o.o.</p>
+
+          <div class="profile-stats" aria-label="Статистика профиля">
+            <article class="profile-stat">
+              <div class="profile-stat__value">24</div>
+              <div class="profile-stat__label">Проекты</div>
+            </article>
+            <article class="profile-stat">
+              <div class="profile-stat__value">120+</div>
+              <div class="profile-stat__label">Клиенты</div>
+            </article>
+            <article class="profile-stat">
+              <div class="profile-stat__value">10 лет</div>
+              <div class="profile-stat__label">Опыт</div>
+            </article>
+          </div>
+
+          <nav class="profile-actions" aria-label="Действия профиля">
+            <button class="btn-pill">
+              <i class="fa-regular fa-id-card"></i>
+              Обо мне
+            </button>
+            <button class="btn-pill">
+              <i class="fa-regular fa-folder-open"></i>
+              Портфолио
+            </button>
+            <button class="btn-pill btn-primary">
+              <i class="fa-regular fa-paper-plane"></i>
+              Связаться
+            </button>
+          </nav>
+        </section>
+
+        <section class="section" aria-labelledby="portfolio-title">
+          <div class="section-header">
+            <h2 id="portfolio-title" class="section-title">Проекты</h2>
+            <p class="section-subtitle">Подборка актуальных кейсов AXIRO / INGVARR</p>
+          </div>
+
+          <div class="portfolio-grid">
+            <figure class="portfolio-card">
+              <div
+                class="portfolio-card__image"
+                style="background-image:url('https://images.pexels.com/photos/460672/pexels-photo-460672.jpeg?auto=compress&cs=tinysrgb&w=800');"
+              ></div>
+              <figcaption class="portfolio-card__overlay">
+                <div class="portfolio-card__title">Стальные мосты • Польша</div>
+                <div class="portfolio-card__meta">Инженеринг • Монтаж • Контроль качества</div>
+              </figcaption>
+            </figure>
+
+            <figure class="portfolio-card">
+              <div
+                class="portfolio-card__image"
+                style="background-image:url('https://images.pexels.com/photos/439416/pexels-photo-439416.jpeg?auto=compress&cs=tinysrgb&w=800');"
+              ></div>
+              <figcaption class="portfolio-card__overlay">
+                <div class="portfolio-card__title">AXIRO Platform</div>
+                <div class="portfolio-card__meta">Соцсеть для подрядчиков и клиентов</div>
+              </figcaption>
+            </figure>
+
+            <figure class="portfolio-card">
+              <div
+                class="portfolio-card__image"
+                style="background-image:url('https://images.pexels.com/photos/1462935/pexels-photo-1462935.jpeg?auto=compress&cs=tinysrgb&w=800');"
+              ></div>
+              <figcaption class="portfolio-card__overlay">
+                <div class="portfolio-card__title">Heavy Steel Assembly</div>
+                <div class="portfolio-card__meta">Welding • NDT • Project Management</div>
+              </figcaption>
+            </figure>
+
+            <figure class="portfolio-card">
+              <div
+                class="portfolio-card__image"
+                style="background-image:url('https://images.pexels.com/photos/942317/pexels-photo-942317.jpeg?auto=compress&cs=tinysrgb&w=800');"
+              ></div>
+              <figcaption class="portfolio-card__overlay">
+                <div class="portfolio-card__title">Railway Bridges</div>
+                <div class="portfolio-card__meta">Проектирование узлов и монтаж</div>
+              </figcaption>
+            </figure>
+
+            <figure class="portfolio-card">
+              <div
+                class="portfolio-card__image"
+                style="background-image:url('https://images.pexels.com/photos/258160/pexels-photo-258160.jpeg?auto=compress&cs=tinysrgb&w=800');"
+              ></div>
+              <figcaption class="portfolio-card__overlay">
+                <div class="portfolio-card__title">AXIRO Mobile</div>
+                <div class="portfolio-card__meta">UX-дизайн мобильного приложения</div>
+              </figcaption>
+            </figure>
+
+            <figure class="portfolio-card">
+              <div
+                class="portfolio-card__image"
+                style="background-image:url('https://images.pexels.com/photos/159298/gears-cogs-machine-machinery-159298.jpeg?auto=compress&cs=tinysrgb&w=800');"
+              ></div>
+              <figcaption class="portfolio-card__overlay">
+                <div class="portfolio-card__title">Industrial Solutions</div>
+                <div class="portfolio-card__meta">Комплексные металлоконструкции под ключ</div>
+              </figcaption>
+            </figure>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Floating Dock навигация -->
+  <nav class="dock" aria-label="Главная навигация">
+    <div class="dock-inner">
+      <button class="dock-btn dock-btn--active" aria-label="Домой">
+        <i class="fa-solid fa-house"></i>
+      </button>
+
+      <button class="dock-btn" aria-label="Reels">
+        <i class="fa-solid fa-clapperboard-play"></i>
+      </button>
+
+      <button class="dock-btn dock-btn--center" aria-label="Создать пост или проект">
+        <div class="dock-icon-circle">
+          <i class="fa-solid fa-plus"></i>
+        </div>
+      </button>
+
+      <button class="dock-btn" aria-label="Сообщения">
+        <i class="fa-regular fa-comment-dots"></i>
+      </button>
+
+      <button class="dock-btn" aria-label="Профиль">
+        <div class="dock-avatar">
+          <img
+            src="https://images.pexels.com/photos/2837009/pexels-photo-2837009.jpeg?auto=compress&cs=tinysrgb&w=400"
+            alt="Мой профиль"
+          />
+        </div>
+      </button>
+    </div>
+  </nav>
+</body>
+</html>
