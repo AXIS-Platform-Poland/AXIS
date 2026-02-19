@@ -11,7 +11,7 @@ import ReelsPage from "./pages/ReelsPage";
 import MarketplacePage from "./pages/MarketplacePage";
 import SettingsPage from "./pages/SettingsPage";
 import ProfilePage from "./pages/Profile";
-import EditProfilePage from "./pages/EditProfilePage";
+import EditProfilePage from "./pages/EditProfile";
 import UIPreviewPage from "./pages/UIPreviewPage";
 
 import { useAuth } from "./AuthContext";
