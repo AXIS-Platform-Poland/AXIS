@@ -20,443 +20,386 @@
   <style>
     :root {
       --bg-main: #050505;
-      --bg-soft: #0f0f0f;
+      --bg-grad-1: #0f0f0f;
+      --bg-grad-2: #050505;
       --text-main: #ffffff;
       --accent: #007aff;
       --glass-bg: rgba(255, 255, 255, 0.05);
-      --glass-border: rgba(255, 255, 255, 0.1);
-      --radius-xl: 1.5rem;
-      --radius-lg: 1rem;
-      --transition-fast: 0.3s ease;
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --muted: #9ca3af;
+      --gold: #fbbf24;
     }
 
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
     }
 
     html,
     body {
-      height: 100%;
-    }
-
-    body {
+      margin: 0;
+      padding: 0;
       font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
         sans-serif;
       color: var(--text-main);
-      background:
-        radial-gradient(circle at top, var(--bg-soft) 0, var(--bg-main) 55%, #020202 100%);
+      background: radial-gradient(circle at top, var(--bg-grad-1), var(--bg-grad-2));
       -webkit-font-smoothing: antialiased;
     }
 
-    a {
-      color: inherit;
-      text-decoration: none;
+    body {
+      min-height: 100vh;
     }
 
-    img {
-      max-width: 100%;
-      display: block;
+    main {
+      padding-bottom: 96px; /* место под док-навигацию */
     }
 
     .page {
-      min-height: 100vh;
-      padding: 1.2rem 1rem 5.5rem;
-      display: flex;
-      justify-content: center;
-    }
-
-    .page-inner {
-      width: 100%;
       max-width: 960px;
+      margin: 0 auto;
+      padding: 16px 16px 32px;
     }
 
-    /* Top bar */
-
+    /* Верх: логотип + индикатор онлайн + меню */
     .top-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 1rem;
-      padding: 0.4rem 0.2rem;
+      margin-bottom: 16px;
     }
 
-    .top-bar__brand {
+    .brand {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 8px;
       font-size: 0.95rem;
-      font-weight: 600;
-      letter-spacing: 0.09em;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.8);
     }
 
-    .top-bar__brand-dot {
-      width: 0.45rem;
-      height: 0.45rem;
-      border-radius: 999px;
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      box-shadow: 0 0 12px rgba(34, 197, 94, 0.8);
+    .brand-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.9);
     }
 
-    .top-bar__menu-btn {
-      width: 2.35rem;
-      height: 2.35rem;
+    .menu-toggle {
+      width: 40px;
+      height: 40px;
       border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.45);
-      background: rgba(15, 23, 42, 0.92);
-      color: rgba(229, 231, 235, 0.9);
+      border: 1px solid var(--glass-border);
+      background: rgba(15, 23, 42, 0.85);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: var(--transition-fast);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8);
+      color: var(--text-main);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(16px);
     }
 
-    .top-bar__menu-btn:hover {
-      transform: translateY(-1px) scale(1.04);
-      border-color: rgba(255, 255, 255, 0.35);
-      color: var(--accent);
+    .menu-toggle i {
+      font-size: 1.1rem;
     }
 
-    /* Settings menu */
-
-    .settings-menu {
+    /* Выпадающее меню */
+    .menu-panel {
       position: fixed;
-      top: 0.95rem;
-      right: 1rem;
-      width: 14rem;
-      border-radius: 1rem;
+      top: 64px;
+      right: 16px;
+      width: 220px;
       background: rgba(15, 23, 42, 0.96);
-      border: 1px solid rgba(148, 163, 184, 0.55);
-      box-shadow: 0 22px 50px rgba(0, 0, 0, 0.95);
-      padding: 0.65rem 0.5rem;
+      border-radius: 20px;
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 22px 60px rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      opacity: 0;
-      transform: translateY(-6px);
-      pointer-events: none;
-      transition: var(--transition-fast);
-      z-index: 60;
+      padding: 12px 12px 10px;
+      font-size: 0.85rem;
+      display: none;
+      z-index: 40;
     }
 
-    .settings-menu--open {
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: auto;
+    .menu-panel.open {
+      display: block;
     }
 
-    .settings-menu__section-title {
-      font-size: 0.7rem;
+    .menu-section-title {
       text-transform: uppercase;
-      letter-spacing: 0.16em;
-      color: rgba(156, 163, 175, 0.95);
-      padding: 0.35rem 0.75rem 0.25rem;
+      letter-spacing: 0.18em;
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin: 4px 6px 6px;
     }
 
-    .settings-menu__list {
+    .menu-list {
       list-style: none;
-      padding: 0.25rem 0.35rem 0.35rem;
+      margin: 0;
+      padding: 0;
     }
 
-    .settings-menu__item {
-      border-radius: 0.6rem;
-      padding: 0.4rem 0.5rem;
-      font-size: 0.78rem;
-      color: rgba(229, 231, 235, 0.92);
+    .menu-item {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 0.4rem;
+      gap: 8px;
+      padding: 8px 8px;
+      border-radius: 12px;
       cursor: pointer;
-      transition: var(--transition-fast);
+      color: #e5e7eb;
+      transition: background 0.25s ease, transform 0.25s ease, color 0.25s ease;
     }
 
-    .settings-menu__item:hover {
-      background: rgba(31, 41, 55, 0.95);
-    }
-
-    .settings-menu__item i {
-      font-size: 0.85rem;
+    .menu-item i {
+      width: 18px;
+      text-align: center;
       color: var(--accent);
     }
 
-    .settings-menu__lang-group {
-      display: flex;
-      gap: 0.35rem;
+    .menu-item:hover {
+      background: rgba(31, 41, 55, 0.9);
+      transform: translateY(-1px);
+      color: #ffffff;
     }
 
-    .settings-menu__lang-btn {
-      border-radius: 999px;
-      padding: 0.15rem 0.6rem;
-      border: 1px solid rgba(148, 163, 175, 0.5);
-      font-size: 0.7rem;
-      color: rgba(229, 231, 235, 0.9);
-      cursor: pointer;
-      background: rgba(15, 23, 42, 0.85);
-      transition: var(--transition-fast);
-    }
-
-    .settings-menu__lang-btn--active {
-      background: rgba(56, 189, 248, 0.16);
-      border-color: rgba(56, 189, 248, 0.8);
-      color: #e0f2fe;
-    }
-
-    .settings-menu__lang-btn:hover {
-      background: rgba(15, 23, 42, 1);
-    }
-
-    .settings-menu__divider {
+    .menu-divider {
       height: 1px;
-      margin: 0.3rem 0.4rem;
-      background: linear-gradient(
-        to right,
-        transparent,
-        rgba(148, 163, 184, 0.5),
-        transparent
-      );
+      background: rgba(148, 163, 184, 0.28);
+      margin: 8px 0;
     }
 
-    /* Profile card with cover */
-
-    .profile-card {
+    /* Профиль: карточка (баннер + аватар + имя + статистика) */
+    .profile-header {
       position: relative;
-      border-radius: var(--radius-xl);
+      border-radius: 32px;
       overflow: hidden;
-      background: rgba(15, 23, 42, 0.96);
-      border: 1px solid rgba(148, 163, 184, 0.5);
-      box-shadow: 0 26px 80px rgba(0, 0, 0, 0.9);
-      margin-bottom: 1.5rem;
+      background: radial-gradient(circle at top, #020617, #020617 40%, #000 100%);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      box-shadow: 0 24px 70px rgba(15, 23, 42, 0.95);
+      margin-bottom: 20px;
     }
 
-    .profile-cover {
+    .header-cover {
       width: 100%;
-      height: 8.5rem;
-      background-image: url("https://images.pexels.com/photos/240040/pexels-photo-240040.jpeg?auto=compress&cs=tinysrgb&w=1200");
+      height: 180px;
+      background-image: url("https://images.pexels.com/photos/167684/pexels-photo-167684.jpeg?auto=compress&cs=tinysrgb&w=1600");
       background-size: cover;
       background-position: center;
-      filter: saturate(1.1);
+      position: relative;
     }
 
-    .profile-body {
-      padding: 3.8rem 1.4rem 1.4rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.95), #020617 70%);
-    }
-
-    .profile-avatar {
+    .avatar-wrapper {
       position: absolute;
-      top: 4.1rem;
       left: 50%;
+      bottom: -56px;
       transform: translateX(-50%);
-      width: 6.6rem;
-      height: 6.6rem;
+      width: 112px;
+      height: 112px;
       border-radius: 999px;
-      border: 3px solid rgba(255, 255, 255, 0.35);
       overflow: hidden;
       box-shadow:
-        0 0 0 3px rgba(255, 255, 255, 0.25),
-        0 0 30px rgba(255, 255, 255, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: radial-gradient(circle at top, #1f2937 0, #020617 85%);
+        0 0 0 3px rgba(15, 23, 42, 0.9),
+        0 0 0 5px rgba(255, 255, 255, 0.18),
+        0 0 32px rgba(255, 255, 255, 0.42);
+      background: #111827;
     }
 
-    .profile-avatar img {
+    .avatar-wrapper img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
 
+    .profile-main {
+      padding: 72px 18px 20px;
+      text-align: center;
+    }
+
     .profile-name {
-      font-size: 1.6rem;
+      font-size: 1.7rem;
       font-weight: 700;
-      letter-spacing: 0.04em;
-      margin-bottom: 0.25rem;
+      letter-spacing: 0.03em;
+      margin-bottom: 4px;
     }
 
-    .profile-subtitle {
-      font-size: 0.82rem;
-      color: #fbbf24;
+    .profile-status {
+      font-size: 0.8rem;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      letter-spacing: 0.15em;
-      margin-bottom: 0.6rem;
+      color: var(--gold);
+      margin-bottom: 12px;
     }
 
-    .profile-badge {
+    .profile-type {
       display: inline-flex;
       align-items: center;
-      gap: 0.35rem;
+      gap: 8px;
+      padding: 6px 14px;
       border-radius: 999px;
-      padding: 0.2rem 0.75rem;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.5);
-      font-size: 0.7rem;
-      color: rgba(229, 231, 235, 0.9);
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.9);
+      font-size: 0.72rem;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
-      margin-bottom: 1rem;
+      margin-bottom: 18px;
+      color: #e5e7eb;
     }
 
-    .profile-badge i {
-      font-size: 0.8rem;
-      color: var(--accent);
+    .profile-type i {
+      color: #38bdf8;
     }
 
-    .profile-stats {
-      width: 100%;
+    /* Статистика */
+    .stats-row {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 0.75rem;
-      margin-bottom: 1.4rem;
+      gap: 10px;
+      padding: 0 10px 18px;
     }
 
-    .profile-stat {
-      border-radius: 1rem;
-      padding: 0.75rem 0.6rem;
-      background: radial-gradient(circle at top, rgba(255, 255, 255, 0.08), rgba(15, 23, 42, 0.95));
-      border: 1px solid rgba(148, 163, 184, 0.25);
-    }
-
-    .profile-stat__value {
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin-bottom: 0.25rem;
-    }
-
-    .profile-stat__label {
-      font-size: 0.64rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: rgba(209, 213, 219, 0.7);
-    }
-
-    .profile-actions {
+    .stat-item {
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      padding: 12px 6px 10px;
       display: flex;
-      gap: 0.6rem;
-      margin-top: 0.4rem;
-      width: 100%;
-      overflow-x: auto;
-      padding-bottom: 0.1rem;
-      scrollbar-width: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
     }
 
-    .profile-actions::-webkit-scrollbar {
-      display: none;
+    .stat-value {
+      font-size: 1.15rem;
+      font-weight: 600;
     }
 
-    .btn-pill {
-      flex: 0 0 auto;
-      padding: 0.6rem 1.1rem;
+    .stat-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* Action buttons */
+    .actions-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      padding: 0 10px 18px;
+    }
+
+    .btn-ghost,
+    .btn-main,
+    .btn-outline {
       border-radius: 999px;
       border: 1px solid var(--glass-border);
-      background: rgba(255, 255, 255, 0.04);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      font-size: 0.78rem;
-      font-weight: 500;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-main);
+      padding: 10px 18px;
+      font-size: 0.85rem;
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
-      color: rgba(249, 250, 251, 0.9);
+      gap: 8px;
       cursor: pointer;
-      transition: var(--transition-fast);
+      transition: transform 0.25s ease, box-shadow 0.25s ease,
+        background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.75);
       white-space: nowrap;
     }
 
-    .btn-pill:hover {
-      transform: scale(1.05);
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.35);
-    }
-
-    .btn-primary {
+    .btn-main {
       background: #ffffff;
-      color: #050505;
-      border-color: rgba(255, 255, 255, 0.9);
-      box-shadow:
-        0 12px 32px rgba(0, 0, 0, 0.6),
-        0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+      color: #020617;
+      border-color: transparent;
     }
 
-    .btn-primary:hover {
-      background: #f4f4f5;
+    .btn-outline {
+      background: rgba(15, 23, 42, 0.92);
+      border-color: rgba(148, 163, 184, 0.7);
+    }
+
+    .btn-ghost:hover,
+    .btn-main:hover,
+    .btn-outline:hover {
       transform: scale(1.05) translateY(-1px);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.85);
     }
 
-    .btn-pill i {
-      font-size: 0.8rem;
+    .btn-ghost i,
+    .btn-outline i {
+      color: var(--accent);
     }
 
-    /* Feed section */
-
-    .section {
-      margin-top: 1.3rem;
+    .btn-main i {
+      color: #020617;
     }
 
-    .section-header {
+    /* Секция постов */
+    .posts-section {
+      margin-top: 26px;
+    }
+
+    .posts-header {
       display: flex;
-      align-items: baseline;
       justify-content: space-between;
-      margin-bottom: 0.6rem;
+      align-items: baseline;
+      margin-bottom: 12px;
+      padding: 0 4px;
     }
 
-    .section-title {
-      font-size: 0.95rem;
-      font-weight: 600;
+    .posts-title {
+      font-size: 1rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .posts-subtitle {
+      font-size: 0.72rem;
+      color: var(--muted);
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: rgba(229, 231, 235, 0.9);
     }
 
-    .section-subtitle {
-      font-size: 0.75rem;
-      color: rgba(156, 163, 175, 0.9);
-    }
-
-    .feed {
-      display: grid;
-      gap: 0.85rem;
-    }
-
+    /* Пост – теперь БЕЗ рамки, на полную ширину */
     .post-card {
-      border-radius: 1.1rem;
-      background: rgba(15, 23, 42, 0.96);
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.85);
+      width: 100%;
+      margin: 0 0 26px 0;
+      background: none;
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
       overflow: hidden;
+    }
+
+    .post-inner {
+      background: linear-gradient(
+        to bottom,
+        rgba(15, 23, 42, 0.96),
+        rgba(15, 23, 42, 0.98)
+      );
     }
 
     .post-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.7rem 0.9rem 0.5rem;
+      padding: 12px 16px 8px;
     }
 
-    .post-user {
+    .post-author {
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 10px;
     }
 
     .post-avatar {
-      width: 2.15rem;
-      height: 2.15rem;
-      border-radius: 999px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
       overflow: hidden;
-      border: 2px solid rgba(255, 255, 255, 0.85);
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.9);
     }
 
     .post-avatar img {
@@ -465,163 +408,164 @@
       object-fit: cover;
     }
 
-    .post-user-info {
+    .post-meta {
       display: flex;
       flex-direction: column;
-      gap: 0.1rem;
+      gap: 2px;
     }
 
-    .post-username {
-      font-size: 0.82rem;
+    .post-name {
+      font-size: 0.9rem;
       font-weight: 600;
     }
 
-    .post-badge {
-      font-size: 0.68rem;
-      color: rgba(156, 163, 175, 0.95);
+    .post-tagline {
+      font-size: 0.72rem;
+      color: var(--muted);
     }
 
-    .post-meta {
+    .post-time {
       font-size: 0.7rem;
-      color: rgba(156, 163, 175, 0.9);
+      color: var(--muted);
     }
 
     .post-menu {
-      color: rgba(156, 163, 175, 0.9);
-      font-size: 1rem;
+      color: var(--muted);
+      cursor: pointer;
     }
 
-    .post-content-text {
-      padding: 0.2rem 0.9rem 0.6rem;
-      font-size: 0.8rem;
-      color: rgba(229, 231, 235, 0.95);
+    .post-text {
+      padding: 0 16px 10px;
+      font-size: 0.9rem;
       line-height: 1.5;
+      color: #e5e7eb;
     }
 
-    .post-media {
+    .post-image {
       width: 100%;
-      max-height: 16rem;
-      overflow: hidden;
+      height: auto;
+      display: block;
+      border-radius: 0;
     }
 
-    .post-media img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+    .post-footer {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 16px 12px;
+      border-top: 1px solid rgba(31, 41, 55, 0.95);
+      font-size: 0.85rem;
+      color: #e5e7eb;
     }
 
     .post-actions {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.55rem 0.9rem 0.65rem;
-      border-top: 1px solid rgba(31, 41, 55, 0.95);
-      font-size: 0.8rem;
+      gap: 14px;
     }
 
-    .post-actions-left,
-    .post-actions-right {
-      display: flex;
-      align-items: center;
-      gap: 0.65rem;
-    }
-
-    .post-action {
+    .post-action-btn {
       display: inline-flex;
       align-items: center;
-      gap: 0.35rem;
+      gap: 6px;
       cursor: pointer;
-      color: rgba(209, 213, 219, 0.9);
-      transition: var(--transition-fast);
+      color: #e5e7eb;
+      transition: color 0.25s ease, transform 0.25s ease;
     }
 
-    .post-action i {
+    .post-action-btn i {
       font-size: 0.9rem;
     }
 
-    .post-action:hover {
+    .post-action-btn:hover {
       color: var(--accent);
       transform: translateY(-1px);
     }
 
-    .post-likes {
-      font-size: 0.75rem;
-      padding: 0 0.9rem 0.6rem;
-      color: rgba(209, 213, 219, 0.9);
-    }
-
-    /* Dock */
-
+    /* Нижний док-навигация */
     .dock {
       position: fixed;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: 0.9rem;
-      width: calc(100% - 2.5rem);
-      max-width: 480px;
-      z-index: 40;
-      padding: 0.45rem;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.9);
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding-bottom: env(safe-area-inset-bottom, 8px);
+      display: flex;
+      justify-content: center;
+      z-index: 50;
+      pointer-events: none;
     }
 
     .dock-inner {
+      pointer-events: auto;
+      width: min(520px, 100% - 24px);
+      background: rgba(15, 23, 42, 0.92);
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(20px);
+      padding: 6px 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.15rem 0.35rem;
+      gap: 4px;
     }
 
-    .dock-btn {
+    .dock-item {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: rgba(229, 231, 235, 0.85);
-      font-size: 1.1rem;
-      padding: 0.35rem 0;
+      color: #e5e7eb;
       cursor: pointer;
-      transition: var(--transition-fast);
-    }
-
-    .dock-btn--center {
-      margin: 0 0.15rem;
-    }
-
-    .dock-btn--center .dock-icon-circle {
-      width: 2.35rem;
-      height: 2.35rem;
+      transition: transform 0.25s ease, color 0.25s ease, background 0.25s ease;
       border-radius: 999px;
+      padding: 6px 0;
+    }
+
+    .dock-item i {
+      font-size: 1.2rem;
+    }
+
+    .dock-item--center {
+      flex: 1.1;
+    }
+
+    .dock-item--center button {
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ec4899, #8b5cf6, #0ea5e9);
+      border: none;
+      width: 44px;
+      height: 44px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #007aff, #9333ea, #f97316);
-      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.9);
-      color: #fff;
-      font-size: 1.15rem;
+      color: #ffffff;
+      cursor: pointer;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.9);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
 
-    .dock-btn--active {
+    .dock-item--center button i {
+      font-size: 1.3rem;
+    }
+
+    .dock-item--center button:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 24px 55px rgba(0, 0, 0, 0.98);
+    }
+
+    .dock-item--active,
+    .dock-item:hover {
       color: var(--accent);
+      background: rgba(15, 23, 42, 0.95);
       transform: translateY(-2px);
     }
 
-    .dock-btn:hover {
-      color: var(--accent);
-      transform: translateY(-2px) scale(1.03);
-    }
-
     .dock-avatar {
-      width: 1.7rem;
-      height: 1.7rem;
-      border-radius: 999px;
-      border: 2px solid rgba(255, 255, 255, 0.8);
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
       overflow: hidden;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.8);
+      border: 2px solid rgba(148, 163, 184, 0.8);
+      box-shadow: 0 0 16px rgba(148, 163, 184, 0.9);
     }
 
     .dock-avatar img {
@@ -630,309 +574,343 @@
       object-fit: cover;
     }
 
-    /* Responsive */
-
-    @media (min-width: 640px) {
-      .page {
-        padding-top: 2rem;
+    /* Адаптив */
+    @media (min-width: 768px) {
+      .header-cover {
+        height: 220px;
       }
 
-      .profile-cover {
-        height: 9.5rem;
+      .avatar-wrapper {
+        width: 128px;
+        height: 128px;
+        bottom: -64px;
       }
 
-      .profile-avatar {
-        top: 4.6rem;
-        width: 7.4rem;
-        height: 7.4rem;
-      }
-
-      .profile-body {
-        padding: 4.3rem 2rem 1.7rem;
+      .profile-main {
+        padding-top: 80px;
       }
 
       .profile-name {
-        font-size: 1.8rem;
+        font-size: 2rem;
       }
 
-      .profile-actions {
-        justify-content: center;
+      .stats-row {
+        padding-inline: 40px;
+      }
+
+      .actions-row {
+        padding-inline: 40px;
+      }
+
+      .post-header,
+      .post-text,
+      .post-footer {
+        padding-inline: 28px;
+      }
+
+      .page {
+        padding-inline: 24px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .profile-header {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
       }
     }
   </style>
 </head>
+
 <body>
-  <!-- Меню настроек -->
-  <div class="settings-menu" id="settingsMenu">
-    <div class="settings-menu__section-title">Языки</div>
-    <ul class="settings-menu__list">
-      <li class="settings-menu__item">
-        <span>Выбор языка</span>
-        <div class="settings-menu__lang-group">
-          <button class="settings-menu__lang-btn settings-menu__lang-btn--active">RU</button>
-          <button class="settings-menu__lang-btn">PL</button>
-          <button class="settings-menu__lang-btn">EN</button>
-        </div>
-      </li>
-    </ul>
-
-    <div class="settings-menu__divider"></div>
-
-    <div class="settings-menu__section-title">Аккаунт</div>
-    <ul class="settings-menu__list">
-      <li class="settings-menu__item">
-        <span>Вход</span>
-        <i class="fa-solid fa-right-to-bracket"></i>
-      </li>
-      <li class="settings-menu__item">
-        <span>Регистрация</span>
-        <i class="fa-regular fa-user-plus"></i>
-      </li>
-      <li class="settings-menu__item">
-        <span>Выход</span>
-        <i class="fa-solid fa-arrow-right-from-bracket"></i>
-      </li>
-    </ul>
-  </div>
-
-  <div class="page">
-    <div class="page-inner">
+  <main>
+    <div class="page">
+      <!-- Верхний бар -->
       <header class="top-bar">
-        <div class="top-bar__brand">
-          <span class="top-bar__brand-dot"></span>
+        <div class="brand">
+          <span class="brand-dot"></span>
           <span>AXIRO PROFILE</span>
         </div>
-        <button class="top-bar__menu-btn" id="menuToggle" aria-label="Открыть меню настроек">
-          <i class="fa-solid fa-bars"></i>
+
+        <button class="menu-toggle" id="menuToggle" aria-label="Открыть меню">
+          <i class="fas fa-bars"></i>
         </button>
       </header>
 
-      <main>
-        <!-- Профиль -->
-        <section class="profile-card" aria-labelledby="profile-name">
-          <div class="profile-cover"></div>
+      <!-- Выпадающее меню -->
+      <aside class="menu-panel" id="menuPanel">
+        <div class="menu-section-title">Навигация</div>
+        <ul class="menu-list">
+          <li class="menu-item">
+            <i class="fas fa-house"></i>
+            <span>Главная</span>
+          </li>
+          <li class="menu-item">
+            <i class="fas fa-clapperboard"></i>
+            <span>Лента / Reels</span>
+          </li>
+          <li class="menu-item">
+            <i class="fas fa-user"></i>
+            <span>Мой профиль</span>
+          </li>
+        </ul>
 
-          <div class="profile-avatar">
+        <div class="menu-divider"></div>
+
+        <div class="menu-section-title">Язык</div>
+        <ul class="menu-list">
+          <li class="menu-item">
+            <i class="fas fa-globe"></i>
+            <span>Русский</span>
+          </li>
+          <li class="menu-item">
+            <i class="fas fa-language"></i>
+            <span>Polski</span>
+          </li>
+          <li class="menu-item">
+            <i class="fas fa-language"></i>
+            <span>English</span>
+          </li>
+        </ul>
+
+        <div class="menu-divider"></div>
+
+        <div class="menu-section-title">Аккаунт</div>
+        <ul class="menu-list">
+          <li class="menu-item">
+            <i class="fas fa-right-to-bracket"></i>
+            <span>Вход</span>
+          </li>
+          <li class="menu-item">
+            <i class="fas fa-user-plus"></i>
+            <span>Регистрация</span>
+          </li>
+          <li class="menu-item">
+            <i class="fas fa-arrow-right-from-bracket"></i>
+            <span>Выйти</span>
+          </li>
+        </ul>
+      </aside>
+
+      <!-- Профиль -->
+      <section class="profile-header" aria-label="Профиль пользователя">
+        <div class="header-cover">
+          <div class="avatar-wrapper">
             <img
-              src="https://images.pexels.com/photos/2837009/pexels-photo-2837009.jpeg?auto=compress&cs=tinysrgb&w=600"
-              alt="Avatar"
+              src="https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=800"
+              alt="Аватар Ihor Nepomiashchyi"
             />
           </div>
+        </div>
 
-          <div class="profile-body">
-            <h1 id="profile-name" class="profile-name">Ihor Nepomiashchyi</h1>
-            <p class="profile-subtitle">Owner • INGVARR Sp. z o.o.</p>
+        <div class="profile-main">
+          <h1 class="profile-name">Ihor Nepomiashchyi</h1>
+          <div class="profile-status">Owner • INGVARR Sp. z o.o.</div>
 
-            <div class="profile-badge">
-              <i class="fa-solid fa-crown"></i>
-              Профиль компании / личный профиль
+          <div class="profile-type">
+            <i class="fas fa-crown"></i>
+            <span>Профиль компании / личный профиль</span>
+          </div>
+
+          <div class="stats-row">
+            <div class="stat-item">
+              <div class="stat-value">248</div>
+              <div class="stat-label">Подписки</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">1280</div>
+              <div class="stat-label">Подписчики</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">36</div>
+              <div class="stat-label">Публикации</div>
+            </div>
+          </div>
+
+          <div class="actions-row">
+            <button class="btn-ghost">
+              <i class="fas fa-id-card"></i>
+              <span>Обо мне</span>
+            </button>
+            <button class="btn-outline">
+              <i class="fas fa-user-plus"></i>
+              <span>Подписаться</span>
+            </button>
+            <button class="btn-main">
+              <i class="fas fa-paper-plane"></i>
+              <span>Связаться</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Посты -->
+      <section class="posts-section" aria-label="Посты пользователя">
+        <div class="posts-header">
+          <h2 class="posts-title">Посты</h2>
+          <div class="posts-subtitle">Личная лента AXIRO / INGVARR</div>
+        </div>
+
+        <!-- Пост 1 -->
+        <article class="post-card">
+          <div class="post-inner">
+            <header class="post-header">
+              <div class="post-author">
+                <div class="post-avatar">
+                  <img
+                    src="https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=800"
+                    alt="Автор поста"
+                  />
+                </div>
+                <div class="post-meta">
+                  <div class="post-name">Ihor Nepomiashchyi</div>
+                  <div class="post-tagline">
+                    Профессиональный аккаунт • AXIRO
+                  </div>
+                  <div class="post-time">2 часа назад • Katowice</div>
+                </div>
+              </div>
+              <div class="post-menu">
+                <i class="fas fa-ellipsis"></i>
+              </div>
+            </header>
+
+            <div class="post-text">
+              Новый объект: старт монтажа стальных конструкций для мостового
+              перехода. Команда INGVARR уже на площадке, NDT и документация под
+              контролем.
             </div>
 
-            <div class="profile-stats" aria-label="Статистика профиля">
-              <article class="profile-stat">
-                <div class="profile-stat__value">248</div>
-                <div class="profile-stat__label">Подписки</div>
-              </article>
-              <article class="profile-stat">
-                <div class="profile-stat__value">1 280</div>
-                <div class="profile-stat__label">Подписчики</div>
-              </article>
-              <article class="profile-stat">
-                <div class="profile-stat__value">36</div>
-                <div class="profile-stat__label">Публикации</div>
-              </article>
+            <img
+              class="post-image"
+              src="https://images.pexels.com/photos/50632/pexels-photo-50632.jpeg?auto=compress&cs=tinysrgb&w=1600"
+              alt="Проект INGVARR"
+            />
+
+            <footer class="post-footer">
+              <div class="post-actions">
+                <div class="post-action-btn">
+                  <i class="far fa-heart"></i>
+                  <span>124</span>
+                </div>
+                <div class="post-action-btn">
+                  <i class="far fa-comment"></i>
+                  <span>18</span>
+                </div>
+                <div class="post-action-btn">
+                  <i class="far fa-bookmark"></i>
+                </div>
+              </div>
+              <div class="post-action-btn">
+                <i class="fas fa-share"></i>
+                <span>Поделиться</span>
+              </div>
+            </footer>
+          </div>
+        </article>
+
+        <!-- Пост 2 -->
+        <article class="post-card">
+          <div class="post-inner">
+            <header class="post-header">
+              <div class="post-author">
+                <div class="post-avatar">
+                  <img
+                    src="https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=800"
+                    alt="Автор поста"
+                  />
+                </div>
+                <div class="post-meta">
+                  <div class="post-name">Ihor Nepomiashchyi</div>
+                  <div class="post-tagline">
+                    Строительная компания • INGVARR
+                  </div>
+                  <div class="post-time">1 день назад • Warszawa</div>
+                </div>
+              </div>
+              <div class="post-menu">
+                <i class="fas fa-ellipsis"></i>
+              </div>
+            </header>
+
+            <div class="post-text">
+              Завершили этап сварки главных балок. Используем только
+              сертифицированные материалы, контроль качества по ISO и полная
+              фото-отчётность для заказчика.
             </div>
 
-            <nav class="profile-actions" aria-label="Действия профиля">
-              <button class="btn-pill">
-                <i class="fa-regular fa-id-card"></i>
-                Обо мне
-              </button>
-              <button class="btn-pill">
-                <i class="fa-regular fa-bell"></i>
-                Подписаться
-              </button>
-              <button class="btn-pill btn-primary">
-                <i class="fa-regular fa-paper-plane"></i>
-                Связаться
-              </button>
-            </nav>
-          </div>
-        </section>
+            <img
+              class="post-image"
+              src="https://images.pexels.com/photos/220182/pexels-photo-220182.jpeg?auto=compress&cs=tinysrgb&w=1600"
+              alt="Индустриальный объект"
+            />
 
-        <!-- Лента постов -->
-        <section class="section" aria-labelledby="feed-title">
-          <div class="section-header">
-            <h2 id="feed-title" class="section-title">Посты</h2>
-            <p class="section-subtitle">Личная лента AXIRO / INGVARR</p>
-          </div>
-
-          <div class="feed">
-            <!-- Пост 1 -->
-            <article class="post-card">
-              <header class="post-header">
-                <div class="post-user">
-                  <div class="post-avatar">
-                    <img
-                      src="https://images.pexels.com/photos/2837009/pexels-photo-2837009.jpeg?auto=compress&cs=tinysrgb&w=400"
-                      alt="Автор"
-                    />
-                  </div>
-                  <div class="post-user-info">
-                    <span class="post-username">Ihor Nepomiashchyi</span>
-                    <span class="post-badge">Профессиональный аккаунт • AXIRO</span>
-                    <span class="post-meta">2 ч назад • Katowice</span>
-                  </div>
-                </div>
-                <div class="post-menu">
-                  <i class="fa-solid fa-ellipsis"></i>
-                </div>
-              </header>
-
-              <div class="post-content-text">
-                Новый объект: старт монтажа стальных конструкций для мостового перехода.
-                Команда INGVARR уже на площадке, NDT и документация под контролем.
-              </div>
-
-              <div class="post-media">
-                <img
-                  src="https://images.pexels.com/photos/460672/pexels-photo-460672.jpeg?auto=compress&cs=tinysrgb&w=1200"
-                  alt="Мостовой проект"
-                />
-              </div>
-
+            <footer class="post-footer">
               <div class="post-actions">
-                <div class="post-actions-left">
-                  <div class="post-action">
-                    <i class="fa-regular fa-heart"></i>
-                    <span>Нравится</span>
-                  </div>
-                  <div class="post-action">
-                    <i class="fa-regular fa-comment"></i>
-                    <span>Коммент</span>
-                  </div>
+                <div class="post-action-btn">
+                  <i class="far fa-heart"></i>
+                  <span>89</span>
                 </div>
-                <div class="post-actions-right">
-                  <div class="post-action">
-                    <i class="fa-solid fa-share-nodes"></i>
-                  </div>
-                  <div class="post-action">
-                    <i class="fa-regular fa-bookmark"></i>
-                  </div>
+                <div class="post-action-btn">
+                  <i class="far fa-comment"></i>
+                  <span>9</span>
+                </div>
+                <div class="post-action-btn">
+                  <i class="far fa-bookmark"></i>
                 </div>
               </div>
-
-              <div class="post-likes">
-                132 отметки "Нравится" • 18 комментариев
+              <div class="post-action-btn">
+                <i class="fas fa-share"></i>
+                <span>Поделиться</span>
               </div>
-            </article>
-
-            <!-- Пост 2 -->
-            <article class="post-card">
-              <header class="post-header">
-                <div class="post-user">
-                  <div class="post-avatar">
-                    <img
-                      src="https://images.pexels.com/photos/428364/pexels-photo-428364.jpeg?auto=compress&cs=tinysrgb&w=400"
-                      alt="Автор"
-                    />
-                  </div>
-                  <div class="post-user-info">
-                    <span class="post-username">AXIRO Platform</span>
-                    <span class="post-badge">Обновление сервиса</span>
-                    <span class="post-meta">Вчера • Online</span>
-                  </div>
-                </div>
-                <div class="post-menu">
-                  <i class="fa-solid fa-ellipsis"></i>
-                </div>
-              </header>
-
-              <div class="post-content-text">
-                Тестируем новый дизайн профиля и мобильную навигацию в стиле топовых
-                соцсетей. Скоро подключим роли, marketplace и быстрые заявки от клиентов.
-              </div>
-
-              <div class="post-actions">
-                <div class="post-actions-left">
-                  <div class="post-action">
-                    <i class="fa-regular fa-heart"></i>
-                    <span>Нравится</span>
-                  </div>
-                  <div class="post-action">
-                    <i class="fa-regular fa-comment"></i>
-                    <span>Коммент</span>
-                  </div>
-                </div>
-                <div class="post-actions-right">
-                  <div class="post-action">
-                    <i class="fa-solid fa-share-nodes"></i>
-                  </div>
-                  <div class="post-action">
-                    <i class="fa-regular fa-bookmark"></i>
-                  </div>
-                </div>
-              </div>
-
-              <div class="post-likes">
-                57 отметок "Нравится" • 9 комментариев
-              </div>
-            </article>
+            </footer>
           </div>
-        </section>
-      </main>
+        </article>
+      </section>
     </div>
-  </div>
+  </main>
 
-  <!-- Floating Dock -->
-  <nav class="dock" aria-label="Главная навигация">
-    <div class="dock-inner">
-      <button class="dock-btn dock-btn--active" aria-label="Домой">
-        <i class="fa-solid fa-house"></i>
-      </button>
-
-      <button class="dock-btn" aria-label="Reels">
-        <i class="fa-solid fa-clapperboard-play"></i>
-      </button>
-
-      <button class="dock-btn dock-btn--center" aria-label="Создать пост или проект">
-        <div class="dock-icon-circle">
-          <i class="fa-solid fa-plus"></i>
+    <!-- Нижний док -->
+    <nav class="dock" aria-label="Основная навигация">
+      <div class="dock-inner">
+        <div class="dock-item dock-item--active">
+          <i class="fas fa-house"></i>
         </div>
-      </button>
-
-      <button class="dock-btn" aria-label="Сообщения">
-        <i class="fa-regular fa-comment-dots"></i>
-      </button>
-
-      <button class="dock-btn" aria-label="Профиль">
-        <div class="dock-avatar">
-          <img
-            src="https://images.pexels.com/photos/2837009/pexels-photo-2837009.jpeg?auto=compress&cs=tinysrgb&w=400"
-            alt="Мой профиль"
-          />
+        <div class="dock-item">
+          <i class="fas fa-clapperboard"></i>
         </div>
-      </button>
-    </div>
-  </nav>
+        <div class="dock-item dock-item--center">
+          <button aria-label="Создать пост">
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
+        <div class="dock-item">
+          <i class="fas fa-comments"></i>
+        </div>
+        <div class="dock-item">
+          <div class="dock-avatar">
+            <img
+              src="https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=800"
+              alt="Профиль"
+            />
+          </div>
+        </div>
+      </div>
+    </nav>
 
   <script>
+    // Открытие / закрытие меню
     const menuToggle = document.getElementById("menuToggle");
-    const settingsMenu = document.getElementById("settingsMenu");
+    const menuPanel = document.getElementById("menuPanel");
 
-    menuToggle.addEventListener("click", (e) => {
-      e.stopPropagation();
-      settingsMenu.classList.toggle("settings-menu--open");
+    menuToggle.addEventListener("click", () => {
+      menuPanel.classList.toggle("open");
     });
 
     document.addEventListener("click", (e) => {
-      if (
-        settingsMenu.classList.contains("settings-menu--open") &&
-        !settingsMenu.contains(e.target) &&
-        e.target !== menuToggle &&
-        !menuToggle.contains(e.target)
-      ) {
-        settingsMenu.classList.remove("settings-menu--open");
+      if (!menuPanel.contains(e.target) && !menuToggle.contains(e.target)) {
+        menuPanel.classList.remove("open");
       }
     });
   </script>
