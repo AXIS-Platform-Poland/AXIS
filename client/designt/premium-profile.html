@@ -8,7 +8,7 @@
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <!-- Font Awesome для иконок -->
+  <!-- Font Awesome -->
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
@@ -60,11 +60,9 @@
       display: block;
     }
 
-    /* Страница целиком */
-
     .page {
       min-height: 100vh;
-      padding: 1.5rem 1rem 5.5rem; /* снизу место под док-бар */
+      padding: 1.2rem 1rem 5.5rem;
       display: flex;
       justify-content: center;
     }
@@ -74,14 +72,14 @@
       max-width: 960px;
     }
 
-    /* Верхняя панель с языками / логотипом */
+    /* Top bar */
 
     .top-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 1.5rem;
-      padding: 0.5rem 0.25rem;
+      margin-bottom: 1rem;
+      padding: 0.4rem 0.2rem;
     }
 
     .top-bar__brand {
@@ -103,65 +101,171 @@
       box-shadow: 0 0 12px rgba(34, 197, 94, 0.8);
     }
 
-    .top-bar__lang {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.2rem;
+    .top-bar__menu-btn {
+      width: 2.35rem;
+      height: 2.35rem;
       border-radius: 999px;
-      background: rgba(15, 23, 42, 0.75);
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      font-size: 0.75rem;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: rgba(15, 23, 42, 0.92);
+      color: rgba(229, 231, 235, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8);
     }
 
-    .top-bar__lang-btn {
-      padding: 0.25rem 0.65rem;
-      border-radius: 999px;
-      border: none;
-      background: transparent;
-      color: rgba(229, 231, 235, 0.75);
+    .top-bar__menu-btn:hover {
+      transform: translateY(-1px) scale(1.04);
+      border-color: rgba(255, 255, 255, 0.35);
+      color: var(--accent);
+    }
+
+    /* Settings menu */
+
+    .settings-menu {
+      position: fixed;
+      top: 0.95rem;
+      right: 1rem;
+      width: 14rem;
+      border-radius: 1rem;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      box-shadow: 0 22px 50px rgba(0, 0, 0, 0.95);
+      padding: 0.65rem 0.5rem;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      opacity: 0;
+      transform: translateY(-6px);
+      pointer-events: none;
+      transition: var(--transition-fast);
+      z-index: 60;
+    }
+
+    .settings-menu--open {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .settings-menu__section-title {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: rgba(156, 163, 175, 0.95);
+      padding: 0.35rem 0.75rem 0.25rem;
+    }
+
+    .settings-menu__list {
+      list-style: none;
+      padding: 0.25rem 0.35rem 0.35rem;
+    }
+
+    .settings-menu__item {
+      border-radius: 0.6rem;
+      padding: 0.4rem 0.5rem;
+      font-size: 0.78rem;
+      color: rgba(229, 231, 235, 0.92);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.4rem;
       cursor: pointer;
       transition: var(--transition-fast);
     }
 
-    .top-bar__lang-btn--active {
-      background: rgba(255, 255, 255, 0.12);
-      color: #ffffff;
+    .settings-menu__item:hover {
+      background: rgba(31, 41, 55, 0.95);
     }
 
-    .top-bar__lang-btn:hover {
-      background: rgba(255, 255, 255, 0.08);
+    .settings-menu__item i {
+      font-size: 0.85rem;
+      color: var(--accent);
     }
 
-    /* Профиль */
+    .settings-menu__lang-group {
+      display: flex;
+      gap: 0.35rem;
+    }
+
+    .settings-menu__lang-btn {
+      border-radius: 999px;
+      padding: 0.15rem 0.6rem;
+      border: 1px solid rgba(148, 163, 175, 0.5);
+      font-size: 0.7rem;
+      color: rgba(229, 231, 235, 0.9);
+      cursor: pointer;
+      background: rgba(15, 23, 42, 0.85);
+      transition: var(--transition-fast);
+    }
+
+    .settings-menu__lang-btn--active {
+      background: rgba(56, 189, 248, 0.16);
+      border-color: rgba(56, 189, 248, 0.8);
+      color: #e0f2fe;
+    }
+
+    .settings-menu__lang-btn:hover {
+      background: rgba(15, 23, 42, 1);
+    }
+
+    .settings-menu__divider {
+      height: 1px;
+      margin: 0.3rem 0.4rem;
+      background: linear-gradient(
+        to right,
+        transparent,
+        rgba(148, 163, 184, 0.5),
+        transparent
+      );
+    }
+
+    /* Profile card with cover */
 
     .profile-card {
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
+      position: relative;
       border-radius: var(--radius-xl);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      padding: 1.75rem 1.5rem 1.5rem;
+      overflow: hidden;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      box-shadow: 0 26px 80px rgba(0, 0, 0, 0.9);
+      margin-bottom: 1.5rem;
+    }
+
+    .profile-cover {
+      width: 100%;
+      height: 8.5rem;
+      background-image: url("https://images.pexels.com/photos/240040/pexels-photo-240040.jpeg?auto=compress&cs=tinysrgb&w=1200");
+      background-size: cover;
+      background-position: center;
+      filter: saturate(1.1);
+    }
+
+    .profile-body {
+      padding: 3.8rem 1.4rem 1.4rem;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      box-shadow: 0 26px 80px rgba(0, 0, 0, 0.8);
-      margin-bottom: 1.5rem;
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.95), #020617 70%);
     }
 
     .profile-avatar {
-      width: 6.4rem;
-      height: 6.4rem;
+      position: absolute;
+      top: 4.1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 6.6rem;
+      height: 6.6rem;
       border-radius: 999px;
+      border: 3px solid rgba(255, 255, 255, 0.35);
       overflow: hidden;
-      margin-bottom: 1rem;
-      border: 3px solid rgba(255, 255, 255, 0.32);
       box-shadow:
         0 0 0 3px rgba(255, 255, 255, 0.25),
-        0 0 30px rgba(255, 255, 255, 0.45);
+        0 0 30px rgba(255, 255, 255, 0.4);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -175,18 +279,38 @@
     }
 
     .profile-name {
-      font-size: 1.45rem;
+      font-size: 1.6rem;
       font-weight: 700;
       letter-spacing: 0.04em;
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.25rem;
     }
 
     .profile-subtitle {
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       color: #fbbf24;
       text-transform: uppercase;
-      letter-spacing: 0.16em;
-      margin-bottom: 1.2rem;
+      letter-spacing: 0.15em;
+      margin-bottom: 0.6rem;
+    }
+
+    .profile-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      border-radius: 999px;
+      padding: 0.2rem 0.75rem;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      font-size: 0.7rem;
+      color: rgba(229, 231, 235, 0.9);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 1rem;
+    }
+
+    .profile-badge i {
+      font-size: 0.8rem;
+      color: var(--accent);
     }
 
     .profile-stats {
@@ -199,19 +323,19 @@
 
     .profile-stat {
       border-radius: 1rem;
-      padding: 0.7rem 0.55rem;
+      padding: 0.75rem 0.6rem;
       background: radial-gradient(circle at top, rgba(255, 255, 255, 0.08), rgba(15, 23, 42, 0.95));
       border: 1px solid rgba(148, 163, 184, 0.25);
     }
 
     .profile-stat__value {
-      font-size: 1.15rem;
+      font-size: 1.2rem;
       font-weight: 600;
       margin-bottom: 0.25rem;
     }
 
     .profile-stat__label {
-      font-size: 0.62rem;
+      font-size: 0.64rem;
       letter-spacing: 0.18em;
       text-transform: uppercase;
       color: rgba(209, 213, 219, 0.7);
@@ -274,17 +398,17 @@
       font-size: 0.8rem;
     }
 
-    /* Раздел Portfolio */
+    /* Feed section */
 
     .section {
-      margin-top: 1.25rem;
+      margin-top: 1.3rem;
     }
 
     .section-header {
       display: flex;
       align-items: baseline;
       justify-content: space-between;
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.6rem;
     }
 
     .section-title {
@@ -300,66 +424,133 @@
       color: rgba(156, 163, 175, 0.9);
     }
 
-    .portfolio-grid {
+    .feed {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0.9rem;
+      gap: 0.85rem;
     }
 
-    .portfolio-card {
-      position: relative;
-      border-radius: 1rem;
+    .post-card {
+      border-radius: 1.1rem;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.85);
       overflow: hidden;
-      background: radial-gradient(circle at top left, #1f2937 0, #020617 60%);
-      min-height: 7rem;
-      cursor: pointer;
-      box-shadow: 0 18px 35px rgba(0, 0, 0, 0.7);
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
     }
 
-    .portfolio-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 24px 50px rgba(0, 0, 0, 0.85);
+    .post-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.7rem 0.9rem 0.5rem;
     }
 
-    .portfolio-card__image {
+    .post-user {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .post-avatar {
+      width: 2.15rem;
+      height: 2.15rem;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.85);
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.8);
+    }
+
+    .post-avatar img {
       width: 100%;
       height: 100%;
-      background-size: cover;
-      background-position: center;
+      object-fit: cover;
     }
 
-    .portfolio-card__overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.1));
-      opacity: 0;
+    .post-user-info {
       display: flex;
       flex-direction: column;
-      justify-content: flex-end;
-      padding: 0.75rem;
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      transition: var(--transition-fast);
-      transform: translateY(10px);
+      gap: 0.1rem;
     }
 
-    .portfolio-card:hover .portfolio-card__overlay {
-      opacity: 1;
-      transform: translateY(0);
+    .post-username {
+      font-size: 0.82rem;
+      font-weight: 600;
     }
 
-    .portfolio-card__title {
-      font-size: 0.8rem;
-      font-weight: 500;
+    .post-badge {
+      font-size: 0.68rem;
+      color: rgba(156, 163, 175, 0.95);
     }
 
-    .portfolio-card__meta {
+    .post-meta {
       font-size: 0.7rem;
-      color: rgba(209, 213, 219, 0.85);
+      color: rgba(156, 163, 175, 0.9);
     }
 
-    /* Floating Dock Nav */
+    .post-menu {
+      color: rgba(156, 163, 175, 0.9);
+      font-size: 1rem;
+    }
+
+    .post-content-text {
+      padding: 0.2rem 0.9rem 0.6rem;
+      font-size: 0.8rem;
+      color: rgba(229, 231, 235, 0.95);
+      line-height: 1.5;
+    }
+
+    .post-media {
+      width: 100%;
+      max-height: 16rem;
+      overflow: hidden;
+    }
+
+    .post-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .post-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.55rem 0.9rem 0.65rem;
+      border-top: 1px solid rgba(31, 41, 55, 0.95);
+      font-size: 0.8rem;
+    }
+
+    .post-actions-left,
+    .post-actions-right {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .post-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      cursor: pointer;
+      color: rgba(209, 213, 219, 0.9);
+      transition: var(--transition-fast);
+    }
+
+    .post-action i {
+      font-size: 0.9rem;
+    }
+
+    .post-action:hover {
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .post-likes {
+      font-size: 0.75rem;
+      padding: 0 0.9rem 0.6rem;
+      color: rgba(209, 213, 219, 0.9);
+    }
+
+    /* Dock */
 
     .dock {
       position: fixed;
@@ -439,53 +630,71 @@
       object-fit: cover;
     }
 
-    /* Адаптив */
+    /* Responsive */
 
     @media (min-width: 640px) {
       .page {
-        padding-top: 2.25rem;
+        padding-top: 2rem;
       }
 
-      .profile-card {
-        padding: 2rem 2.25rem 1.8rem;
+      .profile-cover {
+        height: 9.5rem;
       }
 
       .profile-avatar {
-        width: 7.5rem;
-        height: 7.5rem;
+        top: 4.6rem;
+        width: 7.4rem;
+        height: 7.4rem;
+      }
+
+      .profile-body {
+        padding: 4.3rem 2rem 1.7rem;
       }
 
       .profile-name {
-        font-size: 1.65rem;
-      }
-
-      .profile-subtitle {
-        font-size: 0.85rem;
+        font-size: 1.8rem;
       }
 
       .profile-actions {
         justify-content: center;
       }
-
-      .portfolio-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-    }
-
-    @media (min-width: 900px) {
-      .profile-card {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-      }
-
-      .profile-stats {
-        max-width: 520px;
-      }
     }
   </style>
 </head>
 <body>
+  <!-- Меню настроек -->
+  <div class="settings-menu" id="settingsMenu">
+    <div class="settings-menu__section-title">Языки</div>
+    <ul class="settings-menu__list">
+      <li class="settings-menu__item">
+        <span>Выбор языка</span>
+        <div class="settings-menu__lang-group">
+          <button class="settings-menu__lang-btn settings-menu__lang-btn--active">RU</button>
+          <button class="settings-menu__lang-btn">PL</button>
+          <button class="settings-menu__lang-btn">EN</button>
+        </div>
+      </li>
+    </ul>
+
+    <div class="settings-menu__divider"></div>
+
+    <div class="settings-menu__section-title">Аккаунт</div>
+    <ul class="settings-menu__list">
+      <li class="settings-menu__item">
+        <span>Вход</span>
+        <i class="fa-solid fa-right-to-bracket"></i>
+      </li>
+      <li class="settings-menu__item">
+        <span>Регистрация</span>
+        <i class="fa-regular fa-user-plus"></i>
+      </li>
+      <li class="settings-menu__item">
+        <span>Выход</span>
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      </li>
+    </ul>
+  </div>
+
   <div class="page">
     <div class="page-inner">
       <header class="top-bar">
@@ -493,135 +702,189 @@
           <span class="top-bar__brand-dot"></span>
           <span>AXIRO PROFILE</span>
         </div>
-
-        <!-- Здесь в React-проекте вместо этих кнопок будет твой LanguageSwitcher -->
-        <div class="top-bar__lang">
-          <button class="top-bar__lang-btn top-bar__lang-btn--active">RU</button>
-          <button class="top-bar__lang-btn">PL</button>
-          <button class="top-bar__lang-btn">EN</button>
-        </div>
+        <button class="top-bar__menu-btn" id="menuToggle" aria-label="Открыть меню настроек">
+          <i class="fa-solid fa-bars"></i>
+        </button>
       </header>
 
       <main>
+        <!-- Профиль -->
         <section class="profile-card" aria-labelledby="profile-name">
+          <div class="profile-cover"></div>
+
           <div class="profile-avatar">
-            <!-- поставь свою фотографию -->
-            <img src="https://images.pexels.com/photos/2837009/pexels-photo-2837009.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Avatar" />
+            <img
+              src="https://images.pexels.com/photos/2837009/pexels-photo-2837009.jpeg?auto=compress&cs=tinysrgb&w=600"
+              alt="Avatar"
+            />
           </div>
 
-          <h1 id="profile-name" class="profile-name">Ihor Nepomiashchyi</h1>
-          <p class="profile-subtitle">Owner • INGVARR Sp. z o.o.</p>
+          <div class="profile-body">
+            <h1 id="profile-name" class="profile-name">Ihor Nepomiashchyi</h1>
+            <p class="profile-subtitle">Owner • INGVARR Sp. z o.o.</p>
 
-          <div class="profile-stats" aria-label="Статистика профиля">
-            <article class="profile-stat">
-              <div class="profile-stat__value">24</div>
-              <div class="profile-stat__label">Проекты</div>
-            </article>
-            <article class="profile-stat">
-              <div class="profile-stat__value">120+</div>
-              <div class="profile-stat__label">Клиенты</div>
-            </article>
-            <article class="profile-stat">
-              <div class="profile-stat__value">10 лет</div>
-              <div class="profile-stat__label">Опыт</div>
-            </article>
+            <div class="profile-badge">
+              <i class="fa-solid fa-crown"></i>
+              Профиль компании / личный профиль
+            </div>
+
+            <div class="profile-stats" aria-label="Статистика профиля">
+              <article class="profile-stat">
+                <div class="profile-stat__value">248</div>
+                <div class="profile-stat__label">Подписки</div>
+              </article>
+              <article class="profile-stat">
+                <div class="profile-stat__value">1 280</div>
+                <div class="profile-stat__label">Подписчики</div>
+              </article>
+              <article class="profile-stat">
+                <div class="profile-stat__value">36</div>
+                <div class="profile-stat__label">Публикации</div>
+              </article>
+            </div>
+
+            <nav class="profile-actions" aria-label="Действия профиля">
+              <button class="btn-pill">
+                <i class="fa-regular fa-id-card"></i>
+                Обо мне
+              </button>
+              <button class="btn-pill">
+                <i class="fa-regular fa-bell"></i>
+                Подписаться
+              </button>
+              <button class="btn-pill btn-primary">
+                <i class="fa-regular fa-paper-plane"></i>
+                Связаться
+              </button>
+            </nav>
           </div>
-
-          <nav class="profile-actions" aria-label="Действия профиля">
-            <button class="btn-pill">
-              <i class="fa-regular fa-id-card"></i>
-              Обо мне
-            </button>
-            <button class="btn-pill">
-              <i class="fa-regular fa-folder-open"></i>
-              Портфолио
-            </button>
-            <button class="btn-pill btn-primary">
-              <i class="fa-regular fa-paper-plane"></i>
-              Связаться
-            </button>
-          </nav>
         </section>
 
-        <section class="section" aria-labelledby="portfolio-title">
+        <!-- Лента постов -->
+        <section class="section" aria-labelledby="feed-title">
           <div class="section-header">
-            <h2 id="portfolio-title" class="section-title">Проекты</h2>
-            <p class="section-subtitle">Подборка актуальных кейсов AXIRO / INGVARR</p>
+            <h2 id="feed-title" class="section-title">Посты</h2>
+            <p class="section-subtitle">Личная лента AXIRO / INGVARR</p>
           </div>
 
-          <div class="portfolio-grid">
-            <figure class="portfolio-card">
-              <div
-                class="portfolio-card__image"
-                style="background-image:url('https://images.pexels.com/photos/460672/pexels-photo-460672.jpeg?auto=compress&cs=tinysrgb&w=800');"
-              ></div>
-              <figcaption class="portfolio-card__overlay">
-                <div class="portfolio-card__title">Стальные мосты • Польша</div>
-                <div class="portfolio-card__meta">Инженеринг • Монтаж • Контроль качества</div>
-              </figcaption>
-            </figure>
+          <div class="feed">
+            <!-- Пост 1 -->
+            <article class="post-card">
+              <header class="post-header">
+                <div class="post-user">
+                  <div class="post-avatar">
+                    <img
+                      src="https://images.pexels.com/photos/2837009/pexels-photo-2837009.jpeg?auto=compress&cs=tinysrgb&w=400"
+                      alt="Автор"
+                    />
+                  </div>
+                  <div class="post-user-info">
+                    <span class="post-username">Ihor Nepomiashchyi</span>
+                    <span class="post-badge">Профессиональный аккаунт • AXIRO</span>
+                    <span class="post-meta">2 ч назад • Katowice</span>
+                  </div>
+                </div>
+                <div class="post-menu">
+                  <i class="fa-solid fa-ellipsis"></i>
+                </div>
+              </header>
 
-            <figure class="portfolio-card">
-              <div
-                class="portfolio-card__image"
-                style="background-image:url('https://images.pexels.com/photos/439416/pexels-photo-439416.jpeg?auto=compress&cs=tinysrgb&w=800');"
-              ></div>
-              <figcaption class="portfolio-card__overlay">
-                <div class="portfolio-card__title">AXIRO Platform</div>
-                <div class="portfolio-card__meta">Соцсеть для подрядчиков и клиентов</div>
-              </figcaption>
-            </figure>
+              <div class="post-content-text">
+                Новый объект: старт монтажа стальных конструкций для мостового перехода.
+                Команда INGVARR уже на площадке, NDT и документация под контролем.
+              </div>
 
-            <figure class="portfolio-card">
-              <div
-                class="portfolio-card__image"
-                style="background-image:url('https://images.pexels.com/photos/1462935/pexels-photo-1462935.jpeg?auto=compress&cs=tinysrgb&w=800');"
-              ></div>
-              <figcaption class="portfolio-card__overlay">
-                <div class="portfolio-card__title">Heavy Steel Assembly</div>
-                <div class="portfolio-card__meta">Welding • NDT • Project Management</div>
-              </figcaption>
-            </figure>
+              <div class="post-media">
+                <img
+                  src="https://images.pexels.com/photos/460672/pexels-photo-460672.jpeg?auto=compress&cs=tinysrgb&w=1200"
+                  alt="Мостовой проект"
+                />
+              </div>
 
-            <figure class="portfolio-card">
-              <div
-                class="portfolio-card__image"
-                style="background-image:url('https://images.pexels.com/photos/942317/pexels-photo-942317.jpeg?auto=compress&cs=tinysrgb&w=800');"
-              ></div>
-              <figcaption class="portfolio-card__overlay">
-                <div class="portfolio-card__title">Railway Bridges</div>
-                <div class="portfolio-card__meta">Проектирование узлов и монтаж</div>
-              </figcaption>
-            </figure>
+              <div class="post-actions">
+                <div class="post-actions-left">
+                  <div class="post-action">
+                    <i class="fa-regular fa-heart"></i>
+                    <span>Нравится</span>
+                  </div>
+                  <div class="post-action">
+                    <i class="fa-regular fa-comment"></i>
+                    <span>Коммент</span>
+                  </div>
+                </div>
+                <div class="post-actions-right">
+                  <div class="post-action">
+                    <i class="fa-solid fa-share-nodes"></i>
+                  </div>
+                  <div class="post-action">
+                    <i class="fa-regular fa-bookmark"></i>
+                  </div>
+                </div>
+              </div>
 
-            <figure class="portfolio-card">
-              <div
-                class="portfolio-card__image"
-                style="background-image:url('https://images.pexels.com/photos/258160/pexels-photo-258160.jpeg?auto=compress&cs=tinysrgb&w=800');"
-              ></div>
-              <figcaption class="portfolio-card__overlay">
-                <div class="portfolio-card__title">AXIRO Mobile</div>
-                <div class="portfolio-card__meta">UX-дизайн мобильного приложения</div>
-              </figcaption>
-            </figure>
+              <div class="post-likes">
+                132 отметки "Нравится" • 18 комментариев
+              </div>
+            </article>
 
-            <figure class="portfolio-card">
-              <div
-                class="portfolio-card__image"
-                style="background-image:url('https://images.pexels.com/photos/159298/gears-cogs-machine-machinery-159298.jpeg?auto=compress&cs=tinysrgb&w=800');"
-              ></div>
-              <figcaption class="portfolio-card__overlay">
-                <div class="portfolio-card__title">Industrial Solutions</div>
-                <div class="portfolio-card__meta">Комплексные металлоконструкции под ключ</div>
-              </figcaption>
-            </figure>
+            <!-- Пост 2 -->
+            <article class="post-card">
+              <header class="post-header">
+                <div class="post-user">
+                  <div class="post-avatar">
+                    <img
+                      src="https://images.pexels.com/photos/428364/pexels-photo-428364.jpeg?auto=compress&cs=tinysrgb&w=400"
+                      alt="Автор"
+                    />
+                  </div>
+                  <div class="post-user-info">
+                    <span class="post-username">AXIRO Platform</span>
+                    <span class="post-badge">Обновление сервиса</span>
+                    <span class="post-meta">Вчера • Online</span>
+                  </div>
+                </div>
+                <div class="post-menu">
+                  <i class="fa-solid fa-ellipsis"></i>
+                </div>
+              </header>
+
+              <div class="post-content-text">
+                Тестируем новый дизайн профиля и мобильную навигацию в стиле топовых
+                соцсетей. Скоро подключим роли, marketplace и быстрые заявки от клиентов.
+              </div>
+
+              <div class="post-actions">
+                <div class="post-actions-left">
+                  <div class="post-action">
+                    <i class="fa-regular fa-heart"></i>
+                    <span>Нравится</span>
+                  </div>
+                  <div class="post-action">
+                    <i class="fa-regular fa-comment"></i>
+                    <span>Коммент</span>
+                  </div>
+                </div>
+                <div class="post-actions-right">
+                  <div class="post-action">
+                    <i class="fa-solid fa-share-nodes"></i>
+                  </div>
+                  <div class="post-action">
+                    <i class="fa-regular fa-bookmark"></i>
+                  </div>
+                </div>
+              </div>
+
+              <div class="post-likes">
+                57 отметок "Нравится" • 9 комментариев
+              </div>
+            </article>
           </div>
         </section>
       </main>
     </div>
   </div>
 
-  <!-- Floating Dock навигация -->
+  <!-- Floating Dock -->
   <nav class="dock" aria-label="Главная навигация">
     <div class="dock-inner">
       <button class="dock-btn dock-btn--active" aria-label="Домой">
@@ -652,5 +915,26 @@
       </button>
     </div>
   </nav>
+
+  <script>
+    const menuToggle = document.getElementById("menuToggle");
+    const settingsMenu = document.getElementById("settingsMenu");
+
+    menuToggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      settingsMenu.classList.toggle("settings-menu--open");
+    });
+
+    document.addEventListener("click", (e) => {
+      if (
+        settingsMenu.classList.contains("settings-menu--open") &&
+        !settingsMenu.contains(e.target) &&
+        e.target !== menuToggle &&
+        !menuToggle.contains(e.target)
+      ) {
+        settingsMenu.classList.remove("settings-menu--open");
+      }
+    });
+  </script>
 </body>
 </html>
