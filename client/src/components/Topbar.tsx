@@ -1,11 +1,9 @@
 // @ts-nocheck
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import LanguageSwitcher from "../i18n/LanguageSwitcher";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 type TopbarProps = {
-  // Оставляем пропсы для совместимости,
-  // даже если сейчас ничего не используем
   onToggleSidebar?: () => void;
   [key: string]: any;
 };
@@ -46,7 +44,7 @@ const brandDotStyle: React.CSSProperties = {
 const brandTextStyle: React.CSSProperties = {
   fontSize: 14,
   letterSpacing: "0.18em",
-  textTransform: "uppercase" as const,
+  textTransform: "uppercase",
   color: "#e5e7eb",
   fontWeight: 600,
 };
@@ -85,20 +83,16 @@ export default function Topbar(_props: TopbarProps) {
 
   return (
     <header style={barStyle}>
-      {/* ЛЕВАЯ ЧАСТЬ: бренд AXIRO PROFILE */}
+      {/* Левый блок: бренд */}
       <div style={brandStyle}>
         <span style={brandDotStyle} />
         <span style={brandTextStyle}>AXIRO PROFILE</span>
       </div>
 
-      {/* ПРАВАЯ ЧАСТЬ: язык + профиль */}
+      {/* Правый блок: язык + профиль */}
       <div style={rightBlockStyle}>
-        {/* Переключатель языка (как и раньше) */}
-        <div>
-          <LanguageSwitcher />
-        </div>
+        <LanguageSwitcher />
 
-        {/* Кнопка перехода в профиль */}
         <button
           type="button"
           onClick={handleProfileClick}
@@ -113,7 +107,6 @@ export default function Topbar(_props: TopbarProps) {
           }}
           title={isProfile ? "Ваш профиль" : "Открыть профиль"}
         >
-          {/* Здесь можно позже подставить реальный аватар пользователя */}
           <span style={{ fontSize: 18 }}>👤</span>
         </button>
       </div>
