@@ -1,152 +1,136 @@
+import React from "react";
 import { useAuth } from "../AuthContext";
 import { useNavigate } from "react-router-dom";
 
-export default function ProfilePage() {
-  const { profile } = useAuth();
+export default function Profile() {
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
 
-  if (!profile) {
+  if (!user || !profile) {
     return (
-      <div className="text-white p-6">
+      <div className="text-center text-white mt-20 text-xl">
         Загрузка профиля…
       </div>
     );
   }
 
-  const cardBg = "rgba(15, 23, 42, 0.9)";
-  const borderC = "rgba(255,255,255,0.07)";
-
   return (
-    <div className="p-4 md:p-8 text-white max-w-5xl mx-auto">
+    <div className="p-4 md:p-8 w-full mx-auto max-w-5xl text-white">
 
-      {/* Верхний блок профиля */}
-      <div
-        className="rounded-xl p-6 mb-6 shadow-lg flex flex-col md:flex-row items-center md:items-start gap-6"
-        style={{ background: cardBg, border: `1px solid ${borderC}` }}
-      >
-        {/* Аватар */}
-        <img
-          src={profile.avatar_url || "https://placehold.co/150x150/png"}
-          alt="avatar"
-          className="w-32 h-32 rounded-full object-cover border border-gray-700 shadow-md cursor-pointer"
-          onClick={() => navigate("/edit-profile")}
-        />
+      {/* 🔵 Блок ПРОФИЛЯ */}
+      <div className="bg-[#0D1624] rounded-2xl p-6 shadow-xl border border-[#1E3A5F]">
+        <div className="flex flex-col md:flex-row md:items-center gap-6">
 
-        <div className="flex-1">
+          {/* Аватар */}
+          <img
+            src={profile.avatar_url || "/no-avatar.png"}
+            className="w-28 h-28 rounded-full object-cover border-2 border-[#1E3A5F]"
+            alt="avatar"
+          />
+
           {/* Имя + бейдж */}
-          <h1 className="text-2xl font-bold flex items-center gap-3">
-            {profile.full_name || "Без имени"}
-          </h1>
+          <div className="flex flex-col gap-1">
+            <h2 className="text-2xl font-bold">{profile.full_name}</h2>
 
-          {/* Бейдж Owner */}
-          <span className="inline-block px-3 py-1 mt-2 rounded-full text-sm bg-blue-600/20 border border-blue-500/30 text-blue-300">
-            OWNER • INGVARR Sp. z o.o.
-          </span>
+            {/* Маленький бейдж */}
+            <span className="px-3 py-1 text-sm rounded-full bg-[#1E3A5F] w-fit">
+              OWNER • INGVARR Sp. z o.o.
+            </span>
 
-          {/* ID */}
-          <p className="mt-3 text-sm opacity-80 break-all">
-            ID: {profile.id}
-          </p>
-
-          {/* Кнопки справа (на мобилке вниз) */}
-          <div className="flex gap-3 mt-4 flex-wrap">
-            <button
-              onClick={() => navigate(-1)}
-              className="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600 transition"
-            >
-              ← Назад
-            </button>
-
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(window.location.href);
-              }}
-              className="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600 transition"
-            >
-              Поделиться
-            </button>
-
-            <button
-              onClick={() => navigate("/edit-profile")}
-              className="px-4 py-2 rounded bg-orange-500 hover:bg-orange-400 transition"
-            >
-              Редактировать
-            </button>
+            {/* ID */}
+            <div className="text-sm opacity-70">ID: {profile.user_id}</div>
           </div>
+        </div>
+
+        {/* Кнопки */}
+        <div className="flex flex-wrap gap-3 mt-6">
+          <button
+            onClick={() => navigate(-1)}
+            className="px-4 py-2 bg-gray-600 rounded-lg hover:bg-gray-700"
+          >
+            ← Назад
+          </button>
+
+          <button
+            onClick={() => navigator.share?.({ url: window.location.href })}
+            className="px-4 py-2 bg-blue-700 rounded-lg hover:bg-blue-800"
+          >
+            Поделиться
+          </button>
+
+          <button
+            onClick={() => navigate("/edit-profile")}
+            className="px-4 py-2 bg-orange-500 rounded-lg hover:bg-orange-600"
+          >
+            Редактировать
+          </button>
         </div>
       </div>
 
-      {/* Статистика */}
-      <div
-        className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6"
-      >
+      {/* 🔵 Статистика */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
         {[
           { label: "Посты", value: 0 },
           { label: "Лайки", value: 0 },
           { label: "Комментарии", value: 0 },
           { label: "Друзья", value: 0 },
-        ].map((item, i) => (
+        ].map((i) => (
           <div
-            key={i}
-            className="rounded-xl p-4 text-center shadow"
-            style={{ background: cardBg, border: `1px solid ${borderC}` }}
+            key={i.label}
+            className="bg-[#0D1624] border border-[#1E3A5F] p-4 rounded-xl text-center shadow-md"
           >
-            <div className="text-2xl font-bold">{item.value}</div>
-            <div className="opacity-70 mt-1">{item.label}</div>
+            <div className="text-3xl font-bold">{i.value}</div>
+            <div className="opacity-70 mt-1">{i.label}</div>
           </div>
         ))}
       </div>
 
-      {/* Быстрые действия */}
-      <div
-        className="rounded-xl p-5 mb-6 shadow grid grid-cols-1 md:grid-cols-3 gap-4"
-        style={{ background: cardBg, border: `1px solid ${borderC}` }}
-      >
+      {/* 🔵 Быстрые действия */}
+      <div className="flex flex-col md:flex-row gap-4 mt-6">
         <button
-          onClick={() => navigate("/create-post")}
-          className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-500 transition"
+          onClick={() => navigate("/post/create")}
+          className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 rounded-xl"
         >
           Создать пост
         </button>
 
         <button
           onClick={() => navigate("/feed")}
-          className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-500 transition"
+          className="flex-1 px-4 py-3 bg-gray-700 hover:bg-gray-800 rounded-xl"
         >
           Перейти в ленту
         </button>
 
         <button
           onClick={() => navigate("/reels")}
-          className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-500 transition"
+          className="flex-1 px-4 py-3 bg-purple-700 hover:bg-purple-800 rounded-xl"
         >
           Открыть ролики
         </button>
       </div>
 
-      {/* Посты пользователя */}
-      <div
-        className="rounded-xl p-6 shadow"
-        style={{ background: cardBg, border: `1px solid ${borderC}` }}
-      >
-        <h2 className="text-xl font-bold mb-2">Посты пользователя</h2>
+      {/* 🔵 Посты пользователя */}
+      <div className="bg-[#0D1624] border border-[#1E3A5F] rounded-2xl p-6 mt-8 shadow-xl">
+        <h3 className="text-xl font-bold mb-3">Посты пользователя</h3>
 
-        <p className="opacity-80">
+        <div className="opacity-70">
           Пока нет постов. Создай первый пост на странице{" "}
           <span
-            onClick={() => navigate("/create-post")}
             className="text-blue-400 cursor-pointer"
+            onClick={() => navigate("/post/create")}
           >
-            «Посты».
+            «Посты»
           </span>
-        </p>
-
-        <p className="text-sm opacity-60 mt-3">
+          .
+          <br />
+          <br />
           В будущем здесь появятся:
-          <br />— последние публикации  
-          <br />— ролики  
-          <br />— ссылки на соцсети  
-        </p>
+          <ul className="list-disc ml-5 mt-2">
+            <li>последние публикации</li>
+            <li>ролики</li>
+            <li>ссылки на соцсети</li>
+          </ul>
+        </div>
       </div>
     </div>
   );
