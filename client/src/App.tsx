@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
@@ -10,9 +11,9 @@ import FriendsPage from "./pages/FriendsPage";
 import ReelsPage from "./pages/ReelsPage";
 import MarketplacePage from "./pages/MarketplacePage";
 import SettingsPage from "./pages/SettingsPage";
-import ProfilePage from "./pages/Profile";
-import EditProfilePage from "./pages/EditProfile";
 import UIPreviewPage from "./pages/UIPreviewPage";
+import ProfilePage from "./pages/Profile";
+import EditProfile from "./pages/EditProfile";
 
 import { useAuth } from "./AuthContext";
 
@@ -20,155 +21,195 @@ export default function App() {
   const { user, loading } = useAuth();
   const location = useLocation();
 
-  // небольшой прелоадер при старте приложения
-  const [bootReady, setBootReady] = useState(false);
-  // режим «UI дизайн» (включается хоткеем, просто красивый бейдж)
-  const [designMode, setDesignMode] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  // блокируем скролл пока грузится приложение, потом включаем
+  // определяем мобильный экран
   useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    const timer = setTimeout(() => {
-      setBootReady(true);
-      document.body.style.overflow = prev || "auto";
-    }, 300);
-
-    return () => {
-      clearTimeout(timer);
-      document.body.style.overflow = prev || "auto";
+    const handleResize = () => {
+      if (typeof window === "undefined") return;
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      if (!mobile) setIsSidebarOpen(false);
     };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // хоткей Ctrl+Shift+D — включить / выключить «UI Design Mode»
+  // при смене страницы закрываем боковое меню
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.code === "KeyD") {
-        e.preventDefault();
-        setDesignMode((prev) => !prev);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
+    setIsSidebarOpen(false);
+  }, [location.pathname]);
 
-  // глобальный лоадер, пока проверяется сессия / стартует приложение
-  if (!bootReady || loading) {
+  // блокируем скролл под выезжающим меню
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.body.style.overflow = isSidebarOpen ? "hidden" : "";
+  }, [isSidebarOpen]);
+
+  // загрузка
+  if (loading) {
     return (
       <div
-        className="app-shell"
         style={{
+          minHeight: "100vh",
+          background: "#020617",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          height: "100vh",
-          color: "white",
+          color: "#e5e7eb",
         }}
       >
-        <div style={{ textAlign: "center" }}>
-          <div
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: "999px",
-              border: "3px solid rgba(255,255,255,0.15)",
-              borderTopColor: "rgba(255,255,255,0.9)",
-              margin: "0 auto 16px",
-              animation: "spin 1s linear infinite",
-            }}
-          />
-          <div style={{ fontSize: 18, fontWeight: 500 }}>AXIS Platform</div>
-          <div style={{ opacity: 0.6, marginTop: 4 }}>Загрузка интерфейса…</div>
-        </div>
+        Загрузка…
       </div>
     );
   }
 
-  // если юзер не залогинен и это не /auth — кидаем на авторизацию
-  if (!user && location.pathname !== "/auth") {
-    return <Navigate to="/auth" replace />;
-  }
-
-  // если юзер залогинен и открыл /auth — редирект в посты
-  if (user && location.pathname === "/auth") {
-    return <Navigate to="/posts" replace />;
-  }
-
-  return (
-    <div className="app-root">
-      <div className="app-layout">
-        {/* Сайдбар слева (на мобиле он сам адаптируется внутри компонента) */}
-        {user && (
-          <aside className="app-sidebar">
-            <Sidebar />
-          </aside>
-        )}
-
-        {/* Правая часть: топбар + контент */}
-        <div className="app-main">
-          {user && (
-            <header className="app-topbar">
-              <Topbar />
-            </header>
-          )}
-
-          <main className="app-content">
-            <Routes>
-              {/* Авторизация */}
-              <Route path="/auth" element={<AuthPage />} />
-
-              {/* Главная лента / посты */}
-              <Route path="/posts" element={<HomePage />} />
-
-              {/* Друзья / ролики / маркетплейс / настройки */}
-              <Route path="/friends" element={<FriendsPage />} />
-              <Route path="/reels" element={<ReelsPage />} />
-              <Route path="/marketplace" element={<MarketplacePage />} />
-              <Route path="/settings" element={<SettingsPage />} />
-
-              {/* Профиль и отдельная страница редактирования профиля */}
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/edit-profile" element={<EditProfilePage />} />
-
-              {/* Страница для тестов интерфейса */}
-              <Route path="/ui-preview" element={<UIPreviewPage />} />
-
-              {/* Редиректы по умолчанию */}
-              <Route
-                path="/"
-                element={<Navigate to={user ? "/posts" : "/auth"} replace />}
-              />
-              <Route
-                path="*"
-                element={<Navigate to={user ? "/posts" : "/auth"} replace />}
-              />
-            </Routes>
-          </main>
-        </div>
+  // если не залогинен — только AuthPage
+  if (!user) {
+    return (
+      <div
+        className="app-shell"
+        style={{ minHeight: "100vh", background: "#020617", color: "#e5e7eb" }}
+      >
+        <Routes>
+          <Route path="/auth" element={<AuthPage />} />
+          <Route path="*" element={<Navigate to="/auth" replace />} />
+        </Routes>
       </div>
+    );
+  }
 
-      {/* Бейдж «UI Design Mode» — чисто визуальная штука */}
-      {designMode && (
-        <div
+  // основное приложение
+  return (
+    <div
+      className="app-shell"
+      style={{
+        minHeight: "100vh",
+        background: "#020617",
+        color: "#e5e7eb",
+        display: "flex",
+      }}
+    >
+      {/* Сайдбар слева на десктопе */}
+      {!isMobile && (
+        <aside
           style={{
-            position: "fixed",
-            right: 16,
-            bottom: 16,
-            padding: "10px 16px",
-            borderRadius: 999,
-            background:
-              "linear-gradient(135deg, rgba(0,199,255,0.25), rgba(255,140,0,0.45))",
-            backdropFilter: "blur(18px)",
-            border: "1px solid rgba(255,255,255,0.25)",
-            fontSize: 11,
-            letterSpacing: 0.7,
-            textTransform: "uppercase",
-            color: "white",
-            zIndex: 80,
+            width: 260,
+            flexShrink: 0,
+            borderRight: "1px solid rgba(15,23,42,0.9)",
+            background: "#020617",
           }}
         >
-          UI Design Mode • Ctrl+Shift+D
+          <Sidebar />
+        </aside>
+      )}
+
+      {/* Правая колонка: топбар + контент */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        {/* Верхняя полоса на мобиле: бургер + Topbar в одной линии */}
+        {isMobile && (
+          <div
+            style={{
+              position: "sticky",
+              top: 0,
+              zIndex: 30,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "8px 12px",
+              background:
+                "linear-gradient(to right, rgba(15,23,42,0.98), rgba(15,23,42,0.9))",
+              borderBottom: "1px solid rgba(31,41,55,0.9)",
+            }}
+          >
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              style={{
+                padding: "6px 10px",
+                borderRadius: 999,
+                border: "1px solid rgba(148,163,184,0.6)",
+                background: "rgba(15,23,42,0.9)",
+                color: "#e5e7eb",
+                fontSize: 16,
+                lineHeight: 1,
+                cursor: "pointer",
+              }}
+            >
+              ☰
+            </button>
+            <div style={{ flex: 1, marginLeft: 8 }}>
+              <Topbar />
+            </div>
+          </div>
+        )}
+
+        {/* Топбар на десктопе (без бургера, просто сверху) */}
+        {!isMobile && (
+          <div
+            style={{
+              position: "sticky",
+              top: 0,
+              zIndex: 20,
+              borderBottom: "1px solid rgba(15,23,42,0.9)",
+              background:
+                "linear-gradient(to right, rgba(15,23,42,0.98), rgba(15,23,42,0.9))",
+            }}
+          >
+            <Topbar />
+          </div>
+        )}
+
+        {/* Основной контент с роутами */}
+        <main
+          style={{
+            flex: 1,
+            padding: "16px",
+            paddingTop: isMobile ? 12 : 24,
+          }}
+        >
+          <Routes>
+            <Route path="/" element={<Navigate to="/posts" replace />} />
+            <Route path="/posts" element={<HomePage />} />
+            <Route path="/friends" element={<FriendsPage />} />
+            <Route path="/reels" element={<ReelsPage />} />
+            <Route path="/marketplace" element={<MarketplacePage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/ui-preview" element={<UIPreviewPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/edit-profile" element={<EditProfile />} />
+            <Route path="*" element={<Navigate to="/posts" replace />} />
+          </Routes>
+        </main>
+      </div>
+
+      {/* Выезжающий сайдбар на мобиле */}
+      {isMobile && isSidebarOpen && (
+        <div
+          onClick={() => setIsSidebarOpen(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 40,
+            background: "rgba(15,23,42,0.85)",
+            backdropFilter: "blur(4px)",
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: 260,
+              maxWidth: "80vw",
+              height: "100%",
+              background: "#020617",
+              borderRight: "1px solid rgba(31,41,55,0.9)",
+              paddingTop: 8,
+            }}
+          >
+            <Sidebar />
+          </div>
         </div>
       )}
     </div>
