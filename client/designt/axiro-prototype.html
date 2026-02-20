@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>AXIRO – Prototype</title>
+  <title>AXIRO – Прототип</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
@@ -64,7 +64,7 @@
     }
 
     .screen {
-      display: none; /* по умолчанию скрыты, показываем через JS */
+      display: none;
     }
 
     /* Верхний бар */
@@ -174,8 +174,6 @@
       box-shadow: 0 18px 45px rgba(79, 70, 229, 0.35);
     }
 
-    /* Текст и метки */
-
     .text-muted {
       color: var(--text-muted);
       font-size: 12px;
@@ -198,8 +196,6 @@
       background: radial-gradient(circle at top, rgba(129, 140, 248, 0.32), rgba(15, 23, 42, 0.96));
       color: var(--accent-strong);
     }
-
-    /* Кнопки */
 
     .btn {
       border-radius: var(--radius-pill);
@@ -237,8 +233,6 @@
       outline: none;
     }
 
-    /* Аваты / список */
-
     .avatar {
       width: 56px;
       height: 56px;
@@ -268,8 +262,6 @@
       border: 1px solid rgba(129, 140, 248, 0.7);
       box-shadow: 0 6px 18px rgba(79, 70, 229, 0.6);
     }
-
-    /* Нижняя навигация */
 
     .bottom-nav {
       position: fixed;
@@ -335,8 +327,6 @@
       color: var(--accent-strong);
     }
 
-    /* Поля ввода, search */
-
     .input-wrapper {
       background: radial-gradient(circle at top, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 1));
       border-radius: var(--radius-pill);
@@ -360,8 +350,6 @@
       color: var(--text-muted);
     }
 
-    /* Простые утилиты */
-
     .row {
       display: flex;
       align-items: center;
@@ -373,25 +361,10 @@
       justify-content: space-between;
     }
 
-    .row-gap-8 {
-      display: flex;
-      gap: 8px;
-    }
-
-    .row-gap-10 {
-      display: flex;
-      gap: 10px;
-    }
-
-    .row-gap-12 {
-      display: flex;
-      gap: 12px;
-    }
-
-    .col {
-      display: flex;
-      flex-direction: column;
-    }
+    .row-gap-8 { display: flex; gap: 8px; }
+    .row-gap-10 { display: flex; gap: 10px; }
+    .row-gap-12 { display: flex; gap: 12px; }
+    .col { display: flex; flex-direction: column; }
 
     .mt-8 { margin-top: 8px; }
     .mt-10 { margin-top: 10px; }
@@ -399,8 +372,6 @@
     .mt-16 { margin-top: 16px; }
     .mt-20 { margin-top: 20px; }
     .mb-8 { margin-bottom: 8px; }
-
-    /* Scrollbar лёгкий */
 
     .app-content::-webkit-scrollbar {
       width: 4px;
@@ -417,14 +388,14 @@
 <body>
 
   <div id="screens">
-    <!-- FEED SCREEN -->
+    <!-- ЛЕНТА -->
     <div class="app-shell screen" data-screen="feed">
       <header class="app-header">
         <div class="app-header-left">
           <div class="app-logo">AX</div>
           <div class="app-title">
             <span class="app-title-main">AXIRO</span>
-            <span class="app-title-sub">Network for builders</span>
+            <span class="app-title-sub">Сеть для исполнителей</span>
           </div>
         </div>
         <div class="row-gap-8">
@@ -434,16 +405,16 @@
       </header>
 
       <main class="app-content">
-        <!-- Stories row -->
+        <!-- Активные бригады -->
         <section>
           <div class="row-between mb-8">
-            <span class="section-title">ACTIVE CREWS</span>
-            <span class="text-muted" style="font-size:11px;">See all</span>
+            <span class="section-title">АКТИВНЫЕ БРИГАДЫ</span>
+            <span class="text-muted" style="font-size:11px;">Смотреть все</span>
           </div>
           <div class="row-gap-12" style="overflow-x:auto;padding-bottom:6px;">
             <div class="col" style="align-items:center;min-width:60px;">
               <div class="avatar-sm" style="border:1px dashed rgba(129,140,248,0.7);">+</div>
-              <span class="text-muted" style="font-size:11px;margin-top:4px;">You</span>
+              <span class="text-muted" style="font-size:11px;margin-top:4px;">Вы</span>
             </div>
             <div class="col" style="align-items:center;min-width:60px;">
               <div class="avatar-sm">MK</div>
@@ -464,41 +435,41 @@
           </div>
         </section>
 
-        <!-- Filter chips -->
+        <!-- Фильтры -->
         <section class="mt-12">
           <div class="row-gap-8" style="overflow-x:auto;padding-bottom:6px;">
-            <span class="badge-pill-accent">All</span>
-            <span class="badge-pill">Projects</span>
-            <span class="badge-pill">Crews</span>
-            <span class="badge-pill">Tenders</span>
-            <span class="badge-pill">AXIRO Only</span>
+            <span class="badge-pill-accent">Все</span>
+            <span class="badge-pill">Проекты</span>
+            <span class="badge-pill">Бригады</span>
+            <span class="badge-pill">Тендеры</span>
+            <span class="badge-pill">Только AXIRO</span>
           </div>
         </section>
 
-        <!-- Feed cards -->
+        <!-- Посты -->
         <section class="mt-16">
-          <!-- Post 1 -->
+          <!-- Пост 1 -->
           <article class="card-soft" style="margin-bottom:12px;">
             <div class="row-between">
               <div class="row-gap-10">
                 <div class="avatar-sm">IN</div>
                 <div class="col">
                   <span style="font-size:13px;font-weight:500;">Ihor · INGVARR</span>
-                  <span class="text-muted" style="font-size:11px;">Now · Katowice, PL</span>
+                  <span class="text-muted" style="font-size:11px;">Сейчас · Katowice, PL</span>
                 </div>
               </div>
               <span class="text-muted" style="font-size:16px;">⋮</span>
             </div>
             <p class="text-muted mt-10" style="font-size:13px;line-height:1.6;">
-              New bridge launch in progress. Need 4 MIG/MAG welders (135/136) for night shift, 72h window.
+              Запуск моста в процессе. Нужны 4 сварщика MIG/MAG (135/136) на ночную смену, окно 72 часа.
             </p>
             <div class="card" style="margin-top:10px;padding:10px;">
               <div class="row-between">
                 <div class="col">
-                  <span style="font-size:13px;font-weight:500;">Project · Awanbek</span>
-                  <span class="text-muted" style="font-size:11px;">Start: 26 Feb · Silesia</span>
+                  <span style="font-size:13px;font-weight:500;">Проект · Аванбек</span>
+                  <span class="text-muted" style="font-size:11px;">Старт: 26 февраля · Силезия</span>
                 </div>
-                <span class="badge-pill-accent">Open</span>
+                <span class="badge-pill-accent">Открыт</span>
               </div>
               <div class="row-gap-8 mt-8">
                 <span class="badge-pill">MIG/MAG 135/136</span>
@@ -511,40 +482,40 @@
                 <span>💬 9</span>
                 <span>↻ 3</span>
               </div>
-              <span>Save</span>
+              <span>Сохранить</span>
             </div>
           </article>
 
-          <!-- Post 2 -->
+          <!-- Пост 2 -->
           <article class="card-soft" style="margin-bottom:12px;">
             <div class="row-between">
               <div class="row-gap-10">
                 <div class="avatar-sm">AX</div>
                 <div class="col">
-                  <span style="font-size:13px;font-weight:500;">AXIRO Updates</span>
-                  <span class="text-muted" style="font-size:11px;">1h ago</span>
+                  <span style="font-size:13px;font-weight:500;">AXIRO · Обновления</span>
+                  <span class="text-muted" style="font-size:11px;">1 час назад</span>
                 </div>
               </div>
             </div>
             <p class="text-muted mt-10" style="font-size:13px;line-height:1.6;">
-              Welcome to early AXIRO. Connect your crews, share real projects and keep all chat in one place.
+              Добро пожаловать в раннюю версию AXIRO. Подключайте бригады, делитесь реальными проектами и держите всю коммуникацию в одном месте.
             </p>
             <div class="row-gap-8 mt-10">
-              <button class="btn btn-primary" style="flex:1;">Create project</button>
-              <button class="btn btn-ghost" onclick="showScreen('user')">View crew profile</button>
+              <button class="btn btn-primary" style="flex:1;">Создать проект</button>
+              <button class="btn btn-ghost" onclick="showScreen('user')">Профиль бригады</button>
             </div>
           </article>
         </section>
       </main>
     </div>
 
-    <!-- PROFILE SCREEN -->
+    <!-- ПРОФИЛЬ (СВОЙ) -->
     <div class="app-shell screen" data-screen="profile">
       <header class="app-header">
         <div class="app-header-left">
           <div class="app-logo">AX</div>
           <div class="app-title">
-            <span class="app-title-main">PROFILE</span>
+            <span class="app-title-main">ПРОФИЛЬ</span>
             <span class="app-title-sub">@ihor.axiro</span>
           </div>
         </div>
@@ -555,7 +526,6 @@
       </header>
 
       <main class="app-content">
-        <!-- Header / avatar -->
         <section class="card-highlight">
           <div class="row-gap-12">
             <div class="avatar">IN</div>
@@ -563,56 +533,53 @@
               <div class="row-between">
                 <div class="col">
                   <span style="font-size:16px;font-weight:600;">Ihor Nepomiashchyi</span>
-                  <span class="text-muted" style="font-size:12px;">Founder · INGVARR · AXIRO</span>
+                  <span class="text-muted" style="font-size:12px;">Основатель · INGVARR · AXIRO</span>
                 </div>
-                <span class="badge-pill-accent">Live • online</span>
+                <span class="badge-pill-accent">В сети</span>
               </div>
               <div class="row-gap-10 mt-10">
                 <div class="col" style="min-width:56px;">
-                  <span style="font-size:14px;font-weight:600;">1.2K</span>
-                  <span class="text-muted" style="font-size:11px;">Followers</span>
+                  <span style="font-size:14px;font-weight:600;">1,2K</span>
+                  <span class="text-muted" style="font-size:11px;">Подписчики</span>
                 </div>
                 <div class="col" style="min-width:56px;">
                   <span style="font-size:14px;font-weight:600;">387</span>
-                  <span class="text-muted" style="font-size:11px;">Following</span>
+                  <span class="text-muted" style="font-size:11px;">Подписки</span>
                 </div>
                 <div class="col" style="min-width:56px;">
                   <span style="font-size:14px;font-weight:600;">72</span>
-                  <span class="text-muted" style="font-size:11px;">Projects</span>
+                  <span class="text-muted" style="font-size:11px;">Проекты</span>
                 </div>
               </div>
             </div>
           </div>
           <p class="text-muted mt-12" style="font-size:12px;line-height:1.5;">
-            Building bridges, teams and systems. Welding, infrastructure, AI tools and AXIRO – network for doers.
+            Строю мосты, команды и системы. Сварка, инфраструктура, AI-инструменты и AXIRO — сеть для тех, кто делает.
           </p>
           <div class="row-gap-8 mt-12">
-            <button class="btn btn-primary" style="flex:1;">Edit profile</button>
-            <button class="btn btn-ghost">Share</button>
+            <button class="btn btn-primary" style="flex:1;">Редактировать</button>
+            <button class="btn btn-ghost">Поделиться</button>
           </div>
         </section>
 
-        <!-- Quick chips -->
         <section class="mt-12">
           <div class="row-gap-8">
             <span class="badge-pill">PL · UA · EN</span>
-            <span class="badge-pill">Warsaw · EU projects</span>
-            <span class="badge-pill">Welding · Bridges</span>
+            <span class="badge-pill">Warszawa · EU проекты</span>
+            <span class="badge-pill">Сварка · Мосты</span>
           </div>
         </section>
 
-        <!-- Tabs -->
         <section class="mt-16 card-soft">
           <div class="row-gap-8" style="justify-content:space-between;">
-            <button class="btn btn-ghost" style="flex:1;border-radius:16px;background:rgba(148,163,184,0.12);">Posts</button>
-            <button class="btn btn-ghost" style="flex:1;border-radius:16px;">Reels</button>
-            <button class="btn btn-ghost" style="flex:1;border-radius:16px;">About</button>
+            <button class="btn btn-ghost" style="flex:1;border-radius:16px;background:rgba(148,163,184,0.12);">Посты</button>
+            <button class="btn btn-ghost" style="flex:1;border-radius:16px;">Видео</button>
+            <button class="btn btn-ghost" style="flex:1;border-radius:16px;">О себе</button>
           </div>
         </section>
 
-        <!-- Posts grid (макет) -->
         <section class="mt-12">
-          <div class="section-title">RECENT POSTS</div>
+          <div class="section-title">ПОСЛЕДНИЕ ПОСТЫ</div>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;">
             <div style="aspect-ratio:1/1;border-radius:14px;background:radial-gradient(circle at top,#4f46e5,#020617);border:1px solid rgba(129,140,248,0.5);"></div>
             <div style="aspect-ratio:1/1;border-radius:14px;background:#0f172a;border:1px solid rgba(148,163,184,0.35);"></div>
@@ -623,35 +590,33 @@
           </div>
         </section>
 
-        <!-- About (preview) -->
         <section class="mt-16 card-soft">
           <div class="row-between">
-            <span style="font-size:13px;font-weight:500;">About</span>
-            <span class="text-muted" style="font-size:11px;">Show full ›</span>
+            <span style="font-size:13px;font-weight:500;">О себе</span>
+            <span class="text-muted" style="font-size:11px;">Показать полностью ›</span>
           </div>
           <p class="text-muted mt-8" style="font-size:12px;line-height:1.6;">
-            INGVARR · Specialized welding & steel assembly across EU.  
-            AXIRO · Connecting contractors, crews and real projects.
+            INGVARR · Специализированная сварка и монтаж стальных конструкций по ЕС.  
+            AXIRO · Соединяем заказчиков, бригады и реальные объекты.
           </p>
         </section>
       </main>
     </div>
 
-    <!-- REELS SCREEN -->
+    <!-- КОРОТКИЕ ВИДЕО -->
     <div class="app-shell screen" data-screen="reels">
       <header class="app-header">
         <div class="app-header-left">
           <div class="app-logo">AX</div>
           <div class="app-title">
-            <span class="app-title-main">REELS</span>
-            <span class="app-title-sub">Short vertical videos</span>
+            <span class="app-title-main">ВИДЕО</span>
+            <span class="app-title-sub">Короткие вертикальные видео</span>
           </div>
         </div>
         <button class="icon-button">✚</button>
       </header>
 
       <main class="app-content" style="padding:10px 10px 14px;">
-        <!-- Reel контейнер (один экран) -->
         <section style="height:calc(100% - 4px);display:flex;flex-direction:column;justify-content:center;">
           <div style="
             position:relative;
@@ -664,7 +629,6 @@
             margin:0 auto;
             width:100%;
           ">
-            <!-- Видео заглушка -->
             <div style="
               position:absolute;
               inset:0;
@@ -673,30 +637,27 @@
               background-blend-mode:overlay;
             "></div>
 
-            <!-- Верхний overlay -->
             <div style="position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:center;">
               <div class="row-gap-8">
                 <div class="avatar-sm" style="width:34px;height:34px;border-radius:14px;">IN</div>
                 <div class="col">
                   <span style="font-size:13px;font-weight:500;">Ihor · INGVARR</span>
-                  <span class="text-muted" style="font-size:11px;">Bridge launch · Night shift</span>
+                  <span class="text-muted" style="font-size:11px;">Запуск моста · Ночная смена</span>
                 </div>
               </div>
-              <span class="badge-pill-accent">Follow</span>
+              <span class="badge-pill-accent">Подписаться</span>
             </div>
 
-            <!-- Нижний overlay -->
             <div style="position:absolute;left:14px;right:70px;bottom:16px;">
               <p style="font-size:13px;line-height:1.5;margin:0 0 6px;">
-                Awanbek segment moving into position. Crew synced, machines checked, safety first.
+                Сегмент аванбека выходит в проектное положение. Бригада синхронизирована, техника проверена, безопасность в приоритете.
               </p>
               <div class="row-gap-8">
-                <span class="badge-pill">Project · Silesia</span>
+                <span class="badge-pill">Проект · Silesia</span>
                 <span class="badge-pill">MIG/MAG</span>
               </div>
             </div>
 
-            <!-- Правая колонка действий -->
             <div style="position:absolute;right:12px;bottom:18px;display:flex;flex-direction:column;align-items:center;gap:14px;">
               <div style="text-align:center;font-size:20px;">♡</div>
               <span style="font-size:11px;color:var(--text-muted);">348</span>
@@ -712,7 +673,6 @@
               </div>
             </div>
 
-            <!-- Прогресс -->
             <div style="position:absolute;top:8px;left:14px;right:14px;height:2px;background:rgba(15,23,42,0.9);border-radius:999px;overflow:hidden;">
               <div style="width:40%;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-strong));"></div>
             </div>
@@ -721,14 +681,14 @@
       </main>
     </div>
 
-    <!-- MESSENGER SCREEN -->
+    <!-- МЕССЕНДЖЕР -->
     <div class="app-shell screen" data-screen="messenger">
       <header class="app-header">
         <div class="app-header-left">
           <div class="app-logo">AX</div>
           <div class="app-title">
-            <span class="app-title-main">MESSENGER</span>
-            <span class="app-title-sub">All project chats</span>
+            <span class="app-title-main">ЧАТЫ</span>
+            <span class="app-title-sub">Все чаты по проектам</span>
           </div>
         </div>
         <div class="row-gap-8">
@@ -738,24 +698,22 @@
       </header>
 
       <main class="app-content">
-        <!-- Search -->
         <section>
           <div class="input-wrapper">
             <span style="font-size:14px;">🔍</span>
-            <input type="text" placeholder="Search projects, crews, people" />
+            <input type="text" placeholder="Поиск проектов, бригад, людей" />
           </div>
         </section>
 
-        <!-- Pinned chats -->
         <section class="mt-16">
-          <div class="section-title">PINNED</div>
+          <div class="section-title">ЗАКРЕПЛЁННЫЕ</div>
           <div class="card-soft">
             <div class="row-between">
               <div class="row-gap-10">
                 <div class="avatar-sm">AW</div>
                 <div class="col">
-                  <span style="font-size:13px;font-weight:500;">Awanbek · Main crew</span>
-                  <span class="text-muted" style="font-size:11px;">You: check torque protocol tonight</span>
+                  <span style="font-size:13px;font-weight:500;">Аванбек · Основная бригада</span>
+                  <span class="text-muted" style="font-size:11px;">Вы: проверьте протокол затяжки сегодня</span>
                 </div>
               </div>
               <div class="col" style="align-items:flex-end;font-size:11px;color:var(--text-muted);">
@@ -766,17 +724,16 @@
           </div>
         </section>
 
-        <!-- All chats -->
         <section class="mt-16">
-          <div class="section-title">ALL CHATS</div>
+          <div class="section-title">ВСЕ ЧАТЫ</div>
 
           <div class="card-soft" style="margin-bottom:8px;">
             <div class="row-between">
               <div class="row-gap-10">
                 <div class="avatar-sm">WD</div>
                 <div class="col">
-                  <span style="font-size:13px;font-weight:500;">WKS Duna · Site manager</span>
-                  <span class="text-muted" style="font-size:11px;">Jarosław: send updated NDT report</span>
+                  <span style="font-size:13px;font-weight:500;">WKS Duna · Руководитель участка</span>
+                  <span class="text-muted" style="font-size:11px;">Jarosław: вышли обновлённый отчёт NDT</span>
                 </div>
               </div>
               <span class="text-muted" style="font-size:11px;">09:18</span>
@@ -788,11 +745,11 @@
               <div class="row-gap-10">
                 <div class="avatar-sm">PX</div>
                 <div class="col">
-                  <span style="font-size:13px;font-weight:500;">Polimex · Tender</span>
-                  <span class="text-muted" style="font-size:11px;">You: offer sent, waiting feedback</span>
+                  <span style="font-size:13px;font-weight:500;">Polimex · Тендер</span>
+                  <span class="text-muted" style="font-size:11px;">Вы: оферта отправлена, ждём ответ</span>
                 </div>
               </div>
-              <span class="text-muted" style="font-size:11px;">Yesterday</span>
+              <span class="text-muted" style="font-size:11px;">Вчера</span>
             </div>
           </div>
 
@@ -801,32 +758,31 @@
               <div class="row-gap-10">
                 <div class="avatar-sm">NX</div>
                 <div class="col">
-                  <span style="font-size:13px;font-weight:500;">NEXBUD · Welders group</span>
-                  <span class="text-muted" style="font-size:11px;">Ivan: guys, tomorrow 6:00 at base</span>
+                  <span style="font-size:13px;font-weight:500;">NEXBUD · Группа сварщиков</span>
+                  <span class="text-muted" style="font-size:11px;">Ivan: завтра в 6:00 на базе</span>
                 </div>
               </div>
-              <span class="text-muted" style="font-size:11px;">Mon</span>
+              <span class="text-muted" style="font-size:11px;">Пн</span>
             </div>
           </div>
         </section>
       </main>
     </div>
 
-    <!-- SETTINGS SCREEN -->
+    <!-- НАСТРОЙКИ -->
     <div class="app-shell screen" data-screen="settings">
       <header class="app-header">
         <div class="app-header-left">
           <div class="app-logo">AX</div>
           <div class="app-title">
-            <span class="app-title-main">SETTINGS</span>
-            <span class="app-title-sub">Profile · App · Privacy</span>
+            <span class="app-title-main">НАСТРОЙКИ</span>
+            <span class="app-title-sub">Профиль · Приложение · Приватность</span>
           </div>
         </div>
         <button class="icon-button" onclick="showScreen('profile')">✕</button>
       </header>
 
       <main class="app-content">
-        <!-- Profile quick -->
         <section class="card-soft">
           <div class="row-gap-10">
             <div class="avatar-sm">IN</div>
@@ -834,17 +790,16 @@
               <span style="font-size:14px;font-weight:600;">Ihor Nepomiashchyi</span>
               <span class="text-muted" style="font-size:12px;">@ihor.axiro · INGVARR</span>
             </div>
-            <button class="btn btn-ghost" style="font-size:12px;" onclick="showScreen('profile')">View profile</button>
+            <button class="btn btn-ghost" style="font-size:12px;" onclick="showScreen('profile')">Открыть профиль</button>
           </div>
         </section>
 
-        <!-- Language -->
         <section class="mt-16">
-          <div class="section-title">LANGUAGE</div>
+          <div class="section-title">ЯЗЫК</div>
           <div class="card-soft">
             <div class="row-between">
-              <span style="font-size:13px;font-weight:500;">Interface language</span>
-              <span class="text-muted" style="font-size:11px;">soon selectable</span>
+              <span style="font-size:13px;font-weight:500;">Язык интерфейса</span>
+              <span class="text-muted" style="font-size:11px;">скоро можно будет выбрать</span>
             </div>
             <div class="row-gap-8 mt-10">
               <span class="badge-pill-accent">RU</span>
@@ -854,72 +809,69 @@
           </div>
         </section>
 
-        <!-- App -->
         <section class="mt-16">
-          <div class="section-title">APP</div>
+          <div class="section-title">ПРИЛОЖЕНИЕ</div>
           <div class="card-soft">
             <div class="row-between" style="margin-bottom:10px;">
-              <span style="font-size:13px;">Dark mode</span>
-              <span class="badge-pill-accent">Always on</span>
+              <span style="font-size:13px;">Тёмная тема</span>
+              <span class="badge-pill-accent">Всегда</span>
             </div>
             <div class="row-between" style="margin-bottom:10px;">
-              <span style="font-size:13px;">Notifications</span>
-              <span class="text-muted" style="font-size:12px;">Smart · per project</span>
+              <span style="font-size:13px;">Уведомления</span>
+              <span class="text-muted" style="font-size:12px;">Умные · по проектам</span>
             </div>
             <div class="row-between">
-              <span style="font-size:13px;">Sounds & vibrations</span>
-              <span class="text-muted" style="font-size:12px;">Subtle</span>
+              <span style="font-size:13px;">Звуки и вибро</span>
+              <span class="text-muted" style="font-size:12px;">Мягко</span>
             </div>
           </div>
         </section>
 
-        <!-- Privacy -->
         <section class="mt-16">
-          <div class="section-title">PRIVACY</div>
+          <div class="section-title">КОНФИДЕНЦИАЛЬНОСТЬ</div>
           <div class="card-soft">
             <div class="row-between" style="margin-bottom:10px;">
-              <span style="font-size:13px;">Online status</span>
-              <span class="text-muted" style="font-size:12px;">Visible to contacts</span>
+              <span style="font-size:13px;">Статус «в сети»</span>
+              <span class="text-muted" style="font-size:12px;">Видно контактам</span>
             </div>
             <div class="row-between" style="margin-bottom:10px;">
-              <span style="font-size:13px;">Last seen</span>
-              <span class="text-muted" style="font-size:12px;">Approximate</span>
+              <span style="font-size:13px;">«Был(а) в сети»</span>
+              <span class="text-muted" style="font-size:12px;">Приблизительно</span>
             </div>
             <div class="row-between">
-              <span style="font-size:13px;">Read receipts</span>
-              <span class="text-muted" style="font-size:12px;">Enabled</span>
+              <span style="font-size:13px;">Отчёты о прочтении</span>
+              <span class="text-muted" style="font-size:12px;">Включены</span>
             </div>
           </div>
         </section>
 
-        <!-- Account -->
         <section class="mt-16">
-          <div class="section-title">ACCOUNT</div>
+          <div class="section-title">АККАУНТ</div>
           <div class="card-soft">
             <div class="row-between" style="margin-bottom:10px;">
-              <span style="font-size:13px;">Phone & email</span>
-              <span class="text-muted" style="font-size:12px;">Verified</span>
+              <span style="font-size:13px;">Телефон и e-mail</span>
+              <span class="text-muted" style="font-size:12px;">Подтверждены</span>
             </div>
             <div class="row-between" style="margin-bottom:10px;">
-              <span style="font-size:13px;">Two-factor login</span>
-              <span class="text-muted" style="font-size:12px;">Recommended</span>
+              <span style="font-size:13px;">Двухфакторный вход</span>
+              <span class="text-muted" style="font-size:12px;">Рекомендуется</span>
             </div>
             <div class="row-between">
-              <span class="btn btn-danger" style="padding:6px 12px;">Log out</span>
-              <span class="text-muted" style="font-size:11px;">Version 0.1 · early AXIRO</span>
+              <span class="btn btn-danger" style="padding:6px 12px;">Выйти</span>
+              <span class="text-muted" style="font-size:11px;">Версия 0.1 · ранний AXIRO</span>
             </div>
           </div>
         </section>
       </main>
     </div>
 
-    <!-- USER (OTHER PROFILE) SCREEN -->
+    <!-- ЧУЖОЙ ПРОФИЛЬ -->
     <div class="app-shell screen" data-screen="user">
       <header class="app-header">
         <div class="app-header-left">
           <button class="icon-button" onclick="showScreen('feed')">←</button>
           <div class="app-title" style="margin-left:8px;">
-            <span class="app-title-main">PROFILE</span>
+            <span class="app-title-main">ПРОФИЛЬ</span>
             <span class="app-title-sub">@mostostal.pro</span>
           </div>
         </div>
@@ -927,7 +879,6 @@
       </header>
 
       <main class="app-content">
-        <!-- Header -->
         <section class="card-highlight">
           <div class="row-gap-12">
             <div class="avatar">MK</div>
@@ -935,67 +886,65 @@
               <div class="row-between">
                 <div class="col">
                   <span style="font-size:16px;font-weight:600;">Mostostal Crew</span>
-                  <span class="text-muted" style="font-size:12px;">Bridge assembly · PL</span>
+                  <span class="text-muted" style="font-size:12px;">Монтаж мостов · PL</span>
                 </div>
-                <span class="badge-pill">Verified</span>
+                <span class="badge-pill">Проверено</span>
               </div>
               <div class="row-gap-10 mt-10">
                 <div class="col" style="min-width:56px;">
                   <span style="font-size:14px;font-weight:600;">13</span>
-                  <span class="text-muted" style="font-size:11px;">Crew</span>
+                  <span class="text-muted" style="font-size:11px;">Человек</span>
                 </div>
                 <div class="col" style="min-width:56px;">
                   <span style="font-size:14px;font-weight:600;">22</span>
-                  <span class="text-muted" style="font-size:11px;">Projects</span>
+                  <span class="text-muted" style="font-size:11px;">Проекта</span>
                 </div>
                 <div class="col" style="min-width:56px;">
-                  <span style="font-size:14px;font-weight:600;">4.9</span>
-                  <span class="text-muted" style="font-size:11px;">Rating</span>
+                  <span style="font-size:14px;font-weight:600;">4,9</span>
+                  <span class="text-muted" style="font-size:11px;">Рейтинг</span>
                 </div>
               </div>
             </div>
           </div>
           <p class="text-muted mt-12" style="font-size:12px;line-height:1.5;">
-            Heavy steel structures, bridge erection, launching noses, temporary supports. Working across Poland & EU.
+            Тяжёлые стальные конструкции, монтаж мостов, аванбеки, временные опоры. Работаем по всей Польше и ЕС.
           </p>
           <div class="row-gap-8 mt-12">
-            <button class="btn btn-primary" style="flex:1;" onclick="showScreen('messenger')">Message</button>
-            <button class="btn btn-ghost" style="flex:1;">Invite to project</button>
+            <button class="btn btn-primary" style="flex:1;" onclick="showScreen('messenger')">Написать</button>
+            <button class="btn btn-ghost" style="flex:1;">Пригласить в проект</button>
           </div>
         </section>
 
-        <!-- Shared context -->
         <section class="mt-16 card-soft">
           <div class="row-between">
-            <span style="font-size:13px;font-weight:500;">Connections with you</span>
-            <span class="text-muted" style="font-size:11px;">3 shared projects</span>
+            <span style="font-size:13px;font-weight:500;">Связь с вами</span>
+            <span class="text-muted" style="font-size:11px;">3 общих проекта</span>
           </div>
           <ul class="text-muted" style="margin:8px 0 0;padding-left:16px;font-size:12px;line-height:1.5;">
-            <li>Railway bridge · Katowice</li>
-            <li>Highway overpass · Silesia</li>
-            <li>Steel hall · Wrocław</li>
+            <li>Железнодорожный мост · Katowice</li>
+            <li>Дорожная развязка · Silesia</li>
+            <li>Стальной ангар · Wrocław</li>
           </ul>
         </section>
 
-        <!-- Projects preview -->
         <section class="mt-16">
-          <div class="section-title">RECENT PROJECTS</div>
+          <div class="section-title">ПОСЛЕДНИЕ ПРОЕКТЫ</div>
           <div class="card-soft" style="margin-bottom:8px;">
             <div class="row-between">
               <div class="col">
-                <span style="font-size:13px;font-weight:500;">Bridge launch · PL-204</span>
-                <span class="text-muted" style="font-size:11px;">Status · In progress</span>
+                <span style="font-size:13px;font-weight:500;">Запуск моста · PL-204</span>
+                <span class="text-muted" style="font-size:11px;">Статус · В работе</span>
               </div>
-              <span class="badge-pill-accent">Active</span>
+              <span class="badge-pill-accent">Активен</span>
             </div>
           </div>
           <div class="card-soft" style="margin-bottom:8px;">
             <div class="row-between">
               <div class="col">
-                <span style="font-size:13px;font-weight:500;">Steel assembly · Gdańsk</span>
-                <span class="text-muted" style="font-size:11px;">Status · Completed</span>
+                <span style="font-size:13px;font-weight:500;">Монтаж конструкций · Gdańsk</span>
+                <span class="text-muted" style="font-size:11px;">Статус · Завершён</span>
               </div>
-              <span class="badge-pill">History</span>
+              <span class="badge-pill">История</span>
             </div>
           </div>
         </section>
@@ -1003,28 +952,28 @@
     </div>
   </div>
 
-  <!-- Bottom nav (общая для всех экранов) -->
+  <!-- Общая нижняя навигация -->
   <nav class="bottom-nav">
     <div class="bottom-nav-inner">
       <button class="nav-item" data-target="feed">
         <div class="nav-icon">⌂</div>
-        <span>Feed</span>
+        <span>Лента</span>
       </button>
       <button class="nav-item" data-target="reels">
         <div class="nav-icon">▶</div>
-        <span>Reels</span>
+        <span>Видео</span>
       </button>
       <button class="nav-item" data-target="messenger">
         <div class="nav-icon">✉</div>
-        <span>Chat</span>
+        <span>Чаты</span>
       </button>
       <button class="nav-item" data-target="profile">
         <div class="nav-icon">◎</div>
-        <span>Profile</span>
+        <span>Профиль</span>
       </button>
       <button class="nav-item" data-target="settings">
         <div class="nav-icon">⚙</div>
-        <span>Settings</span>
+        <span>Настройки</span>
       </button>
     </div>
   </nav>
@@ -1051,7 +1000,6 @@
       });
     }
 
-    // обработка кликов по нижней навигации
     document.querySelectorAll('.nav-item').forEach(item => {
       item.addEventListener('click', () => {
         const target = item.getAttribute('data-target');
