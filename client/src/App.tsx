@@ -1,6 +1,4 @@
 :root {
-  --bg-main: #040510;
-  --bg-elevated: #0b0d1a;
   --bg-elevated-soft: #101326;
   --accent: #6366f1;
   --accent-soft: rgba(99, 102, 241, 0.16);
