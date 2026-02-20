@@ -1,0 +1,132 @@
+<!-- Settings.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AXIRO – Settings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="app-header-left">
+        <div class="app-logo">AX</div>
+        <div class="app-title">
+          <span class="app-title-main">SETTINGS</span>
+          <span class="app-title-sub">Profile · App · Privacy</span>
+        </div>
+      </div>
+      <button class="icon-button">✕</button>
+    </header>
+
+    <main class="app-content">
+      <!-- Profile quick -->
+      <section class="card-soft">
+        <div class="row-gap-10">
+          <div class="avatar-sm">IN</div>
+          <div class="col" style="flex:1;">
+            <span style="font-size:14px;font-weight:600;">Ihor Nepomiashchyi</span>
+            <span class="text-muted" style="font-size:12px;">@ihor.axiro · INGVARR</span>
+          </div>
+          <button class="btn btn-ghost" style="font-size:12px;">View profile</button>
+        </div>
+      </section>
+
+      <!-- Language (потом реальная логика) -->
+      <section class="mt-16">
+        <div class="section-title">LANGUAGE</div>
+        <div class="card-soft">
+          <div class="row-between">
+            <span style="font-size:13px;font-weight:500;">Interface language</span>
+            <span class="text-muted" style="font-size:11px;">soon selectable</span>
+          </div>
+          <div class="row-gap-8 mt-10">
+            <span class="badge-pill-accent">RU</span>
+            <span class="badge-pill">EN</span>
+            <span class="badge-pill">PL</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- App -->
+      <section class="mt-16">
+        <div class="section-title">APP</div>
+        <div class="card-soft">
+          <div class="row-between" style="margin-bottom:10px;">
+            <span style="font-size:13px;">Dark mode</span>
+            <span class="badge-pill-accent">Always on</span>
+          </div>
+          <div class="row-between" style="margin-bottom:10px;">
+            <span style="font-size:13px;">Notifications</span>
+            <span class="text-muted" style="font-size:12px;">Smart · per project</span>
+          </div>
+          <div class="row-between">
+            <span style="font-size:13px;">Sounds & vibrations</span>
+            <span class="text-muted" style="font-size:12px;">Subtle</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Privacy -->
+      <section class="mt-16">
+        <div class="section-title">PRIVACY</div>
+        <div class="card-soft">
+          <div class="row-between" style="margin-bottom:10px;">
+            <span style="font-size:13px;">Online status</span>
+            <span class="text-muted" style="font-size:12px;">Visible to contacts</span>
+          </div>
+          <div class="row-between" style="margin-bottom:10px;">
+            <span style="font-size:13px;">Last seen</span>
+            <span class="text-muted" style="font-size:12px;">Approximate</span>
+          </div>
+          <div class="row-between">
+            <span style="font-size:13px;">Read receipts</span>
+            <span class="text-muted" style="font-size:12px;">Enabled</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Account -->
+      <section class="mt-16">
+        <div class="section-title">ACCOUNT</div>
+        <div class="card-soft">
+          <div class="row-between" style="margin-bottom:10px;">
+            <span style="font-size:13px;">Phone & email</span>
+            <span class="text-muted" style="font-size:12px;">Verified</span>
+          </div>
+          <div class="row-between" style="margin-bottom:10px;">
+            <span style="font-size:13px;">Two-factor login</span>
+            <span class="text-muted" style="font-size:12px;">Recommended</span>
+          </div>
+          <div class="row-between">
+            <span class="btn btn-danger" style="padding:6px 12px;">Log out</span>
+            <span class="text-muted" style="font-size:11px;">Version 0.1 · early AXIRO</span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <nav class="bottom-nav">
+    <div class="bottom-nav-inner">
+      <a href="Feed.html" class="nav-item">
+        <div class="nav-icon">⌂</div>
+        <span>Feed</span>
+      </a>
+      <a href="Reels.html" class="nav-item">
+        <div class="nav-icon">▶</div>
+        <span>Reels</span>
+      </a>
+      <a href="Messenger.html" class="nav-item">
+        <div class="nav-icon">✉</div>
+        <span>Chat</span>
+      </a>
+      <a href="Profile.html" class="nav-item">
+        <div class="nav-icon">◎</div>
+        <span>Profile</span>
+      </a>
+    </div>
+  </nav>
+</body>
+</html>
