@@ -1,0 +1,152 @@
+<!-- Feed.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AXIRO – Feed</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="app-header-left">
+        <div class="app-logo">AX</div>
+        <div class="app-title">
+          <span class="app-title-main">AXIRO</span>
+          <span class="app-title-sub">Network for builders</span>
+        </div>
+      </div>
+      <div class="row-gap-8">
+        <button class="icon-button">✚</button>
+        <button class="icon-button">🔍</button>
+      </div>
+    </header>
+
+    <main class="app-content">
+      <!-- Stories row -->
+      <section>
+        <div class="row-between mb-8">
+          <span class="section-title">ACTIVE CREWS</span>
+          <span class="text-muted" style="font-size:11px;">See all</span>
+        </div>
+        <div class="row-gap-12" style="overflow-x:auto;padding-bottom:6px;">
+          <div class="col" style="align-items:center;min-width:60px;">
+            <div class="avatar-sm" style="border:1px dashed rgba(129,140,248,0.7);">+</div>
+            <span class="text-muted" style="font-size:11px;margin-top:4px;">You</span>
+          </div>
+          <div class="col" style="align-items:center;min-width:60px;">
+            <div class="avatar-sm">MK</div>
+            <span class="text-muted" style="font-size:11px;margin-top:4px;">Mostostal</span>
+          </div>
+          <div class="col" style="align-items:center;min-width:60px;">
+            <div class="avatar-sm">PX</div>
+            <span class="text-muted" style="font-size:11px;margin-top:4px;">Polimex</span>
+          </div>
+          <div class="col" style="align-items:center;min-width:60px;">
+            <div class="avatar-sm">WD</div>
+            <span class="text-muted" style="font-size:11px;margin-top:4px;">WKS Duna</span>
+          </div>
+          <div class="col" style="align-items:center;min-width:60px;">
+            <div class="avatar-sm">NX</div>
+            <span class="text-muted" style="font-size:11px;margin-top:4px;">NEXBUD</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Filter chips -->
+      <section class="mt-12">
+        <div class="row-gap-8" style="overflow-x:auto;padding-bottom:6px;">
+          <span class="badge-pill-accent">All</span>
+          <span class="badge-pill">Projects</span>
+          <span class="badge-pill">Crews</span>
+          <span class="badge-pill">Tenders</span>
+          <span class="badge-pill">AXIRO Only</span>
+        </div>
+      </section>
+
+      <!-- Feed cards -->
+      <section class="mt-16">
+        <!-- Post 1 -->
+        <article class="card-soft" style="margin-bottom:12px;">
+          <div class="row-between">
+            <div class="row-gap-10">
+              <div class="avatar-sm">IN</div>
+              <div class="col">
+                <span style="font-size:13px;font-weight:500;">Ihor · INGVARR</span>
+                <span class="text-muted" style="font-size:11px;">Now · Katowice, PL</span>
+              </div>
+            </div>
+            <span class="text-muted" style="font-size:16px;">⋮</span>
+          </div>
+          <p class="text-muted mt-10" style="font-size:13px;line-height:1.6;">
+            New bridge launch in progress. Need 4 MIG/MAG welders (135/136) for night shift, 72h window.
+          </p>
+          <div class="card" style="margin-top:10px;padding:10px;">
+            <div class="row-between">
+              <div class="col">
+                <span style="font-size:13px;font-weight:500;">Project · Awanbek</span>
+                <span class="text-muted" style="font-size:11px;">Start: 26 Feb · Silesia</span>
+              </div>
+              <span class="badge-pill-accent">Open</span>
+            </div>
+            <div class="row-gap-8 mt-8">
+              <span class="badge-pill">MIG/MAG 135/136</span>
+              <span class="badge-pill">NDT · EN ISO 5817</span>
+            </div>
+          </div>
+          <div class="row-between mt-10" style="font-size:12px;color:var(--text-muted);">
+            <div class="row-gap-12">
+              <span>♡ 32</span>
+              <span>💬 9</span>
+              <span>↻ 3</span>
+            </div>
+            <span>Save</span>
+          </div>
+        </article>
+
+        <!-- Post 2 -->
+        <article class="card-soft" style="margin-bottom:12px;">
+          <div class="row-between">
+            <div class="row-gap-10">
+              <div class="avatar-sm">AX</div>
+              <div class="col">
+                <span style="font-size:13px;font-weight:500;">AXIRO Updates</span>
+                <span class="text-muted" style="font-size:11px;">1h ago</span>
+              </div>
+            </div>
+          </div>
+          <p class="text-muted mt-10" style="font-size:13px;line-height:1.6;">
+            Welcome to early AXIRO. Connect your crews, share real projects and keep all chat in one place.
+          </p>
+          <div class="row-gap-8 mt-10">
+            <button class="btn btn-primary" style="flex:1;">Create project</button>
+            <button class="btn btn-ghost">Invite crew</button>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <nav class="bottom-nav">
+    <div class="bottom-nav-inner">
+      <a href="Feed.html" class="nav-item nav-item-active">
+        <div class="nav-icon">⌂</div>
+        <span>Feed</span>
+      </a>
+      <a href="Reels.html" class="nav-item">
+        <div class="nav-icon">▶</div>
+        <span>Reels</span>
+      </a>
+      <a href="Messenger.html" class="nav-item">
+        <div class="nav-icon">✉</div>
+        <span>Chat</span>
+      </a>
+      <a href="Profile.html" class="nav-item">
+        <div class="nav-icon">◎</div>
+        <span>Profile</span>
+      </a>
+    </div>
+  </nav>
+</body>
+</html>
