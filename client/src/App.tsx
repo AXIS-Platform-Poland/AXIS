@@ -1,270 +1,379 @@
-import React, { useState } from 'react';
-import './axiro.css';
-
-type Screen = 'feed' | 'profile' | 'reels' | 'messenger' | 'settings' | 'user';
-
-const App: React.FC = () => {
-  const [screen, setScreen] = useState<Screen>('feed');
-
-  return (
-    <>
-      <div id="screens">
-        {screen === 'feed' && <FeedScreen onShow={setScreen} />}
-        {/* позже добавим остальные экраны:
-            {screen === 'profile' && <ProfileScreen onShow={setScreen} />} и т.д.
-         */}
-      </div>
-
-      <BottomNav active={screen} onChange={setScreen} />
-    </>
-  );
-};
-
-interface ScreenProps {
-  onShow: (screen: Screen) => void;
+:root {
+  --bg-main: #040510;
+  --bg-elevated: #0b0d1a;
+  --bg-elevated-soft: #101326;
+  --accent: #6366f1;
+  --accent-soft: rgba(99, 102, 241, 0.16);
+  --accent-strong: #818cf8;
+  --text-primary: #f9fafb;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  --border-subtle: rgba(148, 163, 184, 0.18);
+  --danger: #f97373;
+  --success: #22c55e;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+  --shadow-soft: 0 18px 40px rgba(15, 23, 42, 0.7);
+  --nav-height: 70px;
 }
 
-/** ЛЕНТА */
-const FeedScreen: React.FC<ScreenProps> = ({ onShow }) => {
-  return (
-    <div className="app-shell">
-      <header className="app-header">
-        <div className="app-header-left">
-          <div className="app-logo">AX</div>
-          <div className="app-title">
-            <span className="app-title-main">AXIRO</span>
-            <span className="app-title-sub">Сеть для исполнителей</span>
-          </div>
-        </div>
-        <div className="row-gap-8">
-          <button className="icon-button">✚</button>
-          <button className="icon-button">🔍</button>
-        </div>
-      </header>
-
-      <main className="app-content">
-        {/* Активные бригады */}
-        <section>
-          <div className="row-between mb-8">
-            <span className="section-title">АКТИВНЫЕ БРИГАДЫ</span>
-            <span className="text-muted" style={{ fontSize: '11px' }}>
-              Смотреть все
-            </span>
-          </div>
-          <div
-            className="row-gap-12"
-            style={{ overflowX: 'auto', paddingBottom: '6px' }}
-          >
-            <div
-              className="col"
-              style={{ alignItems: 'center', minWidth: '60px' }}
-            >
-              <div
-                className="avatar-sm"
-                style={{ border: '1px dashed rgba(129,140,248,0.7)' }}
-              >
-                +
-              </div>
-              <span
-                className="text-muted"
-                style={{ fontSize: '11px', marginTop: '4px' }}
-              >
-                Вы
-              </span>
-            </div>
-
-            <AvatarChip initials="MK" label="Mostostal" />
-            <AvatarChip initials="PX" label="Polimex" />
-            <AvatarChip initials="WD" label="WKS Duna" />
-            <AvatarChip initials="NX" label="NEXBUD" />
-          </div>
-        </section>
-
-        {/* Фильтры */}
-        <section className="mt-12">
-          <div
-            className="row-gap-8"
-            style={{ overflowX: 'auto', paddingBottom: '6px' }}
-          >
-            <span className="badge-pill-accent">Все</span>
-            <span className="badge-pill">Проекты</span>
-            <span className="badge-pill">Бригады</span>
-            <span className="badge-pill">Тендеры</span>
-            <span className="badge-pill">Только AXIRO</span>
-          </div>
-        </section>
-
-        {/* Посты */}
-        <section className="mt-16">
-          {/* Пост 1 */}
-          <article className="card-soft" style={{ marginBottom: '12px' }}>
-            <div className="row-between">
-              <div className="row-gap-10">
-                <div className="avatar-sm">IN</div>
-                <div className="col">
-                  <span style={{ fontSize: '13px', fontWeight: 500 }}>
-                    Ihor · INGVARR
-                  </span>
-                  <span className="text-muted" style={{ fontSize: '11px' }}>
-                    Сейчас · Katowice, PL
-                  </span>
-                </div>
-              </div>
-              <span className="text-muted" style={{ fontSize: '16px' }}>
-                ⋮
-              </span>
-            </div>
-
-            <p
-              className="text-muted mt-10"
-              style={{ fontSize: '13px', lineHeight: 1.6 as number }}
-            >
-              Запуск моста в процессе. Нужны 4 сварщика MIG/MAG (135/136) на
-              ночную смену, окно 72 часа.
-            </p>
-
-            <div className="card" style={{ marginTop: '10px', padding: '10px' }}>
-              <div className="row-between">
-                <div className="col">
-                  <span style={{ fontSize: '13px', fontWeight: 500 }}>
-                    Проект · Аванбек
-                  </span>
-                  <span className="text-muted" style={{ fontSize: '11px' }}>
-                    Старт: 26 февраля · Силезия
-                  </span>
-                </div>
-                <span className="badge-pill-accent">Открыт</span>
-              </div>
-              <div className="row-gap-8 mt-8">
-                <span className="badge-pill">MIG/MAG 135/136</span>
-                <span className="badge-pill">NDT · EN ISO 5817</span>
-              </div>
-            </div>
-
-            <div
-              className="row-between mt-10"
-              style={{ fontSize: '12px', color: 'var(--text-muted)' }}
-            >
-              <div className="row-gap-12">
-                <span>♡ 32</span>
-                <span>💬 9</span>
-                <span>↻ 3</span>
-              </div>
-              <span>Сохранить</span>
-            </div>
-          </article>
-
-          {/* Пост 2 */}
-          <article className="card-soft" style={{ marginBottom: '12px' }}>
-            <div className="row-between">
-              <div className="row-gap-10">
-                <div className="avatar-sm">AX</div>
-                <div className="col">
-                  <span style={{ fontSize: '13px', fontWeight: 500 }}>
-                    AXIRO · Обновления
-                  </span>
-                  <span className="text-muted" style={{ fontSize: '11px' }}>
-                    1 час назад
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <p
-              className="text-muted mt-10"
-              style={{ fontSize: '13px', lineHeight: 1.6 as number }}
-            >
-              Добро пожаловать в раннюю версию AXIRO. Подключайте бригады,
-              делитесь реальными проектами и держите всю коммуникацию в одном
-              месте.
-            </p>
-
-            <div className="row-gap-8 mt-10">
-              <button className="btn btn-primary" style={{ flex: 1 }}>
-                Создать проект
-              </button>
-              <button
-                className="btn btn-ghost"
-                style={{ flex: 1 }}
-                onClick={() => onShow('user')}
-              >
-                Профиль бригады
-              </button>
-            </div>
-          </article>
-        </section>
-      </main>
-    </div>
-  );
-};
-
-interface AvatarChipProps {
-  initials: string;
-  label: string;
+/* RESET */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-const AvatarChip: React.FC<AvatarChipProps> = ({ initials, label }) => (
-  <div
-    className="col"
-    style={{ alignItems: 'center', minWidth: '60px' }}
-  >
-    <div className="avatar-sm">{initials}</div>
-    <span
-      className="text-muted"
-      style={{ fontSize: '11px', marginTop: '4px' }}
-    >
-      {label}
-    </span>
-  </div>
-);
-
-interface BottomNavProps {
-  active: Screen;
-  onChange: (screen: Screen) => void;
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #020617;
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, "SF Pro Text", "Inter", sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-const BottomNav: React.FC<BottomNavProps> = ({ active, onChange }) => {
-  const navItemClass = (name: Screen) =>
-    'nav-item' + (active === name ? ' nav-item-active' : '');
+/* ====== MOBILE-FIRST (как в инсте) ====== */
 
-  return (
-    <nav className="bottom-nav">
-      <div className="bottom-nav-inner">
-        <button className={navItemClass('feed')} onClick={() => onChange('feed')}>
-          <div className="nav-icon">⌂</div>
-          <span>Лента</span>
-        </button>
-        <button
-          className={navItemClass('reels')}
-          onClick={() => onChange('reels')}
-        >
-          <div className="nav-icon">▶</div>
-          <span>Видео</span>
-        </button>
-        <button
-          className={navItemClass('messenger')}
-          onClick={() => onChange('messenger')}
-        >
-          <div className="nav-icon">✉</div>
-          <span>Чаты</span>
-        </button>
-        <button
-          className={navItemClass('profile')}
-          onClick={() => onChange('profile')}
-        >
-          <div className="nav-icon">◎</div>
-          <span>Профиль</span>
-        </button>
-        <button
-          className={navItemClass('settings')}
-          onClick={() => onChange('settings')}
-        >
-          <div className="nav-icon">⚙</div>
-          <span>Настройки</span>
-        </button>
-      </div>
-    </nav>
-  );
-};
+body {
+  width: 100%;
+  min-height: 100vh;
+  display: block;
+  font-size: 16px; /* базовый размер текста */
+  padding-bottom: var(--nav-height);
+}
 
-export default App;
+/* основной контейнер — ВСЕГДА на всю ширину на мобилках */
+.app-shell {
+  width: 100%;
+  max-width: 100%;
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #020617 0, #020617 70%, #020617 100%);
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* HEADER */
+.app-header {
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.9);
+  background: linear-gradient(to bottom, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 1));
+}
+
+.app-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background: radial-gradient(circle at 0 0, #4f46e5 0, #22c55e 40%, #0ea5e9 70%, #020617 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #f9fafb;
+  text-shadow: 0 0 8px rgba(129, 140, 248, 0.8);
+}
+
+.app-title {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-title-main {
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.app-title-sub {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.icon-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: radial-gradient(circle at top, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 1));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+/* CONTENT */
+.app-content {
+  flex: 1;
+  padding: 14px 14px 16px;
+  overflow-y: auto;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 8px;
+}
+
+/* CARDS */
+.card {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.98));
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.card-soft {
+  background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 1));
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.card-highlight {
+  background: radial-gradient(circle at top left, rgba(99, 102, 241, 0.18), rgba(15, 23, 42, 0.98));
+  border-radius: var(--radius-xl);
+  padding: 18px;
+  border: 1px solid rgba(129, 140, 248, 0.6);
+  box-shadow: 0 18px 45px rgba(79, 70, 229, 0.35);
+}
+
+/* TEXT */
+.text-muted {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+p {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* BADGES */
+.badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: radial-gradient(circle at top, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 1));
+  color: var(--text-secondary);
+}
+
+.badge-pill-accent {
+  border-color: rgba(129, 140, 248, 0.7);
+  background: radial-gradient(circle at top, rgba(129, 140, 248, 0.32), rgba(15, 23, 42, 0.96));
+  color: var(--accent-strong);
+}
+
+/* BUTTONS */
+.btn {
+  border-radius: var(--radius-pill);
+  padding: 10px 18px;
+  font-size: 16px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  border-color: rgba(129, 140, 248, 0.9);
+  box-shadow: 0 12px 30px rgba(79, 70, 229, 0.55);
+}
+
+.btn-ghost {
+  border-color: rgba(148, 163, 184, 0.35);
+  background: radial-gradient(circle at top, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 1));
+  color: var(--text-secondary);
+}
+
+.btn-danger {
+  border-color: rgba(248, 113, 113, 0.5);
+  color: #fecaca;
+}
+
+/* AVATARS */
+.avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 24px;
+  background: radial-gradient(circle at top left, #4f46e5, #0f172a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 650;
+  font-size: 22px;
+  color: #e5e7eb;
+  border: 1px solid rgba(129, 140, 248, 0.8);
+  box-shadow: 0 12px 30px rgba(79, 70, 229, 0.7);
+}
+
+.avatar-sm {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: radial-gradient(circle at top left, #4f46e5, #0f172a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 18px;
+  color: #e5e7eb;
+  border: 1px solid rgba(129, 140, 248, 0.7);
+  box-shadow: 0 6px 18px rgba(79, 70, 229, 0.6);
+}
+
+/* NAV BOTTOM */
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.bottom-nav-inner {
+  width: 100%;
+  max-width: 100%;
+  background: radial-gradient(circle at top, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 1));
+  border-top: 1px solid rgba(148, 163, 184, 0.28);
+  padding: 8px 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 13px;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.nav-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.nav-item-active .nav-icon {
+  background: radial-gradient(circle at top, rgba(129, 140, 248, 0.32), rgba(15, 23, 42, 1));
+  border-color: rgba(129, 140, 248, 0.9);
+  color: var(--accent-strong);
+}
+
+.nav-item-active {
+  color: var(--accent-strong);
+}
+
+/* INPUT */
+.input-wrapper {
+  background: radial-gradient(circle at top, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 1));
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  padding: 7px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.input-wrapper input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 15px;
+}
+
+.input-wrapper input::placeholder {
+  color: var(--text-muted);
+}
+
+/* GRID HELPERS */
+.row { display: flex; align-items: center; }
+.row-between { display: flex; align-items: center; justify-content: space-between; }
+.row-gap-8 { display: flex; gap: 8px; }
+.row-gap-10 { display: flex; gap: 10px; }
+.row-gap-12 { display: flex; gap: 12px; }
+.col { display: flex; flex-direction: column; }
+.mt-8 { margin-top: 8px; }
+.mt-10 { margin-top: 10px; }
+.mt-12 { margin-top: 12px; }
+.mt-16 { margin-top: 16px; }
+.mt-20 { margin-top: 20px; }
+.mb-8 { margin-bottom: 8px; }
+
+/* SCROLLBAR */
+.app-content::-webkit-scrollbar {
+  width: 4px;
+}
+.app-content::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 999px;
+}
+
+/* ====== DESKTOP OVERRIDE (красивый «телефон» по центру) ====== */
+@media (min-width: 900px) {
+  body {
+    display: flex;
+    justify-content: center;
+    padding: 12px 8px calc(var(--nav-height) + 12px);
+  }
+
+  .app-shell {
+    max-width: 480px;
+    border-radius: 24px;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .bottom-nav-inner {
+    max-width: 480px;
+    margin: 0 auto;
+    border-radius: 999px;
+    border-left: 1px solid rgba(148, 163, 184, 0.28);
+    border-right: 1px solid rgba(148, 163, 184, 0.28);
+  }
+}
