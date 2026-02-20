@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AXIRO – Prototype</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg-main: #040510;
+      --bg-elevated: #0b0d1a;
+      --bg-elevated-soft: #101326;
+      --accent: #6366f1;
+      --accent-soft: rgba(99, 102, 241, 0.16);
+      --accent-strong: #818cf8;
+      --text-primary: #f9fafb;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --border-subtle: rgba(148, 163, 184, 0.18);
+      --danger: #f97373;
+      --success: #22c55e;
+      --radius-lg: 18px;
+      --radius-xl: 24px;
+      --radius-pill: 999px;
+      --shadow-soft: 0 18px 40px rgba(15, 23, 42, 0.7);
+      --nav-height: 64px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle at top, #020617 0, #020617 40%, #020617 60%, #020617 100%);
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 12px 8px calc(var(--nav-height) + 12px);
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 480px;
+      min-height: calc(100vh - 24px - var(--nav-height));
+      background: radial-gradient(circle at top, #020617 0, #020617 35%, #020617 100%);
+      border-radius: 24px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .screen {
+      display: none; /* по умолчанию скрыты, показываем через JS */
+    }
+
+    /* Верхний бар */
+
+    .app-header {
+      padding: 12px 16px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.9);
+      background: linear-gradient(to bottom, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.96));
+    }
+
+    .app-header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .app-logo {
+      width: 26px;
+      height: 26px;
+      border-radius: 10px;
+      background: radial-gradient(circle at 0 0, #4f46e5 0, #22c55e 40%, #0ea5e9 70%, #020617 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: #f9fafb;
+      text-shadow: 0 0 8px rgba(129, 140, 248, 0.8);
+    }
+
+    .app-title {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-title-main {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+    }
+
+    .app-title-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .icon-button {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 1));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .icon-button:focus {
+      outline: none;
+    }
+
+    /* Контент */
+
+    .app-content {
+      flex: 1;
+      padding: 10px 14px 14px;
+      overflow-y: auto;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 8px;
+    }
+
+    /* Общие блоки / карточки */
+
+    .card {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.98));
+      border-radius: var(--radius-lg);
+      padding: 12px 12px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .card-soft {
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 1));
+      border-radius: var(--radius-lg);
+      padding: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.12);
+    }
+
+    .card-highlight {
+      background: radial-gradient(circle at top left, rgba(99, 102, 241, 0.18), rgba(15, 23, 42, 0.98));
+      border-radius: var(--radius-xl);
+      padding: 14px 14px;
+      border: 1px solid rgba(129, 140, 248, 0.6);
+      box-shadow: 0 18px 45px rgba(79, 70, 229, 0.35);
+    }
+
+    /* Текст и метки */
+
+    .text-muted {
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      padding: 3px 9px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 1));
+      color: var(--text-secondary);
+    }
+
+    .badge-pill-accent {
+      border-color: rgba(129, 140, 248, 0.7);
+      background: radial-gradient(circle at top, rgba(129, 140, 248, 0.32), rgba(15, 23, 42, 0.96));
+      color: var(--accent-strong);
+    }
+
+    /* Кнопки */
+
+    .btn {
+      border-radius: var(--radius-pill);
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      border-color: rgba(129, 140, 248, 0.9);
+      box-shadow: 0 12px 30px rgba(79, 70, 229, 0.55);
+    }
+
+    .btn-ghost {
+      border-color: rgba(148, 163, 184, 0.35);
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 1));
+      color: var(--text-secondary);
+    }
+
+    .btn-danger {
+      border-color: rgba(248, 113, 113, 0.5);
+      color: #fecaca;
+    }
+
+    .btn:focus {
+      outline: none;
+    }
+
+    /* Аваты / список */
+
+    .avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 22px;
+      background: radial-gradient(circle at top left, #4f46e5, #0f172a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 650;
+      font-size: 20px;
+      color: #e5e7eb;
+      border: 1px solid rgba(129, 140, 248, 0.8);
+      box-shadow: 0 12px 30px rgba(79, 70, 229, 0.7);
+    }
+
+    .avatar-sm {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      background: radial-gradient(circle at top left, #4f46e5, #0f172a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 16px;
+      color: #e5e7eb;
+      border: 1px solid rgba(129, 140, 248, 0.7);
+      box-shadow: 0 6px 18px rgba(79, 70, 229, 0.6);
+    }
+
+    /* Нижняя навигация */
+
+    .bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      justify-content: center;
+      padding: 6px 8px 8px;
+      pointer-events: none;
+    }
+
+    .bottom-nav-inner {
+      pointer-events: auto;
+      width: 100%;
+      max-width: 480px;
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 1));
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      box-shadow: 0 18px 36px rgba(15, 23, 42, 1);
+      padding: 6px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-size: 10px;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .nav-item:focus {
+      outline: none;
+    }
+
+    .nav-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+    }
+
+    .nav-item-active .nav-icon {
+      background: radial-gradient(circle at top, rgba(129, 140, 248, 0.32), rgba(15, 23, 42, 1));
+      border-color: rgba(129, 140, 248, 0.9);
+      color: var(--accent-strong);
+    }
+
+    .nav-item-active {
+      color: var(--accent-strong);
+    }
+
+    /* Поля ввода, search */
+
+    .input-wrapper {
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 1));
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .input-wrapper input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-primary);
+      font-size: 13px;
+    }
+
+    .input-wrapper input::placeholder {
+      color: var(--text-muted);
+    }
+
+    /* Простые утилиты */
+
+    .row {
+      display: flex;
+      align-items: center;
+    }
+
+    .row-between {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .row-gap-8 {
+      display: flex;
+      gap: 8px;
+    }
+
+    .row-gap-10 {
+      display: flex;
+      gap: 10px;
+    }
+
+    .row-gap-12 {
+      display: flex;
+      gap: 12px;
+    }
+
+    .col {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mt-8 { margin-top: 8px; }
+    .mt-10 { margin-top: 10px; }
+    .mt-12 { margin-top: 12px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-20 { margin-top: 20px; }
+    .mb-8 { margin-bottom: 8px; }
+
+    /* Scrollbar лёгкий */
+
+    .app-content::-webkit-scrollbar {
+      width: 4px;
+    }
+    .app-content::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .app-content::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.3);
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="screens">
+    <!-- FEED SCREEN -->
+    <div class="app-shell screen" data-screen="feed">
+      <header class="app-header">
+        <div class="app-header-left">
+          <div class="app-logo">AX</div>
+          <div class="app-title">
+            <span class="app-title-main">AXIRO</span>
+            <span class="app-title-sub">Network for builders</span>
+          </div>
+        </div>
+        <div class="row-gap-8">
+          <button class="icon-button">✚</button>
+          <button class="icon-button">🔍</button>
+        </div>
+      </header>
+
+      <main class="app-content">
+        <!-- Stories row -->
+        <section>
+          <div class="row-between mb-8">
+            <span class="section-title">ACTIVE CREWS</span>
+            <span class="text-muted" style="font-size:11px;">See all</span>
+          </div>
+          <div class="row-gap-12" style="overflow-x:auto;padding-bottom:6px;">
+            <div class="col" style="align-items:center;min-width:60px;">
+              <div class="avatar-sm" style="border:1px dashed rgba(129,140,248,0.7);">+</div>
+              <span class="text-muted" style="font-size:11px;margin-top:4px;">You</span>
+            </div>
+            <div class="col" style="align-items:center;min-width:60px;">
+              <div class="avatar-sm">MK</div>
+              <span class="text-muted" style="font-size:11px;margin-top:4px;">Mostostal</span>
+            </div>
+            <div class="col" style="align-items:center;min-width:60px;">
+              <div class="avatar-sm">PX</div>
+              <span class="text-muted" style="font-size:11px;margin-top:4px;">Polimex</span>
+            </div>
+            <div class="col" style="align-items:center;min-width:60px;">
+              <div class="avatar-sm">WD</div>
+              <span class="text-muted" style="font-size:11px;margin-top:4px;">WKS Duna</span>
+            </div>
+            <div class="col" style="align-items:center;min-width:60px;">
+              <div class="avatar-sm">NX</div>
+              <span class="text-muted" style="font-size:11px;margin-top:4px;">NEXBUD</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Filter chips -->
+        <section class="mt-12">
+          <div class="row-gap-8" style="overflow-x:auto;padding-bottom:6px;">
+            <span class="badge-pill-accent">All</span>
+            <span class="badge-pill">Projects</span>
+            <span class="badge-pill">Crews</span>
+            <span class="badge-pill">Tenders</span>
+            <span class="badge-pill">AXIRO Only</span>
+          </div>
+        </section>
+
+        <!-- Feed cards -->
+        <section class="mt-16">
+          <!-- Post 1 -->
+          <article class="card-soft" style="margin-bottom:12px;">
+            <div class="row-between">
+              <div class="row-gap-10">
+                <div class="avatar-sm">IN</div>
+                <div class="col">
+                  <span style="font-size:13px;font-weight:500;">Ihor · INGVARR</span>
+                  <span class="text-muted" style="font-size:11px;">Now · Katowice, PL</span>
+                </div>
+              </div>
+              <span class="text-muted" style="font-size:16px;">⋮</span>
+            </div>
+            <p class="text-muted mt-10" style="font-size:13px;line-height:1.6;">
+              New bridge launch in progress. Need 4 MIG/MAG welders (135/136) for night shift, 72h window.
+            </p>
+            <div class="card" style="margin-top:10px;padding:10px;">
+              <div class="row-between">
+                <div class="col">
+                  <span style="font-size:13px;font-weight:500;">Project · Awanbek</span>
+                  <span class="text-muted" style="font-size:11px;">Start: 26 Feb · Silesia</span>
+                </div>
+                <span class="badge-pill-accent">Open</span>
+              </div>
+              <div class="row-gap-8 mt-8">
+                <span class="badge-pill">MIG/MAG 135/136</span>
+                <span class="badge-pill">NDT · EN ISO 5817</span>
+              </div>
+            </div>
+            <div class="row-between mt-10" style="font-size:12px;color:var(--text-muted);">
+              <div class="row-gap-12">
+                <span>♡ 32</span>
+                <span>💬 9</span>
+                <span>↻ 3</span>
+              </div>
+              <span>Save</span>
+            </div>
+          </article>
+
+          <!-- Post 2 -->
+          <article class="card-soft" style="margin-bottom:12px;">
+            <div class="row-between">
+              <div class="row-gap-10">
+                <div class="avatar-sm">AX</div>
+                <div class="col">
+                  <span style="font-size:13px;font-weight:500;">AXIRO Updates</span>
+                  <span class="text-muted" style="font-size:11px;">1h ago</span>
+                </div>
+              </div>
+            </div>
+            <p class="text-muted mt-10" style="font-size:13px;line-height:1.6;">
+              Welcome to early AXIRO. Connect your crews, share real projects and keep all chat in one place.
+            </p>
+            <div class="row-gap-8 mt-10">
+              <button class="btn btn-primary" style="flex:1;">Create project</button>
+              <button class="btn btn-ghost" onclick="showScreen('user')">View crew profile</button>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <!-- PROFILE SCREEN -->
+    <div class="app-shell screen" data-screen="profile">
+      <header class="app-header">
+        <div class="app-header-left">
+          <div class="app-logo">AX</div>
+          <div class="app-title">
+            <span class="app-title-main">PROFILE</span>
+            <span class="app-title-sub">@ihor.axiro</span>
+          </div>
+        </div>
+        <div class="row-gap-8">
+          <button class="icon-button" onclick="showScreen('settings')">⚙</button>
+          <button class="icon-button">⋮</button>
+        </div>
+      </header>
+
+      <main class="app-content">
+        <!-- Header / avatar -->
+        <section class="card-highlight">
+          <div class="row-gap-12">
+            <div class="avatar">IN</div>
+            <div class="col" style="flex:1;">
+              <div class="row-between">
+                <div class="col">
+                  <span style="font-size:16px;font-weight:600;">Ihor Nepomiashchyi</span>
+                  <span class="text-muted" style="font-size:12px;">Founder · INGVARR · AXIRO</span>
+                </div>
+                <span class="badge-pill-accent">Live • online</span>
+              </div>
+              <div class="row-gap-10 mt-10">
+                <div class="col" style="min-width:56px;">
+                  <span style="font-size:14px;font-weight:600;">1.2K</span>
+                  <span class="text-muted" style="font-size:11px;">Followers</span>
+                </div>
+                <div class="col" style="min-width:56px;">
+                  <span style="font-size:14px;font-weight:600;">387</span>
+                  <span class="text-muted" style="font-size:11px;">Following</span>
+                </div>
+                <div class="col" style="min-width:56px;">
+                  <span style="font-size:14px;font-weight:600;">72</span>
+                  <span class="text-muted" style="font-size:11px;">Projects</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="text-muted mt-12" style="font-size:12px;line-height:1.5;">
+            Building bridges, teams and systems. Welding, infrastructure, AI tools and AXIRO – network for doers.
+          </p>
+          <div class="row-gap-8 mt-12">
+            <button class="btn btn-primary" style="flex:1;">Edit profile</button>
+            <button class="btn btn-ghost">Share</button>
+          </div>
+        </section>
+
+        <!-- Quick chips -->
+        <section class="mt-12">
+          <div class="row-gap-8">
+            <span class="badge-pill">PL · UA · EN</span>
+            <span class="badge-pill">Warsaw · EU projects</span>
+            <span class="badge-pill">Welding · Bridges</span>
+          </div>
+        </section>
+
+        <!-- Tabs -->
+        <section class="mt-16 card-soft">
+          <div class="row-gap-8" style="justify-content:space-between;">
+            <button class="btn btn-ghost" style="flex:1;border-radius:16px;background:rgba(148,163,184,0.12);">Posts</button>
+            <button class="btn btn-ghost" style="flex:1;border-radius:16px;">Reels</button>
+            <button class="btn btn-ghost" style="flex:1;border-radius:16px;">About</button>
+          </div>
+        </section>
+
+        <!-- Posts grid (макет) -->
+        <section class="mt-12">
+          <div class="section-title">RECENT POSTS</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;">
+            <div style="aspect-ratio:1/1;border-radius:14px;background:radial-gradient(circle at top,#4f46e5,#020617);border:1px solid rgba(129,140,248,0.5);"></div>
+            <div style="aspect-ratio:1/1;border-radius:14px;background:#0f172a;border:1px solid rgba(148,163,184,0.35);"></div>
+            <div style="aspect-ratio:1/1;border-radius:14px;background:#020617;border:1px dashed rgba(148,163,184,0.28);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--text-muted);">+</div>
+            <div style="aspect-ratio:1/1;border-radius:14px;background:#020617;border:1px solid rgba(148,163,184,0.35);"></div>
+            <div style="aspect-ratio:1/1;border-radius:14px;background:#020617;border:1px solid rgba(148,163,184,0.35);"></div>
+            <div style="aspect-ratio:1/1;border-radius:14px;background:#020617;border:1px solid rgba(148,163,184,0.35);"></div>
+          </div>
+        </section>
+
+        <!-- About (preview) -->
+        <section class="mt-16 card-soft">
+          <div class="row-between">
+            <span style="font-size:13px;font-weight:500;">About</span>
+            <span class="text-muted" style="font-size:11px;">Show full ›</span>
+          </div>
+          <p class="text-muted mt-8" style="font-size:12px;line-height:1.6;">
+            INGVARR · Specialized welding & steel assembly across EU.  
+            AXIRO · Connecting contractors, crews and real projects.
+          </p>
+        </section>
+      </main>
+    </div>
+
+    <!-- REELS SCREEN -->
+    <div class="app-shell screen" data-screen="reels">
+      <header class="app-header">
+        <div class="app-header-left">
+          <div class="app-logo">AX</div>
+          <div class="app-title">
+            <span class="app-title-main">REELS</span>
+            <span class="app-title-sub">Short vertical videos</span>
+          </div>
+        </div>
+        <button class="icon-button">✚</button>
+      </header>
+
+      <main class="app-content" style="padding:10px 10px 14px;">
+        <!-- Reel контейнер (один экран) -->
+        <section style="height:calc(100% - 4px);display:flex;flex-direction:column;justify-content:center;">
+          <div style="
+            position:relative;
+            border-radius:26px;
+            overflow:hidden;
+            border:1px solid rgba(148,163,184,0.35);
+            background:radial-gradient(circle at top,#1e293b,#020617);
+            height:calc(100vh - 160px);
+            max-height:590px;
+            margin:0 auto;
+            width:100%;
+          ">
+            <!-- Видео заглушка -->
+            <div style="
+              position:absolute;
+              inset:0;
+              background-image:linear-gradient(135deg,rgba(15,23,42,0.9),rgba(15,23,42,1)),
+              repeating-linear-gradient(120deg,rgba(99,102,241,0.5) 0,rgba(99,102,241,0.5) 1px,transparent 1px,transparent 6px);
+              background-blend-mode:overlay;
+            "></div>
+
+            <!-- Верхний overlay -->
+            <div style="position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:center;">
+              <div class="row-gap-8">
+                <div class="avatar-sm" style="width:34px;height:34px;border-radius:14px;">IN</div>
+                <div class="col">
+                  <span style="font-size:13px;font-weight:500;">Ihor · INGVARR</span>
+                  <span class="text-muted" style="font-size:11px;">Bridge launch · Night shift</span>
+                </div>
+              </div>
+              <span class="badge-pill-accent">Follow</span>
+            </div>
+
+            <!-- Нижний overlay -->
+            <div style="position:absolute;left:14px;right:70px;bottom:16px;">
+              <p style="font-size:13px;line-height:1.5;margin:0 0 6px;">
+                Awanbek segment moving into position. Crew synced, machines checked, safety first.
+              </p>
+              <div class="row-gap-8">
+                <span class="badge-pill">Project · Silesia</span>
+                <span class="badge-pill">MIG/MAG</span>
+              </div>
+            </div>
+
+            <!-- Правая колонка действий -->
+            <div style="position:absolute;right:12px;bottom:18px;display:flex;flex-direction:column;align-items:center;gap:14px;">
+              <div style="text-align:center;font-size:20px;">♡</div>
+              <span style="font-size:11px;color:var(--text-muted);">348</span>
+
+              <div style="text-align:center;font-size:18px;">💬</div>
+              <span style="font-size:11px;color:var(--text-muted);">26</span>
+
+              <div style="text-align:center;font-size:18px;">↻</div>
+              <span style="font-size:11px;color:var(--text-muted);">12</span>
+
+              <div style="width:36px;height:36px;border-radius:12px;border:1px solid rgba(148,163,184,0.5);display:flex;align-items:center;justify-content:center;font-size:16px;">
+                ⋯
+              </div>
+            </div>
+
+            <!-- Прогресс -->
+            <div style="position:absolute;top:8px;left:14px;right:14px;height:2px;background:rgba(15,23,42,0.9);border-radius:999px;overflow:hidden;">
+              <div style="width:40%;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-strong));"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- MESSENGER SCREEN -->
+    <div class="app-shell screen" data-screen="messenger">
+      <header class="app-header">
+        <div class="app-header-left">
+          <div class="app-logo">AX</div>
+          <div class="app-title">
+            <span class="app-title-main">MESSENGER</span>
+            <span class="app-title-sub">All project chats</span>
+          </div>
+        </div>
+        <div class="row-gap-8">
+          <button class="icon-button">🔍</button>
+          <button class="icon-button">✚</button>
+        </div>
+      </header>
+
+      <main class="app-content">
+        <!-- Search -->
+        <section>
+          <div class="input-wrapper">
+            <span style="font-size:14px;">🔍</span>
+            <input type="text" placeholder="Search projects, crews, people" />
+          </div>
+        </section>
+
+        <!-- Pinned chats -->
+        <section class="mt-16">
+          <div class="section-title">PINNED</div>
+          <div class="card-soft">
+            <div class="row-between">
+              <div class="row-gap-10">
+                <div class="avatar-sm">AW</div>
+                <div class="col">
+                  <span style="font-size:13px;font-weight:500;">Awanbek · Main crew</span>
+                  <span class="text-muted" style="font-size:11px;">You: check torque protocol tonight</span>
+                </div>
+              </div>
+              <div class="col" style="align-items:flex-end;font-size:11px;color:var(--text-muted);">
+                <span>12:43</span>
+                <span style="margin-top:4px;width:18px;height:18px;border-radius:999px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;">3</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- All chats -->
+        <section class="mt-16">
+          <div class="section-title">ALL CHATS</div>
+
+          <div class="card-soft" style="margin-bottom:8px;">
+            <div class="row-between">
+              <div class="row-gap-10">
+                <div class="avatar-sm">WD</div>
+                <div class="col">
+                  <span style="font-size:13px;font-weight:500;">WKS Duna · Site manager</span>
+                  <span class="text-muted" style="font-size:11px;">Jarosław: send updated NDT report</span>
+                </div>
+              </div>
+              <span class="text-muted" style="font-size:11px;">09:18</span>
+            </div>
+          </div>
+
+          <div class="card-soft" style="margin-bottom:8px;">
+            <div class="row-between">
+              <div class="row-gap-10">
+                <div class="avatar-sm">PX</div>
+                <div class="col">
+                  <span style="font-size:13px;font-weight:500;">Polimex · Tender</span>
+                  <span class="text-muted" style="font-size:11px;">You: offer sent, waiting feedback</span>
+                </div>
+              </div>
+              <span class="text-muted" style="font-size:11px;">Yesterday</span>
+            </div>
+          </div>
+
+          <div class="card-soft" style="margin-bottom:8px;">
+            <div class="row-between">
+              <div class="row-gap-10">
+                <div class="avatar-sm">NX</div>
+                <div class="col">
+                  <span style="font-size:13px;font-weight:500;">NEXBUD · Welders group</span>
+                  <span class="text-muted" style="font-size:11px;">Ivan: guys, tomorrow 6:00 at base</span>
+                </div>
+              </div>
+              <span class="text-muted" style="font-size:11px;">Mon</span>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- SETTINGS SCREEN -->
+    <div class="app-shell screen" data-screen="settings">
+      <header class="app-header">
+        <div class="app-header-left">
+          <div class="app-logo">AX</div>
+          <div class="app-title">
+            <span class="app-title-main">SETTINGS</span>
+            <span class="app-title-sub">Profile · App · Privacy</span>
+          </div>
+        </div>
+        <button class="icon-button" onclick="showScreen('profile')">✕</button>
+      </header>
+
+      <main class="app-content">
+        <!-- Profile quick -->
+        <section class="card-soft">
+          <div class="row-gap-10">
+            <div class="avatar-sm">IN</div>
+            <div class="col" style="flex:1;">
+              <span style="font-size:14px;font-weight:600;">Ihor Nepomiashchyi</span>
+              <span class="text-muted" style="font-size:12px;">@ihor.axiro · INGVARR</span>
+            </div>
+            <button class="btn btn-ghost" style="font-size:12px;" onclick="showScreen('profile')">View profile</button>
+          </div>
+        </section>
+
+        <!-- Language -->
+        <section class="mt-16">
+          <div class="section-title">LANGUAGE</div>
+          <div class="card-soft">
+            <div class="row-between">
+              <span style="font-size:13px;font-weight:500;">Interface language</span>
+              <span class="text-muted" style="font-size:11px;">soon selectable</span>
+            </div>
+            <div class="row-gap-8 mt-10">
+              <span class="badge-pill-accent">RU</span>
+              <span class="badge-pill">EN</span>
+              <span class="badge-pill">PL</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- App -->
+        <section class="mt-16">
+          <div class="section-title">APP</div>
+          <div class="card-soft">
+            <div class="row-between" style="margin-bottom:10px;">
+              <span style="font-size:13px;">Dark mode</span>
+              <span class="badge-pill-accent">Always on</span>
+            </div>
+            <div class="row-between" style="margin-bottom:10px;">
+              <span style="font-size:13px;">Notifications</span>
+              <span class="text-muted" style="font-size:12px;">Smart · per project</span>
+            </div>
+            <div class="row-between">
+              <span style="font-size:13px;">Sounds & vibrations</span>
+              <span class="text-muted" style="font-size:12px;">Subtle</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Privacy -->
+        <section class="mt-16">
+          <div class="section-title">PRIVACY</div>
+          <div class="card-soft">
+            <div class="row-between" style="margin-bottom:10px;">
+              <span style="font-size:13px;">Online status</span>
+              <span class="text-muted" style="font-size:12px;">Visible to contacts</span>
+            </div>
+            <div class="row-between" style="margin-bottom:10px;">
+              <span style="font-size:13px;">Last seen</span>
+              <span class="text-muted" style="font-size:12px;">Approximate</span>
+            </div>
+            <div class="row-between">
+              <span style="font-size:13px;">Read receipts</span>
+              <span class="text-muted" style="font-size:12px;">Enabled</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Account -->
+        <section class="mt-16">
+          <div class="section-title">ACCOUNT</div>
+          <div class="card-soft">
+            <div class="row-between" style="margin-bottom:10px;">
+              <span style="font-size:13px;">Phone & email</span>
+              <span class="text-muted" style="font-size:12px;">Verified</span>
+            </div>
+            <div class="row-between" style="margin-bottom:10px;">
+              <span style="font-size:13px;">Two-factor login</span>
+              <span class="text-muted" style="font-size:12px;">Recommended</span>
+            </div>
+            <div class="row-between">
+              <span class="btn btn-danger" style="padding:6px 12px;">Log out</span>
+              <span class="text-muted" style="font-size:11px;">Version 0.1 · early AXIRO</span>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- USER (OTHER PROFILE) SCREEN -->
+    <div class="app-shell screen" data-screen="user">
+      <header class="app-header">
+        <div class="app-header-left">
+          <button class="icon-button" onclick="showScreen('feed')">←</button>
+          <div class="app-title" style="margin-left:8px;">
+            <span class="app-title-main">PROFILE</span>
+            <span class="app-title-sub">@mostostal.pro</span>
+          </div>
+        </div>
+        <button class="icon-button">⋮</button>
+      </header>
+
+      <main class="app-content">
+        <!-- Header -->
+        <section class="card-highlight">
+          <div class="row-gap-12">
+            <div class="avatar">MK</div>
+            <div class="col" style="flex:1;">
+              <div class="row-between">
+                <div class="col">
+                  <span style="font-size:16px;font-weight:600;">Mostostal Crew</span>
+                  <span class="text-muted" style="font-size:12px;">Bridge assembly · PL</span>
+                </div>
+                <span class="badge-pill">Verified</span>
+              </div>
+              <div class="row-gap-10 mt-10">
+                <div class="col" style="min-width:56px;">
+                  <span style="font-size:14px;font-weight:600;">13</span>
+                  <span class="text-muted" style="font-size:11px;">Crew</span>
+                </div>
+                <div class="col" style="min-width:56px;">
+                  <span style="font-size:14px;font-weight:600;">22</span>
+                  <span class="text-muted" style="font-size:11px;">Projects</span>
+                </div>
+                <div class="col" style="min-width:56px;">
+                  <span style="font-size:14px;font-weight:600;">4.9</span>
+                  <span class="text-muted" style="font-size:11px;">Rating</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="text-muted mt-12" style="font-size:12px;line-height:1.5;">
+            Heavy steel structures, bridge erection, launching noses, temporary supports. Working across Poland & EU.
+          </p>
+          <div class="row-gap-8 mt-12">
+            <button class="btn btn-primary" style="flex:1;" onclick="showScreen('messenger')">Message</button>
+            <button class="btn btn-ghost" style="flex:1;">Invite to project</button>
+          </div>
+        </section>
+
+        <!-- Shared context -->
+        <section class="mt-16 card-soft">
+          <div class="row-between">
+            <span style="font-size:13px;font-weight:500;">Connections with you</span>
+            <span class="text-muted" style="font-size:11px;">3 shared projects</span>
+          </div>
+          <ul class="text-muted" style="margin:8px 0 0;padding-left:16px;font-size:12px;line-height:1.5;">
+            <li>Railway bridge · Katowice</li>
+            <li>Highway overpass · Silesia</li>
+            <li>Steel hall · Wrocław</li>
+          </ul>
+        </section>
+
+        <!-- Projects preview -->
+        <section class="mt-16">
+          <div class="section-title">RECENT PROJECTS</div>
+          <div class="card-soft" style="margin-bottom:8px;">
+            <div class="row-between">
+              <div class="col">
+                <span style="font-size:13px;font-weight:500;">Bridge launch · PL-204</span>
+                <span class="text-muted" style="font-size:11px;">Status · In progress</span>
+              </div>
+              <span class="badge-pill-accent">Active</span>
+            </div>
+          </div>
+          <div class="card-soft" style="margin-bottom:8px;">
+            <div class="row-between">
+              <div class="col">
+                <span style="font-size:13px;font-weight:500;">Steel assembly · Gdańsk</span>
+                <span class="text-muted" style="font-size:11px;">Status · Completed</span>
+              </div>
+              <span class="badge-pill">History</span>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Bottom nav (общая для всех экранов) -->
+  <nav class="bottom-nav">
+    <div class="bottom-nav-inner">
+      <button class="nav-item" data-target="feed">
+        <div class="nav-icon">⌂</div>
+        <span>Feed</span>
+      </button>
+      <button class="nav-item" data-target="reels">
+        <div class="nav-icon">▶</div>
+        <span>Reels</span>
+      </button>
+      <button class="nav-item" data-target="messenger">
+        <div class="nav-icon">✉</div>
+        <span>Chat</span>
+      </button>
+      <button class="nav-item" data-target="profile">
+        <div class="nav-icon">◎</div>
+        <span>Profile</span>
+      </button>
+      <button class="nav-item" data-target="settings">
+        <div class="nav-icon">⚙</div>
+        <span>Settings</span>
+      </button>
+    </div>
+  </nav>
+
+  <script>
+    function showScreen(name) {
+      const screens = document.querySelectorAll('.screen');
+      screens.forEach(s => {
+        if (s.dataset.screen === name) {
+          s.style.display = 'flex';
+        } else {
+          s.style.display = 'none';
+        }
+      });
+
+      const navItems = document.querySelectorAll('.nav-item');
+      navItems.forEach(item => {
+        const target = item.getAttribute('data-target');
+        if (target === name) {
+          item.classList.add('nav-item-active');
+        } else {
+          item.classList.remove('nav-item-active');
+        }
+      });
+    }
+
+    // обработка кликов по нижней навигации
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const target = item.getAttribute('data-target');
+        if (target) showScreen(target);
+      });
+    });
+
+    // стартовый экран
+    showScreen('feed');
+  </script>
+</body>
+</html>
