@@ -1,17 +1,30 @@
-import React, { useState } from 'react';
-import './axiro.css';
+import React, { useState } from "react";
+import "./App.css";
+import "./axiro.css";
 
-type Screen = 'feed' | 'profile' | 'reels' | 'messenger' | 'settings' | 'user';
+/** Все экраны приложения */
+type Screen = "feed" | "profile" | "reels" | "messenger" | "settings" | "user";
+
+/** Пропсы для экранов (чтобы можно было переключать экран) */
+interface ScreenProps {
+  onShow: (screen: Screen) => void;
+}
+
+/* =========================
+ *        ROOT APP
+ * ========================= */
 
 const App: React.FC = () => {
-  const [screen, setScreen] = useState<Screen>('feed');
+  const [screen, setScreen] = useState<Screen>("feed");
 
   return (
     <>
       <div id="screens">
-        {screen === 'feed' && <FeedScreen onShow={setScreen} />}
-        {screen === 'profile' && <ProfileScreen onShow={setScreen} />}
-        {/* остальные экраны добавим позже */}
+        {screen === "feed" && <FeedScreen onShow={setScreen} />}
+        {screen === "profile" && <ProfileScreen onShow={setScreen} />}
+        {screen === "reels" && <ReelsScreen onShow={setScreen} />}
+        {screen === "messenger" && <MessengerScreen onShow={setScreen} />}
+        {screen === "settings" && <SettingsScreen onShow={setScreen} />}
       </div>
 
       <BottomNav active={screen} onChange={setScreen} />
@@ -19,11 +32,9 @@ const App: React.FC = () => {
   );
 };
 
-interface ScreenProps {
-  onShow: (screen: Screen) => void;
-}
-
-/* ================== ЛЕНТА ================== */
+/* =========================
+ *        FEED SCREEN
+ * ========================= */
 
 const FeedScreen: React.FC<ScreenProps> = ({ onShow }) => {
   return (
@@ -43,31 +54,29 @@ const FeedScreen: React.FC<ScreenProps> = ({ onShow }) => {
       </header>
 
       <main className="app-content">
-        {/* Активные бригады */}
+        {/* АКТИВНЫЕ БРИГАДЫ */}
         <section>
           <div className="row-between mb-8">
             <span className="section-title">АКТИВНЫЕ БРИГАДЫ</span>
-            <span className="text-muted" style={{ fontSize: '11px' }}>
+            <span className="text-muted" style={{ fontSize: "11px" }}>
               Смотреть все
             </span>
           </div>
+
           <div
             className="row-gap-12"
-            style={{ overflowX: 'auto', paddingBottom: '6px' }}
+            style={{ overflowX: "auto", paddingBottom: "6px" }}
           >
-            <div
-              className="col"
-              style={{ alignItems: 'center', minWidth: '60px' }}
-            >
+            <div className="col" style={{ alignItems: "center", minWidth: "60px" }}>
               <div
                 className="avatar-sm"
-                style={{ border: '1px dashed rgba(129,140,248,0.7)' }}
+                style={{ border: "1px dashed rgba(129,140,248,0.7)" }}
               >
                 +
               </div>
               <span
                 className="text-muted"
-                style={{ fontSize: '11px', marginTop: '4px' }}
+                style={{ fontSize: "11px", marginTop: "4px" }}
               >
                 Вы
               </span>
@@ -80,11 +89,11 @@ const FeedScreen: React.FC<ScreenProps> = ({ onShow }) => {
           </div>
         </section>
 
-        {/* Фильтры */}
+        {/* ФИЛЬТРЫ */}
         <section className="mt-12">
           <div
             className="row-gap-8"
-            style={{ overflowX: 'auto', paddingBottom: '6px' }}
+            style={{ overflowX: "auto", paddingBottom: "6px" }}
           >
             <span className="badge-pill-accent">Все</span>
             <span className="badge-pill">Проекты</span>
@@ -94,42 +103,41 @@ const FeedScreen: React.FC<ScreenProps> = ({ onShow }) => {
           </div>
         </section>
 
-        {/* Посты */}
+        {/* ПОСТ 1 */}
         <section className="mt-16">
-          {/* Пост 1 */}
-          <article className="card-soft" style={{ marginBottom: '12px' }}>
+          <article className="card-soft" style={{ marginBottom: "12px" }}>
             <div className="row-between">
               <div className="row-gap-10">
                 <div className="avatar-sm">IN</div>
                 <div className="col">
-                  <span style={{ fontSize: '13px', fontWeight: 500 }}>
+                  <span style={{ fontSize: "13px", fontWeight: 500 }}>
                     Ihor · INGVARR
                   </span>
-                  <span className="text-muted" style={{ fontSize: '11px' }}>
+                  <span className="text-muted" style={{ fontSize: "11px" }}>
                     Сейчас · Katowice, PL
                   </span>
                 </div>
               </div>
-              <span className="text-muted" style={{ fontSize: '16px' }}>
+              <span className="text-muted" style={{ fontSize: "16px" }}>
                 ⋮
               </span>
             </div>
 
             <p
               className="text-muted mt-10"
-              style={{ fontSize: '13px', lineHeight: 1.6 as number }}
+              style={{ fontSize: "13px", lineHeight: 1.6 }}
             >
               Запуск моста в процессе. Нужны 4 сварщика MIG/MAG (135/136) на
               ночную смену, окно 72 часа.
             </p>
 
-            <div className="card" style={{ marginTop: '10px', padding: '10px' }}>
+            <div className="card" style={{ marginTop: "10px", padding: "10px" }}>
               <div className="row-between">
                 <div className="col">
-                  <span style={{ fontSize: '13px', fontWeight: 500 }}>
+                  <span style={{ fontSize: "13px", fontWeight: 500 }}>
                     Проект · Аванбек
                   </span>
-                  <span className="text-muted" style={{ fontSize: '11px' }}>
+                  <span className="text-muted" style={{ fontSize: "11px" }}>
                     Старт: 26 февраля · Силезия
                   </span>
                 </div>
@@ -143,7 +151,7 @@ const FeedScreen: React.FC<ScreenProps> = ({ onShow }) => {
 
             <div
               className="row-between mt-10"
-              style={{ fontSize: '12px', color: 'var(--text-muted)' }}
+              style={{ fontSize: "12px", color: "var(--text-muted)" }}
             >
               <div className="row-gap-12">
                 <span>♡ 32</span>
@@ -154,16 +162,16 @@ const FeedScreen: React.FC<ScreenProps> = ({ onShow }) => {
             </div>
           </article>
 
-          {/* Пост 2 */}
-          <article className="card-soft" style={{ marginBottom: '12px' }}>
+          {/* ПОСТ 2 */}
+          <article className="card-soft" style={{ marginBottom: "12px" }}>
             <div className="row-between">
               <div className="row-gap-10">
                 <div className="avatar-sm">AX</div>
                 <div className="col">
-                  <span style={{ fontSize: '13px', fontWeight: 500 }}>
+                  <span style={{ fontSize: "13px", fontWeight: 500 }}>
                     AXIRO · Обновления
                   </span>
-                  <span className="text-muted" style={{ fontSize: '11px' }}>
+                  <span className="text-muted" style={{ fontSize: "11px" }}>
                     1 час назад
                   </span>
                 </div>
@@ -172,11 +180,10 @@ const FeedScreen: React.FC<ScreenProps> = ({ onShow }) => {
 
             <p
               className="text-muted mt-10"
-              style={{ fontSize: '13px', lineHeight: 1.6 as number }}
+              style={{ fontSize: "13px", lineHeight: 1.6 }}
             >
               Добро пожаловать в раннюю версию AXIRO. Подключайте бригады,
-              делитесь реальными проектами и держите всю коммуникацию в одном
-              месте.
+              делитесь реальными проектами и держите всю коммуникацию в одном месте.
             </p>
 
             <div className="row-gap-8 mt-10">
@@ -186,9 +193,9 @@ const FeedScreen: React.FC<ScreenProps> = ({ onShow }) => {
               <button
                 className="btn btn-ghost"
                 style={{ flex: 1 }}
-                onClick={() => onShow('profile')}
+                onClick={() => onShow("profile")}
               >
-                Открыть профиль
+                Профиль бригады
               </button>
             </div>
           </article>
@@ -198,35 +205,33 @@ const FeedScreen: React.FC<ScreenProps> = ({ onShow }) => {
   );
 };
 
-/* ================== ПРОФИЛЬ (как Instagram) ================== */
+/* =========================
+ *      PROFILE SCREEN
+ * ========================= */
 
 const ProfileScreen: React.FC<ScreenProps> = ({ onShow }) => {
   return (
     <div className="app-shell">
-      <header className="app-header">
-        <div className="app-header-left">
-          <button
-            className="icon-button"
-            style={{ marginRight: 4 }}
-            onClick={() => onShow('feed')}
-          >
-            ‹
-          </button>
-          <div className="app-title">
-            <span className="app-title-main">Ihor · INGVARR</span>
-            <span className="app-title-sub">@ingvarr_sp_z_o_o</span>
-          </div>
+      <header className="profile-header">
+        <button className="profile-back-btn" onClick={() => onShow("feed")}>
+          ⟵
+        </button>
+
+        <div className="profile-header-title">
+          <span className="profile-header-name">Ihor · INGVARR</span>
+          <span className="profile-header-username">@ingvarr_sp_z_o_o</span>
         </div>
-        <button className="icon-button">☰</button>
+
+        <button className="profile-menu-btn">☰</button>
       </header>
 
       <main className="app-content">
-        {/* Верхний блок: аватар + статистика */}
+        {/* Аватар + статистика */}
         <section style={{ marginBottom: 16 }}>
           <div className="row-between">
             <div className="row-gap-12">
               <div className="avatar">IN</div>
-              <div className="col" style={{ justifyContent: 'center' }}>
+              <div className="col" style={{ justifyContent: "center" }}>
                 <span style={{ fontSize: 16, fontWeight: 600 }}>Ihor</span>
                 <span className="text-muted" style={{ fontSize: 13 }}>
                   Строительная компания
@@ -241,7 +246,7 @@ const ProfileScreen: React.FC<ScreenProps> = ({ onShow }) => {
           </div>
         </section>
 
-        {/* Био */}
+        {/* BIO */}
         <section style={{ marginBottom: 16 }}>
           <div className="col" style={{ gap: 4 }}>
             <span style={{ fontSize: 14, fontWeight: 600 }}>
@@ -255,15 +260,14 @@ const ProfileScreen: React.FC<ScreenProps> = ({ onShow }) => {
             </span>
             <a
               href="https://www.ingvarr.eu"
-              className="text-muted"
-              style={{ fontSize: 13, color: '#60a5fa', textDecoration: 'none' }}
+              style={{ fontSize: 13, color: "#60a5fa", textDecoration: "none" }}
             >
               www.ingvarr.eu
             </a>
           </div>
         </section>
 
-        {/* Кнопки управления */}
+        {/* КНОПКИ */}
         <section style={{ marginBottom: 16 }}>
           <div className="row-gap-8">
             <button className="btn btn-primary" style={{ flex: 2 }}>
@@ -278,7 +282,7 @@ const ProfileScreen: React.FC<ScreenProps> = ({ onShow }) => {
           </div>
         </section>
 
-        {/* Плашка как "Профессиональная панель" */}
+        {/* ПРОФЕССИОНАЛЬНАЯ ПАНЕЛЬ */}
         <section style={{ marginBottom: 16 }}>
           <div className="card-soft">
             <div className="row-between">
@@ -287,7 +291,7 @@ const ProfileScreen: React.FC<ScreenProps> = ({ onShow }) => {
                   Профессиональная панель
                 </span>
                 <span className="text-muted" style={{ fontSize: 12 }}>
-                  1,2 тыс. просмотров вашей AXIRO-страницы за 30 дней
+                  1,2 тыс. просмотров AXIRO-страницы за 30 дней
                 </span>
               </div>
               <span style={{ fontSize: 18 }}>↗</span>
@@ -295,66 +299,60 @@ const ProfileScreen: React.FC<ScreenProps> = ({ onShow }) => {
           </div>
         </section>
 
-        {/* Табы: Сетка / Видео / Отзывы */}
+        {/* ТАБЫ */}
         <section style={{ marginBottom: 12 }}>
-          <div className="row-gap-12" style={{ justifyContent: 'space-around' }}>
+          <div className="row-gap-12" style={{ justifyContent: "space-around" }}>
             <ProfileTab icon="▦" label="Сетка" active />
             <ProfileTab icon="▶" label="Видео" />
             <ProfileTab icon="★" label="Отзывы" />
           </div>
         </section>
 
-        {/* Сетка проектов (упрощённый мок) */}
+        {/* СЕТКА ПРОЕКТОВ */}
         <section>
           <div
             style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
               gap: 4,
             }}
           >
-            {[
-              'Awanbek',
-              'Most DK79',
-              'Rail Bridge',
-              'Podpory HEB',
-              'Spawanie NDT',
-              'AXIRO Demo',
-            ].map((name) => (
-              <div
-                key={name}
-                style={{
-                  position: 'relative',
-                  paddingBottom: '100%',
-                  borderRadius: 12,
-                  overflow: 'hidden',
-                  background:
-                    'radial-gradient(circle at top, rgba(129,140,248,0.35), rgba(15,23,42,1))',
-                  border: '1px solid rgba(148,163,184,0.22)',
-                }}
-              >
+            {["Awanbek", "Most DK79", "Rail Bridge", "Podpory HEB", "NDT", "AXIRO"].map(
+              (name) => (
                 <div
+                  key={name}
                   style={{
-                    position: 'absolute',
-                    inset: 8,
-                    display: 'flex',
-                    alignItems: 'flex-end',
-                    justifyContent: 'flex-start',
+                    position: "relative",
+                    paddingBottom: "100%",
+                    borderRadius: 12,
+                    overflow: "hidden",
+                    background:
+                      "radial-gradient(circle at top, rgba(129,140,248,0.35), rgba(15,23,42,1))",
+                    border: "1px solid rgba(148,163,184,0.22)",
                   }}
                 >
-                  <span
+                  <div
                     style={{
-                      fontSize: 11,
-                      fontWeight: 500,
-                      color: '#e5e7eb',
-                      textShadow: '0 0 8px rgba(15,23,42,0.9)',
+                      position: "absolute",
+                      inset: 8,
+                      display: "flex",
+                      alignItems: "flex-end",
                     }}
                   >
-                    {name}
-                  </span>
+                    <span
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 500,
+                        color: "#e5e7eb",
+                        textShadow: "0 0 8px rgba(15,23,42,0.9)",
+                      }}
+                    >
+                      {name}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            )}
           </div>
         </section>
       </main>
@@ -362,13 +360,196 @@ const ProfileScreen: React.FC<ScreenProps> = ({ onShow }) => {
   );
 };
 
+/* =========================
+ *        REELS SCREEN
+ * ========================= */
+
+const ReelsScreen: React.FC<ScreenProps> = () => {
+  const reels = [
+    {
+      id: 1,
+      title: "Ночной запуск моста · Аванбек",
+      tags: ["MIG/MAG", "72 часа", "NDT"],
+      views: "2,3K",
+      likes: "180",
+    },
+    {
+      id: 2,
+      title: "Монтаж временных опор HEB 500",
+      tags: ["HEB 500", "Подпоры", "Most"],
+      views: "1,1K",
+      likes: "96",
+    },
+    {
+      id: 3,
+      title: "AXIRO · демо ленты и профилей",
+      tags: ["AXIRO", "Prototype"],
+      views: "560",
+      likes: "42",
+    },
+  ];
+
+  return (
+    <div className="app-shell">
+      <header className="app-header">
+        <div className="app-header-left">
+          <div className="app-logo">▶</div>
+          <div className="app-title">
+            <span className="app-title-main">Видео AXIRO</span>
+            <span className="app-title-sub">Короткие ролики проектов</span>
+          </div>
+        </div>
+      </header>
+
+      <main className="app-content reels-content">
+        <div className="reels-list">
+          {reels.map((reel) => (
+            <article key={reel.id} className="reel-card">
+              <div className="reel-video-dummy">
+                <div className="reel-gradient-overlay" />
+                <div className="reel-chip">00:30</div>
+              </div>
+
+              <div className="reel-info">
+                <div className="row-between">
+                  <div className="col">
+                    <span className="reel-title">{reel.title}</span>
+                    <div className="row-gap-8" style={{ marginTop: 4 }}>
+                      {reel.tags.map((tag) => (
+                        <span key={tag} className="badge-pill">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="col" style={{ alignItems: "flex-end" }}>
+                    <span className="reel-stat">
+                      👁 {reel.views} · ♡ {reel.likes}
+                    </span>
+                    <div className="row-gap-8" style={{ marginTop: 6 }}>
+                      <button className="icon-button">▶</button>
+                      <button className="icon-button">🔇</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </main>
+    </div>
+  );
+};
+
+/* =========================
+ *      MESSENGER SCREEN
+ * ========================= */
+
+const MessengerScreen: React.FC<ScreenProps> = () => {
+  return (
+    <div className="app-shell">
+      <header className="app-header">
+        <div className="app-header-left">
+          <div className="app-logo">✉</div>
+          <div className="app-title">
+            <span className="app-title-main">Чаты</span>
+            <span className="app-title-sub">Сообщения и переговоры</span>
+          </div>
+        </div>
+      </header>
+
+      <main className="app-content">
+        <section className="card-soft">
+          <h3 style={{ margin: 0, fontSize: 15 }}>Сообщения AXIRO</h3>
+          <p className="text-muted" style={{ marginTop: 6, fontSize: 13 }}>
+            Здесь будут диалоги с бригадами, заказчиками и командами. Сейчас это
+            прототип интерфейса, позже подключим Supabase и realtime.
+          </p>
+          <div className="mt-12 row-gap-8">
+            <button className="btn btn-primary">Открыть тестовый чат</button>
+            <button className="btn btn-ghost">Создать новый диалог</button>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+};
+
+/* =========================
+ *      SETTINGS SCREEN
+ * ========================= */
+
+const SettingsScreen: React.FC<ScreenProps> = () => {
+  return (
+    <div className="app-shell">
+      <header className="app-header">
+        <div className="app-header-left">
+          <div className="app-logo">⚙</div>
+          <div className="app-title">
+            <span className="app-title-main">Настройки</span>
+            <span className="app-title-sub">AXIRO · ранний доступ</span>
+          </div>
+        </div>
+      </header>
+
+      <main className="app-content">
+        <section className="card-soft" style={{ marginBottom: 12 }}>
+          <div className="row-between">
+            <span style={{ fontSize: 14 }}>Язык интерфейса</span>
+            <span className="text-muted" style={{ fontSize: 13 }}>
+              RU · EN · PL (скоро)
+            </span>
+          </div>
+        </section>
+
+        <section className="card-soft" style={{ marginBottom: 12 }}>
+          <div className="row-between">
+            <span style={{ fontSize: 14 }}>Тема</span>
+            <span className="text-muted" style={{ fontSize: 13 }}>
+              Dark Premium · активна
+            </span>
+          </div>
+        </section>
+
+        <section className="card-soft">
+          <div className="row-between">
+            <span style={{ fontSize: 14 }}>Уведомления</span>
+            <span className="text-muted" style={{ fontSize: 13 }}>
+              Настроим после подключения бэкенда
+            </span>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+};
+
+/* =========================
+ *  ВСПОМОГАТЕЛЬНЫЕ КОМПОНЕНТЫ
+ * ========================= */
+
+interface AvatarChipProps {
+  initials: string;
+  label: string;
+}
+
+const AvatarChip: React.FC<AvatarChipProps> = ({ initials, label }) => (
+  <div className="col" style={{ alignItems: "center", minWidth: "60px" }}>
+    <div className="avatar-sm">{initials}</div>
+    <span className="text-muted" style={{ fontSize: "11px", marginTop: "4px" }}>
+      {label}
+    </span>
+  </div>
+);
+
 interface ProfileStatProps {
   value: string;
   label: string;
 }
 
 const ProfileStat: React.FC<ProfileStatProps> = ({ value, label }) => (
-  <div className="col" style={{ alignItems: 'center' }}>
+  <div className="col" style={{ alignItems: "center" }}>
     <span style={{ fontSize: 15, fontWeight: 600 }}>{value}</span>
     <span className="text-muted" style={{ fontSize: 11 }}>
       {label}
@@ -386,35 +567,19 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ icon, label, active }) => (
   <button
     className="btn"
     style={{
-      flexDirection: 'column',
+      flexDirection: "column",
       gap: 2,
       borderRadius: 0,
       borderBottom: active
-        ? '2px solid rgba(129,140,248,0.9)'
-        : '2px solid transparent',
-      padding: '6px 4px',
-      color: active ? 'var(--accent-strong)' : 'var(--text-muted)',
+        ? "2px solid rgba(129,140,248,0.9)"
+        : "2px solid transparent",
+      padding: "6px 4px",
+      color: active ? "var(--accent-strong)" : "var(--text-muted)",
     }}
   >
     <span style={{ fontSize: 16 }}>{icon}</span>
     <span style={{ fontSize: 11 }}>{label}</span>
   </button>
-);
-
-/* ================== ВСПОМОГАТЕЛЬНЫЕ КОМПОНЕНТЫ ================== */
-
-interface AvatarChipProps {
-  initials: string;
-  label: string;
-}
-
-const AvatarChip: React.FC<AvatarChipProps> = ({ initials, label }) => (
-  <div className="col" style={{ alignItems: 'center', minWidth: '60px' }}>
-    <div className="avatar-sm">{initials}</div>
-    <span className="text-muted" style={{ fontSize: '11px', marginTop: '4px' }}>
-      {label}
-    </span>
-  </div>
 );
 
 interface BottomNavProps {
@@ -424,39 +589,39 @@ interface BottomNavProps {
 
 const BottomNav: React.FC<BottomNavProps> = ({ active, onChange }) => {
   const navItemClass = (name: Screen) =>
-    'nav-item' + (active === name ? ' nav-item-active' : '');
+    "nav-item" + (active === name ? " nav-item-active" : "");
 
   return (
     <nav className="bottom-nav">
       <div className="bottom-nav-inner">
-        <button className={navItemClass('feed')} onClick={() => onChange('feed')}>
+        <button className={navItemClass("feed")} onClick={() => onChange("feed")}>
           <div className="nav-icon">⌂</div>
           <span>Лента</span>
         </button>
         <button
-          className={navItemClass('reels')}
-          onClick={() => onChange('reels')}
+          className={navItemClass("reels")}
+          onClick={() => onChange("reels")}
         >
           <div className="nav-icon">▶</div>
           <span>Видео</span>
         </button>
         <button
-          className={navItemClass('messenger')}
-          onClick={() => onChange('messenger')}
+          className={navItemClass("messenger")}
+          onClick={() => onChange("messenger")}
         >
           <div className="nav-icon">✉</div>
           <span>Чаты</span>
         </button>
         <button
-          className={navItemClass('profile')}
-          onClick={() => onChange('profile')}
+          className={navItemClass("profile")}
+          onClick={() => onChange("profile")}
         >
           <div className="nav-icon">◎</div>
           <span>Профиль</span>
         </button>
         <button
-          className={navItemClass('settings')}
-          onClick={() => onChange('settings')}
+          className={navItemClass("settings")}
+          onClick={() => onChange("settings")}
         >
           <div className="nav-icon">⚙</div>
           <span>Настройки</span>
