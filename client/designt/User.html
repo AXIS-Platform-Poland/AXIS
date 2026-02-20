@@ -1,0 +1,120 @@
+<!-- User.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AXIRO – User profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="app-header-left">
+        <button class="icon-button" onclick="history.back()">←</button>
+        <div class="app-title" style="margin-left:8px;">
+          <span class="app-title-main">PROFILE</span>
+          <span class="app-title-sub">@mostostal.pro</span>
+        </div>
+      </div>
+      <button class="icon-button">⋮</button>
+    </header>
+
+    <main class="app-content">
+      <!-- Header -->
+      <section class="card-highlight">
+        <div class="row-gap-12">
+          <div class="avatar">MK</div>
+          <div class="col" style="flex:1;">
+            <div class="row-between">
+              <div class="col">
+                <span style="font-size:16px;font-weight:600;">Mostostal Crew</span>
+                <span class="text-muted" style="font-size:12px;">Bridge assembly · PL</span>
+              </div>
+              <span class="badge-pill">Verified</span>
+            </div>
+            <div class="row-gap-10 mt-10">
+              <div class="col" style="min-width:56px;">
+                <span style="font-size:14px;font-weight:600;">13</span>
+                <span class="text-muted" style="font-size:11px;">Crew</span>
+              </div>
+              <div class="col" style="min-width:56px;">
+                <span style="font-size:14px;font-weight:600;">22</span>
+                <span class="text-muted" style="font-size:11px;">Projects</span>
+              </div>
+              <div class="col" style="min-width:56px;">
+                <span style="font-size:14px;font-weight:600;">4.9</span>
+                <span class="text-muted" style="font-size:11px;">Rating</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="text-muted mt-12" style="font-size:12px;line-height:1.5;">
+          Heavy steel structures, bridge erection, launching noses, temporary supports. Working across Poland & EU.
+        </p>
+        <div class="row-gap-8 mt-12">
+          <button class="btn btn-primary" style="flex:1;">Message</button>
+          <button class="btn btn-ghost" style="flex:1;">Invite to project</button>
+        </div>
+      </section>
+
+      <!-- Shared context -->
+      <section class="mt-16 card-soft">
+        <div class="row-between">
+          <span style="font-size:13px;font-weight:500;">Connections with you</span>
+          <span class="text-muted" style="font-size:11px;">3 shared projects</span>
+        </div>
+        <ul class="text-muted" style="margin:8px 0 0;padding-left:16px;font-size:12px;line-height:1.5;">
+          <li>Railway bridge · Katowice</li>
+          <li>Highway overpass · Silesia</li>
+          <li>Steel hall · Wrocław</li>
+        </ul>
+      </section>
+
+      <!-- Projects preview -->
+      <section class="mt-16">
+        <div class="section-title">RECENT PROJECTS</div>
+        <div class="card-soft" style="margin-bottom:8px;">
+          <div class="row-between">
+            <div class="col">
+              <span style="font-size:13px;font-weight:500;">Bridge launch · PL-204</span>
+              <span class="text-muted" style="font-size:11px;">Status · In progress</span>
+            </div>
+            <span class="badge-pill-accent">Active</span>
+          </div>
+        </div>
+        <div class="card-soft" style="margin-bottom:8px;">
+          <div class="row-between">
+            <div class="col">
+              <span style="font-size:13px;font-weight:500;">Steel assembly · Gdańsk</span>
+              <span class="text-muted" style="font-size:11px;">Status · Completed</span>
+            </div>
+            <span class="badge-pill">History</span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <nav class="bottom-nav">
+    <div class="bottom-nav-inner">
+      <a href="Feed.html" class="nav-item">
+        <div class="nav-icon">⌂</div>
+        <span>Feed</span>
+      </a>
+      <a href="Reels.html" class="nav-item">
+        <div class="nav-icon">▶</div>
+        <span>Reels</span>
+      </a>
+      <a href="Messenger.html" class="nav-item">
+        <div class="nav-icon">✉</div>
+        <span>Chat</span>
+      </a>
+      <a href="Profile.html" class="nav-item">
+        <div class="nav-icon">◎</div>
+        <span>Profile</span>
+      </a>
+    </div>
+  </nav>
+</body>
+</html>
