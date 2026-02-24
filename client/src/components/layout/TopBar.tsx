@@ -1,7 +1,6 @@
 import React from "react";
 import { Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import axiroLogo from "../../assets/axiro-logo.png"; // Если у тебя другой путь – поправим
 
 export default function TopBar() {
   const navigate = useNavigate();
@@ -15,38 +14,61 @@ export default function TopBar() {
         width: "100%",
         zIndex: 999,
         height: "64px",
-        background: "rgba(10,15,28,0.75)",
-        backdropFilter: "blur(12px)",
+        background: "rgba(6,11,24,0.9)",
+        backdropFilter: "blur(14px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
         padding: "0 16px",
-        borderBottom: "1px solid rgba(255,255,255,0.06)"
+        borderBottom: "1px solid rgba(255,255,255,0.06)",
       }}
     >
-      {/* ЛОГОТИП AXIRO */}
+      {/* ЛОГОТИП AXIRO (без картинки, кружок + текст) */}
       <div
-        style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}
+        style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}
         onClick={() => navigate("/feed")}
       >
-        <img
-          src={axiroLogo}
-          alt="AXIRO"
-          style={{ width: 36, height: 36, borderRadius: 10 }}
-        />
-        <span
+        <div
           style={{
-            fontSize: 20,
+            width: 32,
+            height: 32,
+            borderRadius: 12,
+            background:
+              "radial-gradient(circle at 30% 20%, #46f0ff 0, #2d7dff 35%, #7b2dff 100%)",
+            boxShadow: "0 0 18px rgba(80,120,255,0.9)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 14,
             fontWeight: 700,
             color: "#ffffff",
-            letterSpacing: 1,
           }}
         >
-          AXIRO
-        </span>
+          AX
+        </div>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <span
+            style={{
+              fontSize: 20,
+              fontWeight: 700,
+              color: "#ffffff",
+              letterSpacing: 1,
+            }}
+          >
+            AXIRO
+          </span>
+          <span
+            style={{
+              fontSize: 11,
+              color: "rgba(255,255,255,0.55)",
+            }}
+          >
+            сеть для исполнителей
+          </span>
+        </div>
       </div>
 
-      {/* КНОПКА МЕНЮ */}
+      {/* КНОПКА МЕНЮ (три полоски, ведёт в Настройки) */}
       <button
         onClick={() => navigate("/settings")}
         style={{
@@ -54,7 +76,7 @@ export default function TopBar() {
           height: 42,
           borderRadius: "50%",
           background: "rgba(255,255,255,0.05)",
-          border: "1px solid rgba(255,255,255,0.08)",
+          border: "1px solid rgba(255,255,255,0.1)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
