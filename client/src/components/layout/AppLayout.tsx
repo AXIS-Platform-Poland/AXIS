@@ -1,26 +1,24 @@
-// src/components/layout/AppLayout.tsx
 import React from "react";
-import "../../axiro.css";
+import TopBar from "./TopBar";
+import BottomNav from "./BottomNav";
 
-type AppLayoutProps = {
-  header?: React.ReactNode;
-  children: React.ReactNode;
-};
-
-/**
- * AppLayout — базовый каркас экрана AXIRO.
- * Сюда НЕ добавляем бизнес-логику, только структуру.
- */
-const AppLayout: React.FC<AppLayoutProps> = ({ header, children }) => {
+export default function AppLayout({ children }) {
   return (
-    <div className="app-shell">
-      {/* Верхний хедер (название экрана / логотип / действия) */}
-      {header}
+    <div
+      style={{
+        width: "100%",
+        minHeight: "100vh",
+        background: "#060B18",
+        paddingTop: "64px", // отступ, чтобы TopBar не перекрывал контент
+      }}
+    >
+      <TopBar />
 
-      {/* Основное содержимое экрана */}
-      <main className="app-content">{children}</main>
+      <div style={{ paddingBottom: "70px" }}>
+        {children}
+      </div>
+
+      <BottomNav />
     </div>
   );
-};
-
-export default AppLayout;
+}
